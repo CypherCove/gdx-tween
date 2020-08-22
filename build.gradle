@@ -1,0 +1,107 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        jcenter()
+    }
+    dependencies {
+
+    }
+}
+
+plugins {
+    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.8.4"
+}
+
+subprojects {
+    apply plugin: "idea"
+    apply plugin: "java"
+
+    ext {
+        gdxVersion = '1.9.11'
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
+    }
+}
+
+configure(subprojects.findAll {it.name != 'example'}) {
+    apply plugin: "java-library"
+
+    group = 'com.cyphercove.gdx-tween'
+    version = '0.1.0'
+
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allJava
+        archiveClassifier = 'sources'
+    }
+
+    task javadocJar(type: Jar) {
+        from javadoc
+        archiveClassifier = 'javadoc'
+    }
+
+    publishing {
+        publications {
+            "$projectId"(MavenPublication) {
+                artifactId = projectId
+                from components.java
+                artifact sourcesJar
+                artifact javadocJar
+                pom {
+                    name = projectId
+                    description = projectDescription
+                    url = 'https://github.com/CypherCove/gdx-tween'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    organization {
+                        name = 'Cypher Cove'
+                        url = 'www.cyphercove.com'
+                    }
+                    scm {
+                        connection = 'scm:git:git@github.com:cyphercove/gdx-tween.git'
+                        developerConnection = 'scm:git:git@cyphercove/gdx-tween.git'
+                        url = 'https://github.com/cyphercove/gdx-tween/'
+                    }
+                }
+            }
+        }
+    }
+
+    bintray {
+        user = System.getenv('BINTRAY_USER')
+        key = System.getenv('BINTRAY_KEY')
+        pkg {
+            repo = 'maven'
+            name = projectId
+            userOrg = 'cyphercove'
+            version {
+                name = rootProject.getVersion()
+                released  = new Date()
+            }
+            licenses = ['Apache-2.0']
+            vcsUrl = 'https://github.com/cyphercove/gdx-tween/'
+        }
+        publications = ['mavenJava']
+    }
+
+    javadoc {
+        if(JavaVersion.current().isJava9Compatible()) {
+            options.addBooleanOption('html5', true)
+        }
+    }
+}
