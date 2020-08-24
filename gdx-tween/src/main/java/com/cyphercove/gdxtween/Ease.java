@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * calling{@link com.badlogic.gdx.utils.Pool.Poolable}. Do not assign a single configurable ease to multiple Tweens because the
  * Tweens automatically free them to their pools when complete.
  */
-public interface Ease {
+public abstract class Ease {
     /**
      * @param a     The progress in the interpolation (for example, elapsed time over total duration).
      *              The value is clamped between 0 and 1.
@@ -37,7 +37,7 @@ public interface Ease {
      * @param end   Where the value should be when {@code a} is 1
      * @return the interpolated value between the given start and end values
      */
-    float apply (float a, float start, float end);
+    public abstract float apply (float a, float start, float end);
 
     /**
      * Provides the derivative of the ease function at a given amount of progress.
@@ -50,34 +50,35 @@ public interface Ease {
      * value change over fraction of total duration. Multiplying this value by the total duration of
      * the ease gives the world speed of the ease.
      */
-    float speed (float a, float start, float end);
+    public abstract float speed (float a, float start, float end);
 
     /**
      * If the ease is poolable, this returns it to its pool. Call only when it will no longer be used.
      */
-    void free ();
+    public void free () {}
 
     /**
      * Eases that are blendable support setting the starting speed of the function so it can smoothly
      * blend from another Ease that it is interrupting.
      */
-    interface BlendableEase extends Ease, Pool.Poolable {
+    public abstract static class BlendableEase extends Ease implements Pool.Poolable {
         /**
          * Set the start speed of the function, in units of value change over total duration. World
          * speed should be divided by total ease duration before passing it in.
          * @param startSpeed The beginning speed for the transition.
          * @return The Ease for building.
          */
-        @NotNull BlendableEase startSpeed (float startSpeed);
+        @NotNull
+        public abstract BlendableEase startSpeed (float startSpeed);
 
         /** @return the start speed of the function. */
-        float getStartSpeed ();
+        public abstract float getStartSpeed ();
     }
 
     /* Immutable static eases --------------------------------------------------------------------*/
 
     @NotNull
-    Ease linear = new Ease() {
+    public static Ease linear = new Ease() {
 
         @Override
         public float apply (float a, float start, float end) {
@@ -93,15 +94,13 @@ public interface Ease {
             return end - start;
         }
 
-        @Override
-        public void free() { }
     };
 
     /**
      * A cubic Hermite spline that starts and ends with zero speed.
      */
     @NotNull
-    Ease smoothstep = new Ease() {
+    public static Ease smoothstep = new Ease() {
         @Override
         public float apply (float a, float start, float end) {
             if (a <= 0)
@@ -118,15 +117,13 @@ public interface Ease {
             return a * (6 - 6 * a) * (end - start);
         }
 
-        @Override
-        public void free() { }
     };
 
     /**
      * A quintic Hermite spline that starts and ends with zero speed and zero acceleration. By Ken Perlin.
      */
     @NotNull
-    Ease smootherstep = new Ease() {
+    public static Ease smootherstep = new Ease() {
         @Override
         public float apply (float a, float start, float end) {
             if (a <= 0)
@@ -143,13 +140,11 @@ public interface Ease {
             return a * a * (a * (a * 30 - 60) + 30) * (end - start);
         }
 
-        @Override
-        public void free() { }
     };
 
     /* Blendable eases --------------------------------------------------------------------------*/
 
-    class CubicHermite implements BlendableEase {
+    public static class CubicHermite extends BlendableEase {
         float startSpeed, endSpeed;
 
         @Override
@@ -180,7 +175,7 @@ public interface Ease {
         }
 
         public void free () {
-            Pools.free(this);
+            cubicPool.free(this);
         }
 
         @Override
@@ -221,6 +216,13 @@ public interface Ease {
         }
     }
 
+    private static Pool<CubicHermite> cubicPool = new Pool<CubicHermite>() {
+        @Override
+        protected CubicHermite newObject() {
+            return new CubicHermite();
+        }
+    };
+
     /**
      * A cubic Hermite function whose starting and ending speeds can be specified.  The
      * function is equivalent to smoothstep if the starting and ending speeds are 0. This ease can
@@ -229,11 +231,11 @@ public interface Ease {
      * @return A cubic hermite ease
      */
     @NotNull
-    static CubicHermite cubic () {
-        return Pools.obtain(CubicHermite.class);
+    public static CubicHermite cubic () {
+        return cubicPool.obtain();
     }
 
-    class QuinticHermite extends CubicHermite {
+    public static class QuinticHermite extends CubicHermite {
 
         @Override
         @NotNull
@@ -247,6 +249,11 @@ public interface Ease {
         public QuinticHermite endSpeed (float startSpeed) {
             super.endSpeed(startSpeed);
             return this;
+        }
+
+        @Override
+        public void free () {
+            cubicPool.free(this);
         }
 
         @Override
@@ -285,6 +292,13 @@ public interface Ease {
         }
     }
 
+    private static Pool<QuinticHermite> quniticPool = new Pool<QuinticHermite>() {
+        @Override
+        protected QuinticHermite newObject() {
+            return new QuinticHermite();
+        }
+    };
+
     /**
      * A quintic Hermite function whose starting and ending speeds can be specified. The starting and
      * ending acceleration will be zero. The function is equivalent to smootherstep if the starting
@@ -294,11 +308,11 @@ public interface Ease {
      * @return A quintic hermite ease
      */
     @NotNull
-    static QuinticHermite quintic () {
-        return Pools.obtain(QuinticHermite.class);
+    public static QuinticHermite quintic () {
+        return quniticPool.obtain();
     }
 
-    class InterpolationWrapper implements Ease, Pool.Poolable {
+    public static class InterpolationWrapper extends Ease implements Pool.Poolable {
         Interpolation interpolation = Interpolation.linear;
         float precision = 0.001f;
         float halfPrecision = 0.0005f;
@@ -361,7 +375,7 @@ public interface Ease {
      * @return An Ease that uses the function of an Interpolation.
      */
     @NotNull
-    static InterpolationWrapper wrap (@NotNull Interpolation interpolation) {
+    public static InterpolationWrapper wrap (@NotNull Interpolation interpolation) {
         InterpolationWrapper ease = Pools.obtain(InterpolationWrapper.class);
         ease.setInterpolation(interpolation);
         return ease;
@@ -377,7 +391,7 @@ public interface Ease {
      * @return An Ease that uses the function of an Interpolation.
      */
     @NotNull
-    static InterpolationWrapper wrap (@NotNull Interpolation interpolation, float speedPrecision) {
+    public static InterpolationWrapper wrap (@NotNull Interpolation interpolation, float speedPrecision) {
         InterpolationWrapper ease = Pools.obtain(InterpolationWrapper.class);
         ease.setInterpolation(interpolation);
         ease.setSpeedPrecision(speedPrecision);

@@ -335,6 +335,51 @@ public final class Tweens {
     }
 
     /**
+     * An LabColorTween that modifies the RGB channels of a Color only. The color is interpolated in CIELAB color space.
+     * This produces a very natural-looking color interpolation, but is computationally expensive.
+     *
+     * @param target   The Color whose RGB will be modified.
+     * @param endR     Final red value.
+     * @param endG     Final green value.
+     * @param endB     Final blue value.
+     * @param duration Duration of the tween.
+     * @param ease     The Ease to use.
+     * @return An LabColorTween that will automatically be returned to a pool when complete.
+     */
+    @NotNull
+    static public LabColorTween toViaLab(@NotNull Color target, float endR, float endG, float endB, float duration,
+                                         @Nullable Ease ease) {
+        return tween(LabColorTween.class)
+                .target(target)
+                .end(endR, endG, endB)
+                .duration(duration)
+                .ease(ease);
+    }
+
+    /**
+     * An LabColorTween that modifies all channels of a Color, including alpha. The RGB channels are interpolated in
+     * CIELAB color space. This produces a very natural-looking color interpolation, but is computationally expensive.
+     *
+     * @param target   The Color whose RGB will be modified.
+     * @param endR     Final red value.
+     * @param endG     Final green value.
+     * @param endB     Final blue value.
+     * @param endA     Final alpha value.
+     * @param duration Duration of the tween.
+     * @param ease     The Ease to use.
+     * @return An LabColorTween that will automatically be returned to a pool when complete.
+     */
+    @NotNull
+    static public LabColorTween toViaLab(@NotNull Color target, float endR, float endG, float endB, float endA,
+                                         float duration, @Nullable Ease ease) {
+        return tween(LabColorTween.class)
+                .target(target)
+                .end(endR, endG, endB, endA)
+                .duration(duration)
+                .ease(ease);
+    }
+
+    /**
      * An AccessorTween that modifies the alpha of a Color via an AlphaAccessor. This allows it to target the alpha of a
      * Color without interrupting other Color-related tweens (such as HsvColorTween) on the same Color. To support
      * interruption of this tween, the AlphaAccessor target should be stored in a field so it can be reused.

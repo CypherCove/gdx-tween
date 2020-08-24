@@ -299,15 +299,17 @@ public abstract class Tween<T, U> implements Pool.Poolable {
     /** Sets a tween to be chained after this one. If there is a completion listener or interruption
      * listener, they will be shared by the entire chain. The completion listener is only called when
      * the entire chain is completed without interruption. It will not complete if it loops.
+     * <p>
+     * This method is protected to expose a cleaner public API. Most subclasses will want to provide a method that
+     * allows automatic creation of subsequent tweens of the same type directly from parameters.
+     * </p>
      *
      * @param next Next tween to run in this sequential chain.
-     * @return The next tween that was passed in.
      */
-    public U next (U next){
+    protected void setNext (U next){
         //noinspection unchecked
         this.next = (Tween<T, U>)next;
         passChainParametersDown();
-        return next;
     }
 
     protected void passChainParametersDown (){

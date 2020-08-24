@@ -33,3 +33,9 @@ See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes an
 ## Basic Usage
 
 Coming soon...
+
+## License
+
+gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the ColorConversion class were 
+ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by this [MIT license](AC-COLORS_LICENSE.md).
+

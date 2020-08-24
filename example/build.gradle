@@ -1,7 +1,6 @@
 apply plugin: "java"
 
 dependencies {
-    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
     implementation project(":gdx-tween")
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"

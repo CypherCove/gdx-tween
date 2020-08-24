@@ -22,6 +22,9 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "java"
 
+    group = 'com.cyphercove.gdx-tween'
+    version = '0.1.0'
+
     ext {
         gdxVersion = '1.9.11'
     }
@@ -33,13 +36,14 @@ subprojects {
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
+
+    dependencies {
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    }
 }
 
 configure(subprojects.findAll {it.name != 'example'}) {
     apply plugin: "java-library"
-
-    group = 'com.cyphercove.gdx-tween'
-    version = '0.1.0'
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allJava
@@ -54,7 +58,9 @@ configure(subprojects.findAll {it.name != 'example'}) {
     publishing {
         publications {
             "$projectId"(MavenPublication) {
+                groupId = project.group
                 artifactId = projectId
+                version = project.version
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
