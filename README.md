@@ -37,5 +37,6 @@ Coming soon...
 ## License
 
 gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the ColorConversion class were 
-ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by this [MIT license](AC-COLORS_LICENSE.md).
+ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by the 
+[MIT license](gdx-tween/src/main/java/com/cyphercove/gdxtween/graphics/ColorConversion.java).
 
