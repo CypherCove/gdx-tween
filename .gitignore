@@ -125,5 +125,6 @@ Thumbs.db
 /ios-moe/xcode/native/
 
 ## Project specific
+/example/build/
 /gdx-tween/build/
 /gdx-tween-kt/build/
