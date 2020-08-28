@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,7 +74,7 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
             return;
         }
         if (vectorIndex == 0)
-            value %= 360f;
+            value = GtMathUtils.modulo(value, 360f);
         else
             value = MathUtils.clamp(value, 0f, 1f);
         HSV[vectorIndex] = value;

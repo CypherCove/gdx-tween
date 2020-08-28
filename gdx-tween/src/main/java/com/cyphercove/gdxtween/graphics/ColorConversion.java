@@ -34,19 +34,21 @@ import org.jetbrains.annotations.NotNull;
  * with some modifications to the formulas to optimize use with LibGDX.
  */
 public final class ColorConversion {
-    private ColorConversion() {}
+    private ColorConversion() {
+    }
 
-    private static final float X_D65 = .9505f;
-    private static final float Y_D65 = 1f;
+    private static final float X_D65 = 0.9505f;
     private static final float Z_D65 = 1.089f;
-    private static final float EPS_LAB = 216f / 24389f;
+    private static final float SIGMA_LAB = 6f / 29F;
+    private static final float SIGMA_LAB3 = SIGMA_LAB * SIGMA_LAB * SIGMA_LAB;
     private static final float KAP_LAB = 24389f / 27f;
-    private static final float MAX_ZERO_TOLERANCE = (float)Math.pow(10.0, -12.0);
 
     /**
      * Sets the RGB of the color from the input cylindrical CIELAB (aka HCL) color space.
+     *
      * @param color Output color.
-     * @param lchIn Input color array. Must be of at least length three.
+     * @param lchIn Input color array, with Luminance, chroma and hue angle in the first three indices respectively.
+     *              Length must be at least 3. The hue angle must be given in radians.
      */
     public static void fromLch(@NotNull Color color, @NotNull float[] lchIn) {
         lchToLab(lchIn);
@@ -56,8 +58,11 @@ public final class ColorConversion {
 
     /**
      * Outputs the RGB of the color in the cylindrical CIELAB (aka HCL) color space.
-     * @param color Input color.
-     * @param lchOut Array the result will be placed in. Must have length of at least three.
+     *
+     * @param color  Input color.
+     * @param lchOut Array the result will be placed in, with Luminance, chroma and hue angle in the first three indices
+     *               respectively. Length must be at least 3. The hue angle is in radians to save the step of converting
+     *               to degrees.
      */
     public static void toLch(@NotNull Color color, @NotNull float[] lchOut) {
         toXyz(color, lchOut);
@@ -65,6 +70,7 @@ public final class ColorConversion {
         labToLch(lchOut);
     }
 
+    /** XYZ in 0..1 range. */
     private static void toXyz(@NotNull Color color, @NotNull float[] xyzOut) {
         float r = invertGammaCorrection(color.r);
         float g = invertGammaCorrection(color.g);
@@ -83,13 +89,11 @@ public final class ColorConversion {
         color.b = applyGammaCorrection(0.055710120445510616f * x + -0.2040210505984867f * y + 1.0569959422543882f * z);
     }
 
+    /** XYZ in 0..1 range. */
     private static void xyzToLab(@NotNull float[] inOut) {
-        float xR = inOut[0] / X_D65;
-        float yR = inOut[1] / Y_D65;
-        float zR = inOut[2] / Z_D65;
-        float xF = forwardTransformXyz(xR);
-        float yF = forwardTransformXyz(yR);
-        float zF = forwardTransformXyz(zR);
+        float xF = forwardTransformXyz(inOut[0] / X_D65);
+        float yF = forwardTransformXyz(inOut[1]);
+        float zF = forwardTransformXyz(inOut[2] / Z_D65);
         inOut[0] = 116f * yF - 16f;
         inOut[1] = 500f * (xF - yF);
         inOut[2] = 200f * (yF - zF);
@@ -100,43 +104,37 @@ public final class ColorConversion {
         float a = inOut[1];
         float b = inOut[2];
         float yF = (L + 16f) / 116f;
-        float zF = (yF - b / 200f);
-        float xF = a / 500f + yF;
-        float xR = (float)Math.pow(xF, 3.0);
-        if (xR <= EPS_LAB) xR = (116f * xF - 16f) / KAP_LAB;
-        float yR = L > KAP_LAB * EPS_LAB ? (float)Math.pow((L + 16f) / 116f, 3.0) : L / KAP_LAB;
-        float zR = (float)Math.pow(zF, 3);
-        if (zR <= EPS_LAB) zR = (116f * zF - 16f) / KAP_LAB;
-        inOut[0] = xR * X_D65;
-        inOut[1] = yR * Y_D65;
-        inOut[2] = zR * Z_D65;
+        float zF = yF - b / 200f;
+        float xF = yF + a / 500f;
+        inOut[0] = X_D65 * (xF > SIGMA_LAB ? xF * xF * xF : (116f * xF - 16f) / KAP_LAB);
+        inOut[1] = L > KAP_LAB * SIGMA_LAB3 ? yF * yF * yF : L / KAP_LAB;
+        inOut[2] = Z_D65 * (zF > SIGMA_LAB ? zF * zF * zF : (116f * zF - 16f) / KAP_LAB);
     }
 
     private static void labToLch(@NotNull float[] inOut) {
         float a = inOut[1];
         float b = inOut[2];
-        if (b < MAX_ZERO_TOLERANCE) b = 0; // Round near zero to avoid weird atan2 behavior.
-        inOut[1] = (float)Math.sqrt(a * a + b * b);
-        inOut[2] = MathUtils.atan2(b, a) * MathUtils.radiansToDegrees;
-        if (inOut[2] < 0) inOut[2] += 360f;
+        inOut[1] = (float) Math.sqrt(a * a + b * b);
+        float h = MathUtils.atan2(b, a);
+        inOut[2] = h < 0f ? h + MathUtils.PI2 : h;
     }
 
     private static void lchToLab(@NotNull float[] inOut) {
         float c = inOut[1];
         float h = inOut[2];
-        inOut[1] = c * MathUtils.cos(h * MathUtils.degreesToRadians);
-        inOut[2] = c * MathUtils.sin(h * MathUtils.degreesToRadians);
+        inOut[1] = c * MathUtils.cos(h);
+        inOut[2] = c * MathUtils.sin(h);
     }
 
     private static float invertGammaCorrection(float component) {
-        return (component <= 0.04045f) ? component / 12.92f : (float)Math.pow((component + 0.055f) / 1.055f, 2.4);
+        return (component <= 0.04045f) ? component / 12.92f : (float) Math.pow((component + 0.055f) / 1.055f, 2.4);
     }
 
     private static float applyGammaCorrection(float component) {
-        return component <= 0.0031308f ? 12.92f * component : 1.055f * (float)Math.pow(component, 1.0 / 2.4) - 0.055f;
+        return component <= 0.0031308f ? 12.92f * component : 1.055f * (float) Math.pow(component, 1.0 / 2.4) - 0.055f;
     }
 
     private static float forwardTransformXyz(float component) {
-        return component > EPS_LAB ? (float)Math.pow(component, 1.0 / 3.0) : (KAP_LAB * component + 16f) / 116f;
+        return component > SIGMA_LAB3 ? (float) Math.cbrt(component) : (KAP_LAB * component + 16f) / 116f;
     }
 }

@@ -35,11 +35,10 @@ import static com.badlogic.gdx.math.MathUtils.random;
 public class Example extends ApplicationAdapter {
 	Texture texture, treeTexture, egg, wheel;
 	SpriteBatch spriteBatch;
-	PerspectiveCamera pCam;
+	PerspectiveCamera pCam = new PerspectiveCamera();
 	Stage stage;
 	Skin skin;
 	Viewport viewport;
-	TextureAtlas atlas;
 	Test test = Test.values()[0];
 	Sprite testSprite;
 	BitmapFont testFont;
@@ -60,7 +59,6 @@ public class Example extends ApplicationAdapter {
 		viewport = new ExtendViewport(W, H);
 
 		texture = new Texture("badlogic.jpg");
-		atlas = new TextureAtlas(Gdx.files.internal("pack"));
 
 		testSprite = new Sprite(texture);
 		testSprite.setPosition(50, 102);
