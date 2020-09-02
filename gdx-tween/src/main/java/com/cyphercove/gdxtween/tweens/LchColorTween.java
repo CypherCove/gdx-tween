@@ -15,13 +15,11 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.tweens;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
 import com.cyphercove.gdxtween.graphics.ColorConversion;
-import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,18 +72,14 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
                 target.a = value; // clamped in applyAfter()
             return;
         }
-        if (vectorIndex == 2)
-            value = GtMathUtils.modulo(value, MathUtils.PI2);
-        else
+        if (vectorIndex != 2)
             value = Math.max(0f, value);
         LCH[vectorIndex] = value;
     }
 
     @Override
     protected void applyAfter() {
-        if (Gdx.input.isButtonJustPressed(0)) Gdx.app.log("interpolated LCH", LCH[0] + " " + LCH[1] + " " + LCH[2]);
         ColorConversion.fromLch(target, LCH);
-        if (Gdx.input.isButtonJustPressed(0)) Gdx.app.log("color before clamp", "rgb: " + target.r + " " + target.g + " " + target.b);
         target.clamp();
     }
 

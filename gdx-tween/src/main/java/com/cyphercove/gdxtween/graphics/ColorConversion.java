@@ -25,6 +25,7 @@ package com.cyphercove.gdxtween.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
+import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -51,9 +52,15 @@ public final class ColorConversion {
      *              Length must be at least 3. The hue angle must be given in radians.
      */
     public static void fromLch(@NotNull Color color, @NotNull float[] lchIn) {
+        float l = lchIn[0];
+        float c = lchIn[1];
+        float h = lchIn[2];
         lchToLab(lchIn);
         labToXyz(lchIn);
         fromXyz(color, lchIn);
+        lchIn[0] = l;
+        lchIn[1] = c;
+        lchIn[2] = h;
     }
 
     /**
@@ -115,7 +122,7 @@ public final class ColorConversion {
         float a = inOut[1];
         float b = inOut[2];
         inOut[1] = (float) Math.sqrt(a * a + b * b);
-        float h = MathUtils.atan2(b, a);
+        float h = GtMathUtils.atan2(b, a); // MathUtils is not accurate enough.
         inOut[2] = h < 0f ? h + MathUtils.PI2 : h;
     }
 
