@@ -31,7 +31,7 @@ interface Tweener {
 }
 
 /** A basic implementation of [Tweener] that can be used as a delegate. */
-class CompanionTweenManager: Tweener {
+class DelegateTweenManager: Tweener {
     override val tweenManager = TweenManager()
     override val alphaTweenManager = TweenManager()
 }
