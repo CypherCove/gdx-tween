@@ -79,8 +79,7 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
 
     @Override
     protected void applyAfter() {
-        ColorConversion.fromLch(target, LCH);
-        target.clamp();
+        ColorConversion.fromLch(target, LCH[0], LCH[1], LCH[2]);
     }
 
     @Override

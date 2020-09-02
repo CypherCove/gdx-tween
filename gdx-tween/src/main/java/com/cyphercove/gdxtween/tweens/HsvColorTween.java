@@ -31,6 +31,7 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
     private float endR, endG, endB, endA;
     private boolean modifyAlpha;
 
+    private static final float SATURATION_THRESHOLD = 1 / 255f; // TODO determine optimal
     private static final float[] HSV = new float[3];
 
     public HsvColorTween(){
@@ -41,7 +42,8 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
     protected void begin () {
         target.toHsv(HSV);
         float startHue = HSV[0];
-        setStartValue(1, HSV[1]);
+        float startSaturation = HSV[1];
+        setStartValue(1, startSaturation);
         setStartValue(2, HSV[2]);
 
         float r = target.r;
@@ -58,7 +60,11 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
         target.g = g;
         target.b = b;
 
-        if (startHue - endHue > 180f)
+        if (startSaturation < SATURATION_THRESHOLD)
+            startHue = endHue;
+        else if (HSV[1] < SATURATION_THRESHOLD)
+            endHue = startHue;
+        else if (startHue - endHue > 180f)
             endHue += 360f;
         else if (endHue - startHue > 180f)
             startHue += 360f;
