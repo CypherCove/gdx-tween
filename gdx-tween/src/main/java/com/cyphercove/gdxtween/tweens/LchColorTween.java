@@ -19,7 +19,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
-import com.cyphercove.gdxtween.graphics.ColorConversion;
+import com.cyphercove.gdxtween.graphics.GtColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
 
     @Override
     protected void begin () {
-        ColorConversion.toLch(target, LCH);
+        GtColor.toLch(target, LCH);
         setStartValue(0, LCH[0]);
         float startChroma = LCH[1];
         setStartValue(1, startChroma);
@@ -50,7 +50,7 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
         target.r = endR;
         target.g = endG;
         target.b = endB;
-        ColorConversion.toLch(target, LCH);
+        GtColor.toLch(target, LCH);
         setEndValue(0, LCH[0]);
         setEndValue(1, LCH[1]);
         float endHue = LCH[2];
@@ -58,9 +58,9 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
         target.g = g;
         target.b = b;
 
-        if (startChroma < ColorConversion.CHROMA_THRESHOLD)
+        if (startChroma < GtColor.CHROMA_THRESHOLD)
             startHue = endHue;
-        else if (LCH[1] < ColorConversion.CHROMA_THRESHOLD)
+        else if (LCH[1] < GtColor.CHROMA_THRESHOLD)
             endHue = startHue;
         else if (startHue - endHue > MathUtils.PI)
             endHue += MathUtils.PI2;
@@ -84,7 +84,7 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
 
     @Override
     protected void applyAfter() {
-        ColorConversion.fromLch(target, LCH[0], LCH[1], LCH[2]);
+        GtColor.fromLch(target, LCH[0], LCH[1], LCH[2]);
     }
 
     @Override

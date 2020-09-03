@@ -34,8 +34,8 @@ import org.jetbrains.annotations.NotNull;
  * This is a port of parts of the Javascript library <a href="https://github.com/vinaypillai/ac-colors">ac-colors</a>,
  * with some modifications to the formulas to optimize use with LibGDX.
  */
-public final class ColorConversion {
-    private ColorConversion() {
+public final class GtColor {
+    private GtColor() {
     }
 
     /**

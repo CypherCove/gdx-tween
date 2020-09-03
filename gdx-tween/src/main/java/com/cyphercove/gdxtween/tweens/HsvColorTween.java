@@ -20,7 +20,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
-import com.cyphercove.gdxtween.graphics.ColorConversion;
+import com.cyphercove.gdxtween.graphics.GtColor;
 import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,9 +60,9 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
         target.g = g;
         target.b = b;
 
-        if (startSaturation < ColorConversion.SATURATION_THRESHOLD)
+        if (startSaturation < GtColor.SATURATION_THRESHOLD)
             startHue = endHue;
-        else if (HSV[1] < ColorConversion.SATURATION_THRESHOLD)
+        else if (HSV[1] < GtColor.SATURATION_THRESHOLD)
             endHue = startHue;
         else if (startHue - endHue > 180f)
             endHue += 360f;
