@@ -40,7 +40,8 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
     protected void begin () {
         ColorConversion.toLch(target, LCH);
         setStartValue(0, LCH[0]);
-        setStartValue(1, LCH[1]);
+        float startChroma = LCH[1];
+        setStartValue(1, startChroma);
         float startHue = LCH[2];
 
         float r = target.r;
@@ -57,7 +58,11 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
         target.g = g;
         target.b = b;
 
-        if (startHue - endHue > MathUtils.PI)
+        if (startChroma < ColorConversion.CHROMA_THRESHOLD)
+            startHue = endHue;
+        else if (LCH[1] < ColorConversion.CHROMA_THRESHOLD)
+            endHue = startHue;
+        else if (startHue - endHue > MathUtils.PI)
             endHue += MathUtils.PI2;
         else if (endHue - startHue > MathUtils.PI)
             startHue += MathUtils.PI2;

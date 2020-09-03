@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.graphics.ColorConversion;
 import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,6 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
     private float endR, endG, endB, endA;
     private boolean modifyAlpha;
 
-    private static final float SATURATION_THRESHOLD = 1 / 255f; // TODO determine optimal
     private static final float[] HSV = new float[3];
 
     public HsvColorTween(){
@@ -43,7 +43,7 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
         target.toHsv(HSV);
         float startHue = HSV[0];
         float startSaturation = HSV[1];
-        setStartValue(1, startSaturation);
+        setStartValue(1, HSV[1]);
         setStartValue(2, HSV[2]);
 
         float r = target.r;
@@ -60,9 +60,9 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
         target.g = g;
         target.b = b;
 
-        if (startSaturation < SATURATION_THRESHOLD)
+        if (startSaturation < ColorConversion.SATURATION_THRESHOLD)
             startHue = endHue;
-        else if (HSV[1] < SATURATION_THRESHOLD)
+        else if (HSV[1] < ColorConversion.SATURATION_THRESHOLD)
             endHue = startHue;
         else if (startHue - endHue > 180f)
             endHue += 360f;

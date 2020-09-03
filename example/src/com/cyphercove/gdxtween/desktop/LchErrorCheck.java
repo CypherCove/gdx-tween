@@ -23,6 +23,18 @@ public class LchErrorCheck {
     private static final Color COLOR = new Color(1f, 1f, 1f, 1f);
     private static final float[] LCH = new float[3];
 
+    public static void main(String[] args) {
+        int maxError = 0;
+        for (int r = 0; r < 255; r++) {
+            for (int g = 0; g < 255; g++) {
+                for (int b = 0; b < 255; b++) {
+                    maxError = Math.max(maxError, checkRoundTrip(r, g, b));
+                }
+            }
+        }
+        System.out.println("Max error: " + maxError);
+    }
+
     private static int checkRoundTrip(int r, int g, int b) {
         int rgba = (r << 24) | (g << 16) | (b << 8) | 255;
         Color.rgba8888ToColor(COLOR, rgba);
@@ -32,10 +44,7 @@ public class LchErrorCheck {
         int outR = (out & 0xff000000) >>> 24;
         int outG = (out & 0x00ff0000) >>> 16;
         int outB = (out & 0x0000ff00) >>> 8;
-        int maxError = Math.abs(outR - r);
-        maxError = Math.max(maxError, Math.abs(outG - g));
-        maxError = Math.max(maxError, Math.abs(outB - b));
-        return maxError;
+        return Math.abs(outR - r) + Math.abs(outG - g) + Math.abs(outB - b);
     }
 
 }
