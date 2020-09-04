@@ -18,9 +18,12 @@ package com.cyphercove.gdxtween
 import com.cyphercove.gdxtween.tweens.AlphaTween
 
 /**
- * An owner of two [TweenRunner]s. Use this interface to be able to start [Tween]s without passing the tween runner
- * explicitly and to automatically handle AlphaTweens separately by the [alphaTweenRunner] so alpha can be modified
+ * An owner of two [TweenRunner]s. Use this interface to be able to start [Tween]s without passing the [TweenRunner]
+ * explicitly and to automatically handle [AlphaTween]s separately in the [alphaTweenRunner] so alpha can be modified
  * independently without interrupting or being interrupted by color tweens.
+ *
+ * When using []TweenManager], under most circumstances, it should not be necessary to access either [TweenRunner]
+ * directly. Instead, the extension functions should be used to start and clear tweens and step both runners.
  */
 interface TweenManager {
     val tweenRunner: TweenRunner

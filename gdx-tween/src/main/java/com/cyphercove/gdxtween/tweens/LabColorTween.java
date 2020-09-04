@@ -23,68 +23,49 @@ import com.cyphercove.gdxtween.graphics.GtColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** A tween for interpolating the components of a {@linkplain Color}, modifying the RGB in the cylindrical CIELAB
+/** A tween for interpolating the components of a {@linkplain Color}, modifying the RGB in the CIELAB (aka Lab)
  * color space. If an alpha component is not set, alpha will not be modified on the target object by this Tween. */
-public class LchColorTween extends Tween<Color, LchColorTween> {
+public class LabColorTween extends Tween<Color, LabColorTween> {
 
-    private float endR, endG, endB, endA;
+    private float endR, endG, endB;
     private boolean modifyAlpha;
+    private final float[] lab = new float[3];
 
-    private static final float[] LCH = new float[3];
+    private static final float[] TMP_SHARED_1 = new float[3];
+    private static final float[] TMP_SHARED_2 = new float[3];
 
-    public LchColorTween(){
-        super(3);
+    public LabColorTween(){
+        super(4);
     }
 
     @Override
     protected void begin () {
-        GtColor.toLch(target, LCH);
-        setStartValue(0, LCH[0]);
-        float startChroma = LCH[1];
-        setStartValue(1, startChroma);
-        float startHue = LCH[2];
+        GtColor.toLab(target, TMP_SHARED_1);
+        GtColor.toLab(endR, endG, endB, TMP_SHARED_2);
+        for (int i = 0; i < 3; i++) {
+            setStartValue(i, TMP_SHARED_1[i]);
+            setEndValue(i, TMP_SHARED_2[i]);
+        }
 
-        float r = target.r;
-        float g = target.g;
-        float b = target.b;
-        target.r = endR;
-        target.g = endG;
-        target.b = endB;
-        GtColor.toLch(target, LCH);
-        setEndValue(0, LCH[0]);
-        setEndValue(1, LCH[1]);
-        float endHue = LCH[2];
-        target.r = r;
-        target.g = g;
-        target.b = b;
-
-        if (startChroma < GtColor.CHROMA_THRESHOLD)
-            startHue = endHue;
-        else if (LCH[1] < GtColor.CHROMA_THRESHOLD)
-            endHue = startHue;
-        else if (startHue - endHue > MathUtils.PI)
-            endHue += MathUtils.PI2;
-        else if (endHue - startHue > MathUtils.PI)
-            startHue += MathUtils.PI2;
-        setStartValue(2, startHue);
-        setEndValue(2, endHue);
+        if (modifyAlpha)
+            setStartValue(3, target.a);
     }
 
     @Override
     protected void apply (int vectorIndex, float value) {
         if (vectorIndex == 3) {
             if (modifyAlpha)
-                target.a = value; // clamped in applyAfter()
+                target.a = MathUtils.clamp(value, 0f, 1f);
             return;
         }
         if (vectorIndex != 2)
             value = Math.max(0f, value);
-        LCH[vectorIndex] = value;
+        lab[vectorIndex] = value;
     }
 
     @Override
     protected void applyAfter() {
-        GtColor.fromLch(target, LCH[0], LCH[1], LCH[2]);
+        GtColor.fromLab(target, lab[0], lab[1], lab[2]);
     }
 
     @Override
@@ -95,7 +76,7 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
     }
 
     @NotNull
-    public LchColorTween end (float r, float g, float b){
+    public LabColorTween end (float r, float g, float b){
         endR = r;
         endG = g;
         endB = b;
@@ -104,11 +85,11 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
     }
 
     @NotNull
-    public LchColorTween end (float r, float g, float b, float a){
+    public LabColorTween end (float r, float g, float b, float a){
         endR = r;
         endG = g;
         endB = b;
-        endA = a;
+        setEndValue(3, a);
         modifyAlpha = true;
         return this;
     }
@@ -130,7 +111,7 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
 
     /** @return the final alpha value set, or -1 if an end alpha is not set. */
     public float getEndA () {
-        return modifyAlpha ? endA : -1f;
+        return modifyAlpha ? getEndValue(3) : -1f;
     }
 
     /**
@@ -144,8 +125,8 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
      * @return An HsvColorTween that will automatically be returned to a pool when this chain is complete.
      */
     @NotNull
-    public LchColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
-        LchColorTween tween = Tweens.toViaLch(target, endR, endG, endB, duration, ease);
+    public LabColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
+        LabColorTween tween = Tweens.toViaLab(target, endR, endG, endB, duration, ease);
         setNext(tween);
         return tween;
     }
@@ -162,8 +143,8 @@ public class LchColorTween extends Tween<Color, LchColorTween> {
      * @return An HsvColorTween that will automatically be returned to a pool when this chain is complete.
      */
     @NotNull
-    public LchColorTween thenTo (float endR, float endG, float endB, float endA, float duration, @Nullable Ease ease){
-        LchColorTween tween = Tweens.toViaLch(target, endR, endG, endB, endA, duration, ease);
+    public LabColorTween thenTo (float endR, float endG, float endB, float endA, float duration, @Nullable Ease ease){
+        LabColorTween tween = Tweens.toViaLab(target, endR, endG, endB, endA, duration, ease);
         setNext(tween);
         return tween;
     }

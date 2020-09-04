@@ -291,6 +291,50 @@ public final class Tweens {
     }
 
     /**
+     * An RgbColorTween that modifies the RGB channels of a Color only. The color is interpolated in RGB color space.
+     *
+     * @param target   The Color whose RGB will be modified.
+     * @param endR     Final red value.
+     * @param endG     Final green value.
+     * @param endB     Final blue value.
+     * @param duration Duration of the tween.
+     * @param ease     The Ease to use.
+     * @return An RgbColorTween that will automatically be returned to a pool when complete.
+     */
+    @NotNull
+    static public RgbColorTween toViaRgb(@NotNull Color target, float endR, float endG, float endB, float duration,
+                                         @Nullable Ease ease) {
+        return tween(RgbColorTween.class)
+                .target(target)
+                .end(endR, endG, endB)
+                .duration(duration)
+                .ease(ease);
+    }
+
+    /**
+     * An RgbColorTween that modifies all channels of a Color, including alpha. The RGB channels are interpolated in RGB
+     * color space.
+     *
+     * @param target   The Color whose RGB will be modified.
+     * @param endR     Final red value.
+     * @param endG     Final green value.
+     * @param endB     Final blue value.
+     * @param endA     Final alpha value.
+     * @param duration Duration of the tween.
+     * @param ease     The Ease to use.
+     * @return An RgbColorTween that will automatically be returned to a pool when complete.
+     */
+    @NotNull
+    static public RgbColorTween toViaRgb(@NotNull Color target, float endR, float endG, float endB, float endA,
+                                         float duration, @Nullable Ease ease) {
+        return tween(RgbColorTween.class)
+                .target(target)
+                .end(endR, endG, endB, endA)
+                .duration(duration)
+                .ease(ease);
+    }
+
+    /**
      * An HsvColorTween that modifies the RGB channels of a Color only. The color is interpolated in HSV color space.
      *
      * @param target   The Color whose RGB will be modified.
@@ -335,8 +379,8 @@ public final class Tweens {
     }
 
     /**
-     * An LabColorTween that modifies the RGB channels of a Color only. The color is interpolated in cylindrical CIELAB
-     * color space. This produces a very natural-looking color interpolation, but is computationally expensive.
+     * An LabColorTween that modifies the RGB channels of a Color only. The color is interpolated in CIELAB (aka Lab)
+     * color space. This produces a very even-looking color interpolation, but is computationally expensive.
      *
      * @param target   The Color whose RGB will be modified.
      * @param endR     Final red value.
@@ -347,9 +391,9 @@ public final class Tweens {
      * @return An LabColorTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public LchColorTween toViaLch(@NotNull Color target, float endR, float endG, float endB, float duration,
+    static public LabColorTween toViaLab(@NotNull Color target, float endR, float endG, float endB, float duration,
                                          @Nullable Ease ease) {
-        return tween(LchColorTween.class)
+        return tween(LabColorTween.class)
                 .target(target)
                 .end(endR, endG, endB)
                 .duration(duration)
@@ -358,7 +402,7 @@ public final class Tweens {
 
     /**
      * An LabColorTween that modifies all channels of a Color, including alpha. The RGB channels are interpolated in
-     * cylindrical CIELAB color space. This produces a very natural-looking color interpolation, but is computationally
+     * CIELAB (aka Lab) color space. This produces a very even-looking color interpolation, but is computationally
      * expensive.
      *
      * @param target   The Color whose RGB will be modified.
@@ -371,9 +415,9 @@ public final class Tweens {
      * @return An LabColorTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public LchColorTween toViaLch(@NotNull Color target, float endR, float endG, float endB, float endA,
+    static public LabColorTween toViaLab(@NotNull Color target, float endR, float endG, float endB, float endA,
                                          float duration, @Nullable Ease ease) {
-        return tween(LchColorTween.class)
+        return tween(LabColorTween.class)
                 .target(target)
                 .end(endR, endG, endB, endA)
                 .duration(duration)

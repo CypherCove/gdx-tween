@@ -16,55 +16,62 @@
 package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.graphics.Color;
-
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
 import com.cyphercove.gdxtween.graphics.GtColor;
-import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** A tween for interpolating the components of a {@linkplain Color}, modifying the RGB in the HSV color space. If an
+/** A tween for interpolating the components of a {@linkplain Color}, modifying the RGB in the RGB color space. If an
  * alpha component is not set, alpha will not be modified on the target object by this Tween. */
-public class HsvColorTween extends Tween<Color, HsvColorTween> {
+public class RgbColorTween extends Tween<Color, RgbColorTween> {
+
+    private static boolean useGammaCorrection = true;
+
+    /**
+     * Whether RgbColorTweens interpolate in linear (gamma correction removed) color space, which yields smoother results.
+     * @return The current value of the setting. True if using linear color space.
+     */
+    public static boolean isUseGammaCorrection() {
+        return useGammaCorrection;
+    }
+
+    /**
+     * Sets whether RgbColorTweens interpolate in linear (gamma correction removed) color space, which yields smoother
+     * results. Default true.
+     * <p>
+     * This setting should not be changed while tweens are in progress.
+     * @param useGammaCorrection Whether to interpolate in linear color space.
+     */
+    public static void setUseGammaCorrection(boolean useGammaCorrection) {
+        RgbColorTween.useGammaCorrection = useGammaCorrection;
+    }
 
     private float endR, endG, endB;
     private boolean modifyAlpha;
 
-    private final float[] hsv = new float[3];
-
-    private static final float[] TMP_SHARED_1 = new float[3];
-    private static final Color TMP_SHARED_2 = new Color();
-
-    public HsvColorTween(){
+    public RgbColorTween(){
         super(4);
     }
 
     @Override
     protected void begin () {
-        target.toHsv(TMP_SHARED_1);
-        float startHue = TMP_SHARED_1[0];
-        float startSaturation = TMP_SHARED_1[1];
-        setStartValue(1, TMP_SHARED_1[1]);
-        setStartValue(2, TMP_SHARED_1[2]);
-
-        TMP_SHARED_2.set(endR, endG, endB, 1f).toHsv(TMP_SHARED_1);
-        float endHue = hsv[0];
-        setEndValue(1, TMP_SHARED_1[1]);
-        setEndValue(2, TMP_SHARED_1[2]);
-
-        if (startSaturation < GtColor.SATURATION_THRESHOLD)
-            startHue = endHue;
-        else if (hsv[1] < GtColor.SATURATION_THRESHOLD)
-            endHue = startHue;
-        else if (startHue - endHue > 180f)
-            endHue += 360f;
-        else if (endHue - startHue > 180f)
-            startHue += 360f;
-        setStartValue(0, startHue);
-        setEndValue(0, endHue);
-
+        if (useGammaCorrection) {
+            setStartValue(0, GtColor.invertGammaCorrection(target.r));
+            setStartValue(1, GtColor.invertGammaCorrection(target.g));
+            setStartValue(2, GtColor.invertGammaCorrection(target.b));
+            setEndValue(0, GtColor.invertGammaCorrection(endR));
+            setEndValue(1, GtColor.invertGammaCorrection(endG));
+            setEndValue(2, GtColor.invertGammaCorrection(endB));
+        } else {
+            setStartValue(0, target.r);
+            setStartValue(1, target.g);
+            setStartValue(2, target.b);
+            setEndValue(0, endR);
+            setEndValue(1, endG);
+            setEndValue(2, endB);
+        }
         if (modifyAlpha)
             setStartValue(3, target.a);
     }
@@ -76,27 +83,34 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
                 target.a = MathUtils.clamp(value, 0f, 1f);
             return;
         }
-        if (vectorIndex == 0)
-            value = GtMathUtils.modulo(value, 360f);
+        if (useGammaCorrection)
+            value = MathUtils.clamp(GtColor.applyGammaCorrection(value), 0f, 1f);
         else
             value = MathUtils.clamp(value, 0f, 1f);
-        hsv[vectorIndex] = value;
-    }
-
-    @Override
-    protected void applyAfter() {
-        target.fromHsv(hsv[0], hsv[1], hsv[2]);
+        switch (vectorIndex){
+            case 0:
+                target.r = value;
+                break;
+            case 1:
+                target.g = value;
+                break;
+            case 2:
+                target.b = value;
+                break;
+        }
     }
 
     @Override
     protected void applyAfterComplete() {
-        target.r = endR;
-        target.g = endG;
-        target.b = endB;
+        if (useGammaCorrection) {
+            target.r = endR;
+            target.g = endG;
+            target.b = endB;
+        }
     }
 
     @NotNull
-    public HsvColorTween end (float r, float g, float b){
+    public RgbColorTween end (float r, float g, float b){
         endR = r;
         endG = g;
         endB = b;
@@ -105,7 +119,7 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
     }
 
     @NotNull
-    public HsvColorTween end (float r, float g, float b, float a){
+    public RgbColorTween end (float r, float g, float b, float a){
         endR = r;
         endG = g;
         endB = b;
@@ -135,7 +149,7 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
     }
 
     /**
-     * Adds another HsvColorTween to the end of this chain and returns it. The tween that modifies the RGB channels of
+     * Adds another LabColorTween to the end of this chain and returns it. The tween that modifies the RGB channels of
      * the Color only.
      * @param endR     Final red value.
      * @param endG     Final green value.
@@ -145,14 +159,14 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
      * @return An HsvColorTween that will automatically be returned to a pool when this chain is complete.
      */
     @NotNull
-    public HsvColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
-        HsvColorTween tween = Tweens.toViaHsv(target, endR, endG, endB, duration, ease);
+    public RgbColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
+        RgbColorTween tween = Tweens.toViaRgb(target, endR, endG, endB, duration, ease);
         setNext(tween);
         return tween;
     }
 
     /**
-     * Adds another HsvColorTween to the end of this chain and returns it. The tween modifies all channels of the Color,
+     * Adds another LabColorTween to the end of this chain and returns it. The tween modifies all channels of the Color,
      * including alpha.
      * @param endR     Final red value.
      * @param endG     Final green value.
@@ -163,8 +177,8 @@ public class HsvColorTween extends Tween<Color, HsvColorTween> {
      * @return An HsvColorTween that will automatically be returned to a pool when this chain is complete.
      */
     @NotNull
-    public HsvColorTween thenTo (float endR, float endG, float endB, float endA, float duration, @Nullable Ease ease){
-        HsvColorTween tween = Tweens.toViaHsv(target, endR, endG, endB, endA, duration, ease);
+    public RgbColorTween thenTo (float endR, float endG, float endB, float endA, float duration, @Nullable Ease ease){
+        RgbColorTween tween = Tweens.toViaRgb(target, endR, endG, endB, endA, duration, ease);
         setNext(tween);
         return tween;
     }

@@ -22,11 +22,11 @@ them in IntelliJ at **Settings | Editor | Inspections | Java | Probable bugs**.
 ## Installation
 When stable, gdx-tween will be available on JCenter. For now, you can publish to Maven local and use:
 
-    compile "com.cyphercove.gdx-tween:gdx-tween:0.1.0"
+    implementation "com.cyphercove.gdx-tween:gdx-tween:0.1.0"
     
 If using Kotlin, use gdx-tween-kt instead, which includes features for more concise syntax:
 
-    compile "com.cyphercove.gdx-tween:gdx-tween-kt:0.1.0"
+    implementation "com.cyphercove.gdx-tween:gdx-tween-kt:0.1.0"
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and LibGDX version increases.
 
@@ -38,5 +38,5 @@ Coming soon...
 
 gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the ColorConversion class were 
 ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by the 
-[MIT license](gdx-tween/src/main/java/com/cyphercove/gdxtween/graphics/ColorConversion.java).
+[MIT license](LICENSE-AC-COLORS.md).
 
