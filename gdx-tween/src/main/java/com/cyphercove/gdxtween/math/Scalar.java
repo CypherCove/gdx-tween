@@ -25,8 +25,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
-/** A 1D {@link Vector}, or mutable float wrapper. */
-public class Scalar implements Serializable, Vector<Scalar> {
+/** A mutable float wrapper, or 1D vector. */
+public class Scalar implements Serializable, Vector<Scalar> { // Vector is implemented for the sake of inheriting docs.
     public static final long serialVersionUID = -3345823286435278757L;
 
     public final static Scalar Zero = new Scalar(0);
@@ -72,7 +72,14 @@ public class Scalar implements Serializable, Vector<Scalar> {
         return this;
     }
 
+    /**
+     * Limits the length of this vector, based on the desired maximum length squared.
+     * @deprecated This method is not faster for a 1D vector. Use {@link #limit} instead.
+     * @param limit2 Squared size limit
+     * @return This vector.
+     */
     @Override
+    @Deprecated
     @NotNull public Scalar limit2 (float limit2) {
         return limit((float) Math.sqrt(limit2));
     }
@@ -83,8 +90,17 @@ public class Scalar implements Serializable, Vector<Scalar> {
         return this;
     }
 
+    /**
+     * ets the length of this vector, based on the square of the desired length. Does nothing if this vector is zero.
+     * @deprecated This method is not faster for a 1D vector. Use {@link #setLength} instead.
+     * @param len2 Squared length to set.
+     * @return This vector.
+     */
     @Override
+    @Deprecated
     @NotNull public Scalar setLength2 (float len2) {
+        if (len2 == 0f)
+            return setLength(0f);
         return setLength((float) Math.sqrt(len2));
     }
 

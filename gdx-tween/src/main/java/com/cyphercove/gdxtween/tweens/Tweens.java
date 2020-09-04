@@ -436,7 +436,7 @@ public final class Tweens {
      * @return An AccessorTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public AccessorTween toAlpha(@NotNull AlphaAccessor target, float endA, float duration, @Nullable Ease ease) {
+    static public AccessorTween alphaTo(@NotNull AlphaAccessor target, float endA, float duration, @Nullable Ease ease) {
         AccessorTween tween = accessor(target, duration, ease);
         tween.end(0, endA);
         return tween;
@@ -455,7 +455,7 @@ public final class Tweens {
      * @return An AlphaTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public AlphaTween toAlpha(@NotNull Color target, float endA, float duration, @Nullable Ease ease) {
+    static public AlphaTween alphaTo(@NotNull Color target, float endA, float duration, @Nullable Ease ease) {
         return tween(AlphaTween.class)
                 .target(target)
                 .end(endA)
