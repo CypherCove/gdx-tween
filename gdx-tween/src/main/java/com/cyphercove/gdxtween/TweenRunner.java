@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Runs submitted {@linkplain Tween Tweens}.
  * <p>
- * {@link #step(float)} should be called on the TweenManager once per frame to update all Tweens.
+ * {@link #step(float)} should be called on the {@link TweenRunner} once per frame to update all Tweens.
  * <p>
  * Behaviors:
  * <ul>
@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
  *     <li>Tweens with pools are automatically freed upon completion.</li>
  * </ul>
  */
-public class TweenManager {
+public class TweenRunner {
     /* It is known Tweens will only ever interrupt a tween targeting the exact same instance of something, so
           1. It is safe to treat the target types as Object, because they will are only passed between Tweens and
              associated listeners targeting the same type.

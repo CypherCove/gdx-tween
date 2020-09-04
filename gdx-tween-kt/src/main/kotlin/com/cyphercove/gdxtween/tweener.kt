@@ -18,20 +18,37 @@ package com.cyphercove.gdxtween
 import com.cyphercove.gdxtween.tweens.AlphaTween
 
 /**
- * An owner of two TweenManagers. Use this interface to be able to start Tweens without passing the tween manager
- * explicitly. AlphaTweens will be handled separately by the [alphaTweenManager] so alpha can be modified independently
+ * An owner of two [TweenRunner]s. Use this interface to be able to start [Tween]s without passing the tween runner
+ * explicitly. AlphaTweens will be handled separately by the [alphaTweenRunner] so alpha can be modified independently
  * without interrupting color tweens.
  */
 interface Tweener {
-    val tweenManager: TweenManager
-    val alphaTweenManager: TweenManager
+    val tweenRunner: TweenRunner
+    val alphaTweenRunner: TweenRunner
 
-    fun Tween<*, *>.start() = start(tweenManager)
-    fun AlphaTween.start() = start(alphaTweenManager)
+    /**
+     * Starts the tween using the [tweenRunner].
+     */
+    fun Tween<*, *>.start() = start(tweenRunner)
+
+    /**
+     * Starts the AlphaTween using the [alphaTweenRunner].
+     */
+    fun AlphaTween.start() = start(alphaTweenRunner)
+}
+
+/**
+ * Removes any running or pending (delayed) tweens for the target object immediately, from both runners. No listener
+ * will be called.
+ * @param target The target object whose tween or tween chain is to be removed.
+ * @return Whether a tween or tween chain existed and was removed.
+ */
+fun Tweener.clearTweens(target: Any): Boolean {
+    return tweenRunner.clearTweens(target) or alphaTweenRunner.clearTweens(target)
 }
 
 /** A basic implementation of [Tweener] that can be used as a delegate. */
 class DelegateTweenManager: Tweener {
-    override val tweenManager = TweenManager()
-    override val alphaTweenManager = TweenManager()
+    override val tweenRunner = TweenRunner()
+    override val alphaTweenRunner = TweenRunner()
 }

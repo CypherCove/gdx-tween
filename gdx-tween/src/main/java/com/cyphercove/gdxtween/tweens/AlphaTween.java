@@ -22,7 +22,8 @@ import org.jetbrains.annotations.NotNull;
 
 /** A tween for changing the alpha component of a {@linkplain Color}. It does not modify the
  * RGB components. Since there cannot be multiple Tweens targeting the same object, it will interrupt other types of
- * Color tweens. To treat RGB and Alpha independently, a second TweenManager dedicated to AlphaTweens may be used.*/
+ * Color tweens. To treat RGB and Alpha independently, a second {@link com.cyphercove.gdxtween.TweenRunner TweenRunner}
+ * dedicated to AlphaTweens may be used.*/
 public class AlphaTween extends Tween<Color, AlphaTween> {
 
     private float endA;

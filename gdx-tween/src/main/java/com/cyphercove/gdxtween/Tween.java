@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 
 /**
- * Base class for tweens that can smoothly interrupt each other with TweenManager.
+ * Base class for tweens that can smoothly interrupt each other with {@link TweenRunner}.
  * <p>
  * Derived from the {@linkplain com.badlogic.gdx.scenes.scene2d.actions.TemporalAction TemporalAction} class.
  * </p>
@@ -34,7 +34,7 @@ import java.util.Arrays;
 public abstract class Tween<T, U> implements Pool.Poolable {
     private float delay, delayTime, duration, time;
     private Ease ease;
-    /** Whether the TweenManager should set this tween's speed to the current speed of any tween it
+    /** Whether the {@link TweenRunner} should set this tween's speed to the current speed of any tween it
      * interrupts, provided the Ease is Blendable. */
     private boolean shouldBlend = true;
     /** If true, the ease's start speeds should be overwritten with the values in the startSpeeds array as the ease is used. */
@@ -80,10 +80,10 @@ public abstract class Tween<T, U> implements Pool.Poolable {
      * <p>Any member of a tween chain can be submitted to the manager, but it will always start at
      * the head of the chain.</p>
      *
-     * @param tweenManager The TweenManager to run the transition.
+     * @param tweenRunner The {@link TweenRunner} to run the transition.
      */
-    public void start (@NotNull TweenManager tweenManager){
-        tweenManager.start(this);
+    public void start (@NotNull TweenRunner tweenRunner){
+        tweenRunner.start(this);
     }
 
     private void resetHead (){
@@ -243,7 +243,7 @@ public abstract class Tween<T, U> implements Pool.Poolable {
     }
 
     /**
-     * Sets the target object that will be transitioned by the tween. The {@linkplain TweenManager}
+     * Sets the target object that will be transitioned by the tween. The {@linkplain TweenRunner}
      * only allows a single tween or tween chain per target object. Adding a new tween to the manager
      * with the same target will interrupt any ongoing tween with the same target.
      * @param target The target object to be transitioned.
@@ -466,14 +466,14 @@ public abstract class Tween<T, U> implements Pool.Poolable {
         return shouldBlend;
     }
 
-    /** Sets whether the TweenManager should make this tween start at the same speed as any tween
+    /** Sets whether the {@link TweenRunner} should make this tween start at the same speed as any tween
      * that it is interrupting. This is only possible if using a
      * {@linkplain com.cyphercove.gdxtween.Ease.BlendableEase BlendableEase}. If this is set true,
      * any starting speed set on the ease will be ignored if this tween interrupts another tween. If
      * this occurs but the tween loops, the original start speed will be used when it repeats. Also,
      * if this is set true and it has a delay, any currently running tween on the same target will
      * not be interrupted until the delay runs out, regardless of the type of ease.
-     * @param shouldBlend Whether this TweenManager should attempt to blend the speeds from any
+     * @param shouldBlend Whether this {@link TweenRunner} should attempt to blend the speeds from any
      *                    interrupted tween.
      * @return This tween for building.
      */

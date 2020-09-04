@@ -402,7 +402,7 @@ public final class Tweens {
      * An AlphaTween that modifies the alpha channel of the Color target only. Since the Color is the target, this tween
      * will interrupt other Color-related tweens (such as HsvColorTween) on the same target. If distinct manipulation of
      * the Color's RGB and A is desired, either use an {@linkplain AlphaAccessor} as the target instead, or create a
-     * separate TweenManager dedicated to AlphaTweens.
+     * separate {@link com.cyphercove.gdxtween.TweenRunner TweenRunner} dedicated to AlphaTweens.
      *
      * @param target   The Color whose alpha will be modified.
      * @param endA     Final alpha value.
