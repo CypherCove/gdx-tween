@@ -24,9 +24,8 @@ import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import com.cyphercove.gdxtween.math.ScalarInt;
-import com.cyphercove.gdxtween.tweens.accessors.AlphaAccessor;
 import com.cyphercove.gdxtween.Ease;
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.TargetingTween;
 import com.cyphercove.gdxtween.math.Scalar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -41,7 +40,7 @@ public final class Tweens {
     static private final IntMap<Pool<AccessorTween>> accessorPools = new IntMap<>();
 
     @NotNull
-    static public <T extends Tween<?, T>> T tween(Class<T> type) {
+    static public <T extends TargetingTween<?, T>> T tween(Class<T> type) {
         Pool<T> pool = Pools.get(type);
         T tween = pool.obtain();
         tween.pool(pool);
@@ -291,7 +290,8 @@ public final class Tweens {
     }
 
     /**
-     * An RgbColorTween that modifies the RGB channels of a Color only. The color is interpolated in RGB color space.
+     * A ColorTween which only modifies the RGB channels of a Color. Defaults to LinearRgb color space. A ColorTween can
+     * run on the same target as an {@link AlphaTween} without them interrupting each other.
      *
      * @param target   The Color whose RGB will be modified.
      * @param endR     Final red value.
@@ -299,12 +299,12 @@ public final class Tweens {
      * @param endB     Final blue value.
      * @param duration Duration of the tween.
      * @param ease     The Ease to use.
-     * @return An RgbColorTween that will automatically be returned to a pool when complete.
+     * @return A ColorTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public RgbColorTween toViaRgb(@NotNull Color target, float endR, float endG, float endB, float duration,
-                                         @Nullable Ease ease) {
-        return tween(RgbColorTween.class)
+    static public ColorTween toRgb(@NotNull Color target, float endR, float endG, float endB, float duration,
+                                   @Nullable Ease ease) {
+        return tween(ColorTween.class)
                 .target(target)
                 .end(endR, endG, endB)
                 .duration(duration)
@@ -312,141 +312,28 @@ public final class Tweens {
     }
 
     /**
-     * An RgbColorTween that modifies all channels of a Color, including alpha. The RGB channels are interpolated in RGB
-     * color space.
+     * A ColorTween which only modifies the RGB channels of a Color. Defaults to LinearRgb color space. A ColorTween can
+     * run on the same target as an {@link AlphaTween} without them interrupting each other.
      *
      * @param target   The Color whose RGB will be modified.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
-     * @param endA     Final alpha value.
+     * @param end      A Color containing the the target values. The reference is not retained by the tween.
      * @param duration Duration of the tween.
      * @param ease     The Ease to use.
-     * @return An RgbColorTween that will automatically be returned to a pool when complete.
+     * @return A ColorTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public RgbColorTween toViaRgb(@NotNull Color target, float endR, float endG, float endB, float endA,
-                                         float duration, @Nullable Ease ease) {
-        return tween(RgbColorTween.class)
-                .target(target)
-                .end(endR, endG, endB, endA)
-                .duration(duration)
-                .ease(ease);
-    }
-
-    /**
-     * An HsvColorTween that modifies the RGB channels of a Color only. The color is interpolated in HSV color space.
-     *
-     * @param target   The Color whose RGB will be modified.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
-     * @param duration Duration of the tween.
-     * @param ease     The Ease to use.
-     * @return An HsvColorTween that will automatically be returned to a pool when complete.
-     */
-    @NotNull
-    static public HsvColorTween toViaHsv(@NotNull Color target, float endR, float endG, float endB, float duration,
+    static public ColorTween toRgb(@NotNull Color target, @NotNull Color end, float duration,
                                          @Nullable Ease ease) {
-        return tween(HsvColorTween.class)
+        return tween(ColorTween.class)
                 .target(target)
-                .end(endR, endG, endB)
+                .end(end.r, end.g, end.b)
                 .duration(duration)
                 .ease(ease);
     }
 
     /**
-     * An HsvColorTween that modifies all channels of a Color, including alpha. The RGB channels are interpolated in HSV
-     * color space.
-     *
-     * @param target   The Color whose RGB will be modified.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
-     * @param endA     Final alpha value.
-     * @param duration Duration of the tween.
-     * @param ease     The Ease to use.
-     * @return An HsvColorTween that will automatically be returned to a pool when complete.
-     */
-    @NotNull
-    static public HsvColorTween toViaHsv(@NotNull Color target, float endR, float endG, float endB, float endA,
-                                         float duration, @Nullable Ease ease) {
-        return tween(HsvColorTween.class)
-                .target(target)
-                .end(endR, endG, endB, endA)
-                .duration(duration)
-                .ease(ease);
-    }
-
-    /**
-     * An LabColorTween that modifies the RGB channels of a Color only. The color is interpolated in CIELAB (aka Lab)
-     * color space. This produces a very even-looking color interpolation, but is computationally expensive.
-     *
-     * @param target   The Color whose RGB will be modified.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
-     * @param duration Duration of the tween.
-     * @param ease     The Ease to use.
-     * @return An LabColorTween that will automatically be returned to a pool when complete.
-     */
-    @NotNull
-    static public LabColorTween toViaLab(@NotNull Color target, float endR, float endG, float endB, float duration,
-                                         @Nullable Ease ease) {
-        return tween(LabColorTween.class)
-                .target(target)
-                .end(endR, endG, endB)
-                .duration(duration)
-                .ease(ease);
-    }
-
-    /**
-     * An LabColorTween that modifies all channels of a Color, including alpha. The RGB channels are interpolated in
-     * CIELAB (aka Lab) color space. This produces a very even-looking color interpolation, but is computationally
-     * expensive.
-     *
-     * @param target   The Color whose RGB will be modified.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
-     * @param endA     Final alpha value.
-     * @param duration Duration of the tween.
-     * @param ease     The Ease to use.
-     * @return An LabColorTween that will automatically be returned to a pool when complete.
-     */
-    @NotNull
-    static public LabColorTween toViaLab(@NotNull Color target, float endR, float endG, float endB, float endA,
-                                         float duration, @Nullable Ease ease) {
-        return tween(LabColorTween.class)
-                .target(target)
-                .end(endR, endG, endB, endA)
-                .duration(duration)
-                .ease(ease);
-    }
-
-    /**
-     * An AccessorTween that modifies the alpha of a Color via an AlphaAccessor. This allows it to target the alpha of a
-     * Color without interrupting other Color-related tweens (such as HsvColorTween) on the same Color. To support
-     * interruption of this tween, the AlphaAccessor target should be stored in a field so it can be reused.
-     *
-     * @param target   The AlphaAccessor whose target Color's alpha will be modified.
-     * @param endA     Final alpha value.
-     * @param duration Duration of the tween.
-     * @param ease     The Ease to use.
-     * @return An AccessorTween that will automatically be returned to a pool when complete.
-     */
-    @NotNull
-    static public AccessorTween alphaTo(@NotNull AlphaAccessor target, float endA, float duration, @Nullable Ease ease) {
-        AccessorTween tween = accessor(target, duration, ease);
-        tween.end(0, endA);
-        return tween;
-    }
-
-    /**
-     * An AlphaTween that modifies the alpha channel of the Color target only. Since the Color is the target, this tween
-     * will interrupt other Color-related tweens (such as HsvColorTween) on the same target. If distinct manipulation of
-     * the Color's RGB and A is desired, either use an {@linkplain AlphaAccessor} as the target instead, or create a
-     * separate {@link com.cyphercove.gdxtween.TweenRunner TweenRunner} dedicated to AlphaTweens.
+     * An AlphaTween that modifies the alpha channel of the Color target only. It can run on the same target as a
+     * {@link ColorTween} without them interrupting each other.
      *
      * @param target   The Color whose alpha will be modified.
      * @param endA     Final alpha value.
@@ -455,7 +342,7 @@ public final class Tweens {
      * @return An AlphaTween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public AlphaTween alphaTo(@NotNull Color target, float endA, float duration, @Nullable Ease ease) {
+    static public AlphaTween toAlpha(@NotNull Color target, float endA, float duration, @Nullable Ease ease) {
         return tween(AlphaTween.class)
                 .target(target)
                 .end(endA)

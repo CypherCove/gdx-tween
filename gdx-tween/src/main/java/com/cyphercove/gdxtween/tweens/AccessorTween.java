@@ -15,14 +15,14 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.tweens;
 
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.TargetingTween;
 import org.jetbrains.annotations.NotNull;
 
 /** An AccessorTween uses an Accessor as its target. An Accessor provides an indirect way to target specific fields
  * of an object without making the object the tween's target. This is necessary if an object has fields that should be
  * modified independently.
  */
-public class AccessorTween extends Tween<AccessorTween.Accessor, AccessorTween> {
+public class AccessorTween extends TargetingTween<AccessorTween.Accessor, AccessorTween> {
 
     public interface Accessor {
         /**

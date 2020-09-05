@@ -17,10 +17,10 @@ package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.math.Vector3;
 
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.TargetingTween;
 import org.jetbrains.annotations.NotNull;
 
-public class Vector3Tween extends Tween<Vector3, Vector3Tween> {
+public class Vector3Tween extends TargetingTween<Vector3, Vector3Tween> {
 
     public Vector3Tween (){
         super(3);

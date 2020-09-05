@@ -17,9 +17,8 @@ package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.graphics.Color;
 import com.cyphercove.gdxtween.Ease;
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.TargetingTween;
 import com.cyphercove.gdxtween.math.Scalar;
-import com.cyphercove.gdxtween.tweens.accessors.AlphaAccessor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * RGB components. Since there cannot be multiple Tweens targeting the same object, it will interrupt other types of
  * Color tweens. To treat RGB and Alpha independently, a second {@link com.cyphercove.gdxtween.TweenRunner TweenRunner}
  * dedicated to AlphaTweens may be used.*/
-public class AlphaTween extends Tween<Color, AlphaTween> {
+public class AlphaTween extends TargetingTween<Color, AlphaTween> {
 
     private float endA;
 
@@ -70,7 +69,7 @@ public class AlphaTween extends Tween<Color, AlphaTween> {
      * @return An AlphaTween that will automatically be returned to a pool when complete.
      */
     public AlphaTween thenTo(float endA, float duration, @Nullable Ease ease) {
-        AlphaTween tween = Tweens.alphaTo(target, endA, duration, ease);
+        AlphaTween tween = Tweens.toAlpha(target, endA, duration, ease);
         setNext(tween);
         return tween;
     }

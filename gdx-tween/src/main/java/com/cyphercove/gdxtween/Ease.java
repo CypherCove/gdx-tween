@@ -23,7 +23,7 @@ import com.badlogic.gdx.utils.Pools;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Easing functions that can be used with {@linkplain Tween Tweens}. Non-configurable eases are provided
+ * Easing functions that can be used with {@linkplain TargetingTween Tweens}. Non-configurable eases are provided
  * as static immutable members. Configurable eases are provided via function calls. These configurable
  * eases are pulled from {@linkplain Pool Pools} and can automatically be returned to their pools by
  * calling{@link com.badlogic.gdx.utils.Pool.Poolable}. Do not assign a single configurable ease to multiple Tweens because the
@@ -226,7 +226,7 @@ public abstract class Ease {
     /**
      * A cubic Hermite function whose starting and ending speeds can be specified.  The
      * function is equivalent to smoothstep if the starting and ending speeds are 0. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain Tween Tweens}.
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetingTween Tweens}.
      *
      * @return A cubic hermite ease
      */
@@ -303,7 +303,7 @@ public abstract class Ease {
      * A quintic Hermite function whose starting and ending speeds can be specified. The starting and
      * ending acceleration will be zero. The function is equivalent to smootherstep if the starting
      * and ending speeds are 0. This ease can be freed to a pool. Do not assign a single instance to
-     * multiple {@linkplain Tween Tweens}.
+     * multiple {@linkplain TargetingTween Tweens}.
      *
      * @return A quintic hermite ease
      */
@@ -369,7 +369,7 @@ public abstract class Ease {
 
     /**
      * A wrapper for {@linkplain Interpolation Interpolations} so they can be used as Eases. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain Tween Tweens}.
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetingTween Tweens}.
      *
      * @param interpolation The Interpolation to wrap.
      * @return An Ease that uses the function of an Interpolation.
@@ -383,7 +383,7 @@ public abstract class Ease {
 
     /**
      * A wrapper for {@linkplain Interpolation Interpolations} so they can be used as Eases. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain Tween Tweens}.
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetingTween Tweens}.
      *
      * @param interpolation  The Interpolation to wrap.
      * @param speedPrecision The precision to use when calculating the speed of this ease. This is the

@@ -111,7 +111,7 @@ public class VectorInterruption extends ExampleScreen {
             Tweens.to(position, temp.x, temp.y, 1f, Ease.quintic())
                     .shouldBlend(shouldBlend)
                     .start(tweenRunner);
-            Tweens.alphaTo(clickColor, 1f, 0.05f, Ease.wrap(Interpolation.pow2In))
+            Tweens.toAlpha(clickColor, 1f, 0.05f, Ease.wrap(Interpolation.pow2In))
                     .thenTo(0f, 0.3f, null).delay(0.1f)
                     .start(tweenRunner);
             return true;

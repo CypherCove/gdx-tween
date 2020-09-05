@@ -16,10 +16,10 @@
 package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.math.GridPoint3;
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.TargetingTween;
 import org.jetbrains.annotations.NotNull;
 
-public class GridPoint3Tween extends Tween<GridPoint3, GridPoint3Tween> {
+public class GridPoint3Tween extends TargetingTween<GridPoint3, GridPoint3Tween> {
 
     public GridPoint3Tween(){
         super(3);

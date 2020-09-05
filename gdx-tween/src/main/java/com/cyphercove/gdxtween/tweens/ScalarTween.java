@@ -15,11 +15,11 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.tweens;
 
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.TargetingTween;
 import com.cyphercove.gdxtween.math.Scalar;
 import org.jetbrains.annotations.NotNull;
 
-public class ScalarTween extends Tween<Scalar, ScalarTween> {
+public class ScalarTween extends TargetingTween<Scalar, ScalarTween> {
 
     public ScalarTween (){
         super(1);
