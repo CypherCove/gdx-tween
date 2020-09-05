@@ -16,9 +16,12 @@
 package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.graphics.Color;
+import com.cyphercove.gdxtween.Ease;
 import com.cyphercove.gdxtween.Tween;
 import com.cyphercove.gdxtween.math.Scalar;
+import com.cyphercove.gdxtween.tweens.accessors.AlphaAccessor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** A tween for changing the alpha component of a {@linkplain Color}. It does not modify the
  * RGB components. Since there cannot be multiple Tweens targeting the same object, it will interrupt other types of
@@ -56,5 +59,19 @@ public class AlphaTween extends Tween<Color, AlphaTween> {
 
     public float getEnd (){
         return getEndValue(0);
+    }
+
+    /**
+     * Adds another AlphaTween to the end of this chain and returns it.
+     *
+     * @param endA     Final alpha value.
+     * @param duration Duration of the tween.
+     * @param ease     The Ease to use.
+     * @return An AlphaTween that will automatically be returned to a pool when complete.
+     */
+    public AlphaTween thenTo(float endA, float duration, @Nullable Ease ease) {
+        AlphaTween tween = Tweens.alphaTo(target, endA, duration, ease);
+        setNext(tween);
+        return tween;
     }
 }

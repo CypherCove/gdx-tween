@@ -15,12 +15,27 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.desktop;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.ScreenAdapter;
 
-public class DesktopLauncher {
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new ExampleRunner(), config);
-	}
+public abstract class ExampleScreen extends ScreenAdapter {
+
+    protected final SharedAssets sharedAssets;
+    private final ExamplesParent examplesParent;
+
+    public ExampleScreen(SharedAssets sharedAssets, ExamplesParent examplesParent) {
+        this.sharedAssets = sharedAssets;
+        this.examplesParent = examplesParent;
+    }
+
+    protected final void setScreenInputProcessors(InputProcessor... processors) {
+        examplesParent.setScreenInputProcessors(processors);
+    }
+
+    abstract protected String getName();
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

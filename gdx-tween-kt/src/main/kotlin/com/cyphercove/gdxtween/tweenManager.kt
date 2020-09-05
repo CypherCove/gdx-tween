@@ -38,24 +38,24 @@ interface TweenManager {
      * Starts the AlphaTween using the [alphaTweenRunner].
      */
     fun AlphaTween.start() = start(alphaTweenRunner)
-}
 
-/** Must be called for every frame of animation to advance all of the tweens in both runners. When using this function,
- * the step functions of the two runners should not be called directly.
- * @param delta The time passed since the last step. */
-fun TweenManager.stepTweens(dt: Float) {
-    tweenRunner.step(dt)
-    alphaTweenRunner.step(dt)
-}
+    /** Must be called for every frame of animation to advance all of the tweens in both runners. When using this function,
+     * the step functions of the two runners should not be called directly.
+     * @param delta The time passed since the last step. */
+    fun TweenManager.stepTweens(dt: Float) {
+        tweenRunner.step(dt)
+        alphaTweenRunner.step(dt)
+    }
 
-/**
- * Removes any running or pending (delayed) tweens for the target object immediately, from both runners. No listener
- * will be called.
- * @param target The target object whose tween or tween chain is to be removed.
- * @return Whether a tween or tween chain existed and was removed.
- */
-fun TweenManager.clearTweens(target: Any): Boolean {
-    return tweenRunner.clearTweens(target) or alphaTweenRunner.clearTweens(target)
+    /**
+     * Removes any running or pending (delayed) tweens for the target object immediately, from both runners. No listener
+     * will be called.
+     * @param target The target object whose tween or tween chain is to be removed.
+     * @return Whether a tween or tween chain existed and was removed.
+     */
+    fun TweenManager.clearTweens(target: Any): Boolean {
+        return tweenRunner.clearTweens(target) or alphaTweenRunner.clearTweens(target)
+    }
 }
 
 /** A basic implementation of [TweenManager] that can be used as a delegate. */

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.cyphercove.gdxtween.desktop;
+package com.cyphercove.gdxtween.desktop.utilities;
 
 import com.badlogic.gdx.graphics.Color;
 import com.cyphercove.gdxtween.graphics.GtColor;

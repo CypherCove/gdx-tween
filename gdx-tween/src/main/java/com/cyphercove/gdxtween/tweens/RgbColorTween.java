@@ -166,7 +166,7 @@ public class RgbColorTween extends Tween<Color, RgbColorTween> {
     }
 
     /**
-     * Adds another LabColorTween to the end of this chain and returns it. The tween modifies all channels of the Color,
+     * Adds another RgbColorTween to the end of this chain and returns it. The tween modifies all channels of the Color,
      * including alpha.
      * @param endR     Final red value.
      * @param endG     Final green value.
@@ -174,7 +174,7 @@ public class RgbColorTween extends Tween<Color, RgbColorTween> {
      * @param endA     Final alpha value.
      * @param duration Duration of the tween.
      * @param ease     The Ease to use.
-     * @return An HsvColorTween that will automatically be returned to a pool when this chain is complete.
+     * @return An RgbColorTween that will automatically be returned to a pool when this chain is complete.
      */
     @NotNull
     public RgbColorTween thenTo (float endR, float endG, float endB, float endA, float duration, @Nullable Ease ease){

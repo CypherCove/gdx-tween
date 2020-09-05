@@ -24,7 +24,7 @@ When stable, gdx-tween will be available on JCenter. For now, you can publish to
 
     implementation "com.cyphercove.gdx-tween:gdx-tween:0.1.0"
     
-If using Kotlin, use gdx-tween-kt instead, which includes features for more concise syntax:
+If using Kotlin, use gdx-tween-kt instead, which includes features for streamlined usage:
 
     implementation "com.cyphercove.gdx-tween:gdx-tween-kt:0.1.0"
 
@@ -36,7 +36,7 @@ Coming soon...
 
 ## License
 
-gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the ColorConversion class were 
+gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the GtColor class were 
 ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by the 
 [MIT license](LICENSE-AC-COLORS.md).
 
