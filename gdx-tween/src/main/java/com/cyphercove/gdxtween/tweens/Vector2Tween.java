@@ -17,16 +17,34 @@ package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.math.Vector2;
 
-import com.cyphercove.gdxtween.TargetingTween;
+import com.badlogic.gdx.utils.Pool;
+import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
-public class Vector2Tween extends TargetingTween<Vector2, Vector2Tween> {
+public class Vector2Tween extends TargetTween<Vector2, Vector2Tween> {
+
+    private static final Pool<Vector2Tween> POOL = new Pool<Vector2Tween>() {
+        @Override
+        protected Vector2Tween newObject() {
+            return new Vector2Tween();
+        }
+    };
+
+    public static Vector2Tween newInstance() {
+        return POOL.obtain();
+    }
 
     public Vector2Tween (){
         super(2);
     }
 
+    @Override
+    public @NotNull Class<Vector2> getTargetType() {
+        return Vector2.class;
+    }
+
     protected void begin () {
+        super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
     }
@@ -62,5 +80,11 @@ public class Vector2Tween extends TargetingTween<Vector2, Vector2Tween> {
 
     public float getEndY (){
         return getEndValue(1);
+    }
+
+    @Override
+    public void free() {
+        super.free();
+        POOL.free(this);
     }
 }

@@ -15,14 +15,38 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.tweens;
 
-import com.cyphercove.gdxtween.TargetingTween;
+import com.badlogic.gdx.utils.IntMap;
+import com.badlogic.gdx.utils.Pool;
+import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
 /** An AccessorTween uses an Accessor as its target. An Accessor provides an indirect way to target specific fields
  * of an object without making the object the tween's target. This is necessary if an object has fields that should be
  * modified independently.
  */
-public class AccessorTween extends TargetingTween<AccessorTween.Accessor, AccessorTween> {
+public class AccessorTween extends TargetTween<AccessorTween.Accessor, AccessorTween> {
+
+    static private final IntMap<Pool<AccessorTween>> accessorPools = new IntMap<>();
+
+    @NotNull
+    static private Pool<AccessorTween> getPool(final int vectorSize) {
+        Pool<AccessorTween> pool = accessorPools.get(vectorSize);
+        if (pool == null) {
+            pool = new Pool<AccessorTween>(100) {
+                @Override
+                protected AccessorTween newObject() {
+                    return new AccessorTween(vectorSize);
+                }
+            };
+            accessorPools.put(vectorSize, pool);
+        }
+        return pool;
+    }
+
+    @NotNull
+    static AccessorTween newInstance(int vectorSize) {
+        return getPool(vectorSize).obtain();
+    }
 
     public interface Accessor {
         /**
@@ -56,6 +80,7 @@ public class AccessorTween extends TargetingTween<AccessorTween.Accessor, Access
     }
 
     protected void begin () {
+        super.begin();
         for (int i = 0; i < getVectorSize(); i++) {
             setStartValue(i, target.getValue(i));
         }
@@ -75,4 +100,14 @@ public class AccessorTween extends TargetingTween<AccessorTween.Accessor, Access
         return super.getEndValue(vectorIndex);
     }
 
+    @Override
+    public @NotNull Class<Accessor> getTargetType() {
+        return Accessor.class;
+    }
+
+    @Override
+    public void free() {
+        super.free();
+        getPool(vectorSize).free(this);
+    }
 }

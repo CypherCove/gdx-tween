@@ -16,8 +16,6 @@
 package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IdentityMap;
-import com.badlogic.gdx.utils.ObjectMap;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 
 /**
- * Runs submitted {@linkplain TargetingTween Tweens}.
+ * Runs submitted {@linkplain Tween Tweens}.
  * <p>
  * {@link #step(float)} should be called on the {@link TweenRunner} once per frame to update all Tweens.
  * <p>
@@ -38,95 +36,56 @@ import java.util.Iterator;
  * </ul>
  */
 public class TweenRunner {
-    /* It is known Tweens will only ever interrupt a tween targeting the exact same instance of something, so
-          1. It is safe to treat the target types as Object, because they will are only passed between Tweens and
-             associated listeners targeting the same type.
-          2. It is safe to cast all Tweens to Tween<Object, ?> because they will only ever interrupt another Tween
-             of matching type.
-     */
-    private final Array<TargetingTween<Object, ?>> tweens = new Array<>();
-    private final Array<TargetingTween<Object, ?>> delayedTweens = new Array<>();
-    private final Array<TargetingTween<?, ?>> tmpTweens = new Array<>();
-    private final ObjectMap<Object, TweenCompletionListener<?>> tmpListeners = new IdentityMap<>();
 
-    /** Adds a tween or tween chain to the manager. Only one tween or tween chain can be running on
-     * the same target. If the tween is marked {@linkplain TargetingTween#isShouldBlend()} and has a delay, it
-     * will not interrupt any existing tween until its delay runs out but it will cancel any other
-     * delayed tween in the same state. If {@linkplain TargetingTween#isShouldBlend()} is false, it will immediately
-     * interrupt any existing tween on the same target before its delay starts.
+    private final Array<Tween<?, ?>> tweens = new Array<>();
+    private final Array<Tween<?, ?>> tmpTweens = new Array<>();
+
+    /**
+     * Adds a tween or tween chain to the manager.
      *
-     * @param tween The tween or member of a tween chain to start.
+     * @param tween The tween to start.
      */
-    public void start (@NotNull TargetingTween<?, ?> tween){
-        @SuppressWarnings("unchecked")
-        // Any tween in a chain can be submitted but always start at the head.
-        TargetingTween<Object, TargetingTween<Object, ?>> headTween = (TargetingTween<Object, TargetingTween<Object, ?>>)tween.head;
-        Object target = headTween.getTarget();
-        TargetingTween<Object, ?> interruptedTween = null;
-        for (TargetingTween<Object, ?> candidate : tweens){
-            if (candidate.checkInterruption(tween, null)){
-                interruptedTween = candidate;
-            }
+    public <T, U> void start (@NotNull Tween<T, U> tween){
+        if (tween.isAttached()) {
+            throw new IllegalStateException("Tween was already started: " + tween);
         }
-        boolean shouldBlend = interruptedTween != null && //TODO move before checkInterruption and pass world speeds array if not delayed
-                interruptedTween.getClass().equals(headTween.getClass()) &&
-                headTween.isShouldBlend();
+        tween.setAttached(true);
 
-        if (shouldBlend && !headTween.isDelayComplete()){
-            // Defer submission to allow existing tween to continue running until delay runs out.
-            // but cancel any queued tween on same target
-            TargetingTween<?, ?> cancelledTween = null;
-
-            for (TargetingTween<Object, ?> candidate : delayedTweens){
-                if (candidate.checkInterruption(tween.head, null)){
-                    cancelledTween = candidate;
+        // Handle interruption by TargetTweens.
+        if (tween instanceof TargetTween) {
+            //TODO if tween is a sequence whose first member is a TargetTween, still need to do this. And if it's a parallel tween, need to check all children.
+            TargetTween<T, U> targetTween = (TargetTween<T, U>)tween;
+            float[] startWorldSpeeds = targetTween.prepare();
+            for (Tween<?, ?> candidate : tweens){
+                if (candidate.checkInterruption(targetTween.getClass(), startWorldSpeeds)){
+                    candidate.free();
+                    tmpTweens.add(candidate);
                 }
             }
-            if (cancelledTween != null)
-                cancelledTween.free();
-            //noinspection unchecked
-            delayedTweens.removeValue((TargetingTween<Object, ?>) cancelledTween, true);
-            delayedTweens.add(headTween);
-            return;
         }
+        tweens.removeAll(tmpTweens, true);
+        tmpTweens.clear();
 
-        TweenInterruptionListener<Object> interruptedTweenListener = null;
-        if (interruptedTween != null){
-            if (shouldBlend){
-                headTween.interrupt(interruptedTween);
-            }
-            interruptedTweenListener = interruptedTween.getInterruptionListener();
-            tweens.removeValue(interruptedTween, true);
-            interruptedTween.free();
-        }
+        tweens.add(tween);
 
-        tweens.add(headTween);
-        if (interruptedTweenListener != null){
-            interruptedTweenListener.onTweenInterrupted(target);
-        }
+    }
+
+    public boolean cancelAllTweens() {
+        // TODO
+        return false;
     }
 
     /**
      * Removes any running or pending (delayed) tweens for the target object immediately. No listener will be called.
-     * @param target The target object whose tween or tween chain is to be removed.
+     * @param target The target object whose associated tweens are to be removed.
      * @return Whether a tween or tween chain existed and was removed.
      */
-    public boolean clearTweens (@Nullable Object target){
+    public boolean cancelTweens (@Nullable Object target){ //todo behavior choice to either mute tween or cancel tween's parents when tween is a child.
         boolean removed = false;
-        Iterator<TargetingTween<Object, ?>> iterator = delayedTweens.iterator();
+        Iterator<Tween<?, ?>> iterator = tweens.iterator();
         while (iterator.hasNext()){
-            TargetingTween<?, ?> tween = iterator.next();
-            if (tween.target == target) {
-                iterator.remove();
-                tween.free();
-                removed = true;
-                break;
-            }
-        }
-        iterator = tweens.iterator();
-        while (iterator.hasNext()){
-            TargetingTween<?, ?> tween = iterator.next();
-            if (tween.target == target) {
+            Tween<?, ?> tween = iterator.next();
+            if (tween.getTarget() == target) {
                 iterator.remove();
                 tween.free();
                 removed = true;
@@ -136,45 +95,19 @@ public class TweenRunner {
         return removed;
     }
 
-    /** Must be called for every frame of animation to advance all of the tweens.
-     * @param delta The time passed since the last step.*/
+    /**
+     * Must be called for every frame of animation to advance all of the tweens.
+     * @param delta The time passed since the last step.
+     * */
     public void step (float delta){
-
-        Iterator<TargetingTween<Object, ?>> iterator = delayedTweens.iterator();
+        Iterator<Tween<?, ?>> iterator = tweens.iterator();
         while (iterator.hasNext()){
-            TargetingTween<?, ?> tween = iterator.next();
-            if(tween.stepDelay(delta)) {
+            Tween<?, ?> tween = iterator.next();
+            //TODO sequence version of this method should collect the left over time to pass to next item.
+            tween.step(delta);
+            if (tween.isComplete()){
                 iterator.remove();
-                tmpTweens.add(tween);
             }
         }
-        for (TargetingTween<?, ?> tween : tmpTweens){
-            start(tween);
-        }
-        tmpTweens.clear();
-
-        iterator = tweens.iterator();
-        while (iterator.hasNext()){
-            TargetingTween<?, ?> tween = iterator.next();
-            if (tween.step(delta)){
-                if (tween.getCompletionListener() != null){
-                    tmpListeners.put(tween.target, tween.getCompletionListener());
-                }
-                tmpTweens.add(tween);
-            }
-        }
-
-        for (TargetingTween<?, ?> tween : tmpTweens){
-            //noinspection unchecked
-            tweens.removeValue((TargetingTween<Object, ?>) tween, true);
-            tween.free();
-        }
-        tmpTweens.clear();
-
-        for (ObjectMap.Entry<Object, TweenCompletionListener<?>> entry: tmpListeners){
-            //noinspection unchecked
-            ((TweenCompletionListener<Object>)entry.value).onTweenComplete(entry.key);
-        }
-        tmpListeners.clear();
     }
 }

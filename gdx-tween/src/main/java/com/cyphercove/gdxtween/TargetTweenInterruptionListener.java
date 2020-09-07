@@ -18,14 +18,13 @@ package com.cyphercove.gdxtween;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *
+ * A listener that fires for {@link TargetTween TargetTweens} when they are interrupted.
  * @param <T> Tween target type
  */
-public interface TweenInterruptionListener<T> {
-
+public interface TargetTweenInterruptionListener<T> {
     /** Called when the associated tween is interrupted by a tween with the same target. The associated tween will
      * not be completed. This method must not begin another tween with the same target.
-     * @param tweenTarget The target object of the tween that was interrupted.
+     * @param interruptedTween The target object of the tween that was interrupted.
      */
-    void onTweenInterrupted (@NotNull T tweenTarget);
+    void onTweenInterrupted (@NotNull Tween<T, ?> interruptedTween);
 }

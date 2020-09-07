@@ -23,11 +23,10 @@ import com.badlogic.gdx.utils.Pools;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Easing functions that can be used with {@linkplain TargetingTween Tweens}. Non-configurable eases are provided
+ * Easing functions that can be used with {@linkplain TargetTween Tweens}. Non-configurable eases are provided
  * as static immutable members. Configurable eases are provided via function calls. These configurable
- * eases are pulled from {@linkplain Pool Pools} and can automatically be returned to their pools by
- * calling{@link com.badlogic.gdx.utils.Pool.Poolable}. Do not assign a single configurable ease to multiple Tweens because the
- * Tweens automatically free them to their pools when complete.
+ * eases are pulled from {@linkplain Pool Pools} and are automatically returned to their pools when their associated
+ * tweens are completed. Do not assign a single configurable ease to multiple Tweens.
  */
 public abstract class Ease {
     /**
@@ -53,7 +52,9 @@ public abstract class Ease {
     public abstract float speed (float a, float start, float end);
 
     /**
-     * If the ease is poolable, this returns it to its pool. Call only when it will no longer be used.
+     * If the ease is poolable, this returns it to its pool. This is called automatically when an Ease
+     * is assigned to a {@link TargetTween} and that tween is freed (which in turn happens automatically
+     * when the Tween is completed, cancelled or interrupted).
      */
     public void free () {}
 
@@ -61,7 +62,7 @@ public abstract class Ease {
      * Eases that are blendable support setting the starting speed of the function so it can smoothly
      * blend from another Ease that it is interrupting.
      */
-    public abstract static class BlendableEase extends Ease implements Pool.Poolable {
+    public abstract static class BlendableEase extends Ease {
         /**
          * Set the start speed of the function, in units of value change over total duration. World
          * speed should be divided by total ease duration before passing it in.
@@ -175,13 +176,9 @@ public abstract class Ease {
         }
 
         public void free () {
-            cubicPool.free(this);
-        }
-
-        @Override
-        public void reset () {
             startSpeed = 0;
             endSpeed = 0;
+            cubicPool.free(this);
         }
 
         @Override
@@ -226,7 +223,7 @@ public abstract class Ease {
     /**
      * A cubic Hermite function whose starting and ending speeds can be specified.  The
      * function is equivalent to smoothstep if the starting and ending speeds are 0. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetingTween Tweens}.
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetTween Tweens}.
      *
      * @return A cubic hermite ease
      */
@@ -303,7 +300,7 @@ public abstract class Ease {
      * A quintic Hermite function whose starting and ending speeds can be specified. The starting and
      * ending acceleration will be zero. The function is equivalent to smootherstep if the starting
      * and ending speeds are 0. This ease can be freed to a pool. Do not assign a single instance to
-     * multiple {@linkplain TargetingTween Tweens}.
+     * multiple {@linkplain TargetTween Tweens}.
      *
      * @return A quintic hermite ease
      */
@@ -312,7 +309,7 @@ public abstract class Ease {
         return quniticPool.obtain();
     }
 
-    public static class InterpolationWrapper extends Ease implements Pool.Poolable {
+    public static class InterpolationWrapper extends Ease {
         Interpolation interpolation = Interpolation.linear;
         float precision = 0.001f;
         float halfPrecision = 0.0005f;
@@ -328,14 +325,10 @@ public abstract class Ease {
 
         @Override
         public void free () {
-            Pools.free(this);
-        }
-
-        @Override
-        public void reset () {
             interpolation = Interpolation.linear;
             precision = 0.001f;
             halfPrecision = 0.0005f;
+            Pools.free(this);
         }
 
         /**
@@ -369,7 +362,7 @@ public abstract class Ease {
 
     /**
      * A wrapper for {@linkplain Interpolation Interpolations} so they can be used as Eases. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetingTween Tweens}.
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetTween Tweens}.
      *
      * @param interpolation The Interpolation to wrap.
      * @return An Ease that uses the function of an Interpolation.
@@ -383,7 +376,7 @@ public abstract class Ease {
 
     /**
      * A wrapper for {@linkplain Interpolation Interpolations} so they can be used as Eases. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetingTween Tweens}.
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetTween Tweens}.
      *
      * @param interpolation  The Interpolation to wrap.
      * @param speedPrecision The precision to use when calculating the speed of this ease. This is the

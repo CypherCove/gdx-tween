@@ -15,18 +15,36 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.tweens;
 
-import com.cyphercove.gdxtween.TargetingTween;
+import com.badlogic.gdx.utils.Pool;
+import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.math.ScalarInt;
 import org.jetbrains.annotations.NotNull;
 
-public class ScalarIntTween extends TargetingTween<ScalarInt, ScalarIntTween> {
+public class ScalarIntTween extends TargetTween<ScalarInt, ScalarIntTween> {
+
+    private static final Pool<ScalarIntTween> POOL = new Pool<ScalarIntTween>() {
+        @Override
+        protected ScalarIntTween newObject() {
+            return new ScalarIntTween();
+        }
+    };
+
+    public static ScalarIntTween newInstance() {
+        return POOL.obtain();
+    }
 
     public ScalarIntTween(){
         super(1);
     }
 
     @Override
+    public @NotNull Class<ScalarInt> getTargetType() {
+        return ScalarInt.class;
+    }
+
+    @Override
     protected void begin () {
+        super.begin();
         setStartValue(0, target.x);
     }
 
@@ -51,4 +69,9 @@ public class ScalarIntTween extends TargetingTween<ScalarInt, ScalarIntTween> {
         return getEndValue(0);
     }
 
+    @Override
+    public void free() {
+        super.free();
+        POOL.free(this);
+    }
 }

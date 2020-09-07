@@ -18,12 +18,16 @@ package com.cyphercove.gdxtween;
 import org.jetbrains.annotations.NotNull;
 
 /**
- *
- * @param <U> Tween target type
+ * The placeholder target of Tweens that have no target.
  */
-public interface TweenCompletionListener<U> {
-    /** Called when the associated tween completes. If a Tween repeats, this is only called when repeating is finished.
-     * @param completedTween The completed tween.
-     */
-    void onTweenComplete (@NotNull U completedTween);
+public final class Targetless {
+    private Targetless() {}
+
+    /** The Targetless instance passed to callbacks for targetless Tweens. */
+    public static final @NotNull Targetless INSTANCE = new Targetless();
+
+    @Override
+    public String toString() {
+        return "Targetless";
+    }
 }

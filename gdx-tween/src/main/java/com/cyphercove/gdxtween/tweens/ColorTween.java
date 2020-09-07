@@ -17,18 +17,28 @@ package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import com.cyphercove.gdxtween.Ease;
-import com.cyphercove.gdxtween.TargetingTween;
+import com.badlogic.gdx.utils.Pool;
+import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.graphics.ColorSpace;
 import com.cyphercove.gdxtween.graphics.GtColor;
 import com.cyphercove.gdxtween.math.GtMathUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A tween for interpolating the components of a {@linkplain Color}.
  * */
-public class ColorTween extends TargetingTween<Color, ColorTween> {
+public class ColorTween extends TargetTween<Color, ColorTween> {
+
+    private static final Pool<ColorTween> POOL = new Pool<ColorTween>() {
+        @Override
+        protected ColorTween newObject() {
+            return new ColorTween();
+        }
+    };
+
+    public static ColorTween newInstance() {
+        return POOL.obtain();
+    }
 
     private ColorSpace colorSpace = ColorSpace.LinearRgb;
     private float endR, endG, endB;
@@ -44,7 +54,13 @@ public class ColorTween extends TargetingTween<Color, ColorTween> {
     }
 
     @Override
+    public @NotNull Class<Color> getTargetType() {
+        return Color.class;
+    }
+
+    @Override
     protected void begin () {
+        super.begin();
         switch (colorSpace) {
             case Rgb:
                 setStartValue(0, target.r);
@@ -197,25 +213,26 @@ public class ColorTween extends TargetingTween<Color, ColorTween> {
     }
 
     @Override
-    public void reset() {
-        super.reset();
+    public void free() {
+        super.free();
         colorSpace = ColorSpace.LinearRgb;
+        POOL.free(this);
     }
 
-    /**
-     * Adds another ColorTween to the end of this chain, set to use the same ColorSpace, and returns it.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
-     * @param duration Duration of the tween.
-     * @param ease     The Ease to use.
-     * @return An RgbColorTween that will automatically be returned to a pool when this chain is complete.
-     */
-    @NotNull
-    public ColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
-        ColorTween tween = Tweens.toRgb(target, endR, endG, endB, duration, ease)
-                .colorSpace(colorSpace);
-        setNext(tween);
-        return tween;
-    }
+//    /**
+//     * Adds another ColorTween to the end of this chain, set to use the same ColorSpace, and returns it.
+//     * @param endR     Final red value.
+//     * @param endG     Final green value.
+//     * @param endB     Final blue value.
+//     * @param duration Duration of the tween.
+//     * @param ease     The Ease to use.
+//     * @return An RgbColorTween that will automatically be returned to a pool when this chain is complete.
+//     */
+//    @NotNull
+//    public ColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
+//        ColorTween tween = Tweens.toRgb(target, endR, endG, endB, duration, ease)
+//                .colorSpace(colorSpace);
+//        setNext(tween);
+//        return tween;
+//    }
 }

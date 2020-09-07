@@ -16,7 +16,7 @@
 package com.cyphercove.gdxtween
 
 /**
- * An owner of a [TweenRunner]. Use this interface to be able to start [TargetingTween]s without passing the [TweenRunner]
+ * An owner of a [TweenRunner]. Use this interface to be able to start [TargetTween]s without passing the [TweenRunner]
  * explicitly.
  */
 interface TweenManager {
@@ -25,7 +25,7 @@ interface TweenManager {
     /**
      * Starts the tween using the [tweenRunner].
      */
-    fun TargetingTween<*, *>.start() = start(tweenRunner)
+    fun TargetTween<*, *>.start() = start(tweenRunner)
 
     /** Must be called for every frame of animation to advance all of the tweens in both runners. When using this function,
      * the step functions of the two runners should not be called directly.

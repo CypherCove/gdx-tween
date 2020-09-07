@@ -16,16 +16,34 @@
 package com.cyphercove.gdxtween.tweens;
 
 import com.badlogic.gdx.math.GridPoint3;
-import com.cyphercove.gdxtween.TargetingTween;
+import com.badlogic.gdx.utils.Pool;
+import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
-public class GridPoint3Tween extends TargetingTween<GridPoint3, GridPoint3Tween> {
+public class GridPoint3Tween extends TargetTween<GridPoint3, GridPoint3Tween> {
+
+    private static final Pool<GridPoint3Tween> POOL = new Pool<GridPoint3Tween>() {
+        @Override
+        protected GridPoint3Tween newObject() {
+            return new GridPoint3Tween();
+        }
+    };
+
+    public static GridPoint3Tween newInstance() {
+        return POOL.obtain();
+    }
 
     public GridPoint3Tween(){
         super(3);
     }
 
+    @Override
+    public @NotNull Class<GridPoint3> getTargetType() {
+        return GridPoint3.class;
+    }
+
     protected void begin () {
+        super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
         setStartValue(2, target.z);
@@ -72,5 +90,11 @@ public class GridPoint3Tween extends TargetingTween<GridPoint3, GridPoint3Tween>
 
     public float getEndZ () {
         return getEndValue(2);
+    }
+
+    @Override
+    public void free() {
+        super.free();
+        POOL.free(this);
     }
 }

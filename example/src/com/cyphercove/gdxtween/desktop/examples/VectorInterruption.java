@@ -1,5 +1,6 @@
 package com.cyphercove.gdxtween.desktop.examples;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
@@ -77,7 +78,7 @@ public class VectorInterruption extends ExampleScreen {
 
     @Override
     public void resize(int width, int height) {
-        tweenRunner.clearTweens(position);
+        tweenRunner.cancelTweens(position);
         Camera camera = sharedAssets.getViewport().getCamera();
         position.set(camera.position.x, camera.position.y);
     }
@@ -102,19 +103,26 @@ public class VectorInterruption extends ExampleScreen {
 
         stage.draw();
     }
-
+int nameCounter;
     private final InputProcessor inputProcessor = new InputAdapter() {
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             sharedAssets.getViewport().getCamera().unproject(temp.set(screenX, screenY, 0));
             clickSprite.setOriginBasedPosition(temp.x, temp.y);
-            Tweens.to(position, temp.x, temp.y, 1f, Ease.quintic())
-                    .shouldBlend(shouldBlend)
+            Tweens.to(position, temp.x, temp.y, 1f)
+                    .name("sprite position " + ++nameCounter)
+                    .ease(shouldBlend ? Ease.quintic() : Ease.smootherstep)
                     .start(tweenRunner);
-            Tweens.toAlpha(clickColor, 1f, 0.05f, Ease.wrap(Interpolation.pow2In))
-                    .thenTo(0f, 0.3f, null).delay(0.1f)
+            Tweens.toAlpha(clickColor, 1f, 0.4f)//0.05f)
+                    .name("indicator color " + ++nameCounter)
+                    .ease(Ease.wrap(Interpolation.pow2In))
+//                    .thenTo(0f, 0.3f, null).delay(0.1f)
                     .start(tweenRunner);
             return true;
         }
     };
+
+    private void log(String msg) { //TODO XXX
+        Gdx.app.log("", msg);
+    }
 }
