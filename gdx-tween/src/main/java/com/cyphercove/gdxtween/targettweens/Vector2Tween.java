@@ -13,70 +13,64 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.cyphercove.gdxtween.tweens;
+package com.cyphercove.gdxtween.targettweens;
 
-import com.badlogic.gdx.math.GridPoint3;
+import com.badlogic.gdx.math.Vector2;
+
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
-public class GridPoint3Tween extends TargetTween<GridPoint3, GridPoint3Tween> {
+public class Vector2Tween extends TargetTween<Vector2, Vector2Tween> {
 
-    private static final Pool<GridPoint3Tween> POOL = new Pool<GridPoint3Tween>() {
+    private static final Pool<Vector2Tween> POOL = new Pool<Vector2Tween>() {
         @Override
-        protected GridPoint3Tween newObject() {
-            return new GridPoint3Tween();
+        protected Vector2Tween newObject() {
+            return new Vector2Tween();
         }
     };
 
-    public static GridPoint3Tween newInstance() {
+    public static Vector2Tween newInstance() {
         return POOL.obtain();
     }
 
-    public GridPoint3Tween(){
-        super(3);
+    public Vector2Tween (){
+        super(2);
     }
 
     @Override
-    public @NotNull Class<GridPoint3> getTargetType() {
-        return GridPoint3.class;
+    public @NotNull Class<Vector2> getTargetType() {
+        return Vector2.class;
     }
 
     protected void begin () {
         super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
-        setStartValue(2, target.z);
     }
 
     protected void apply (int vectorIndex, float value) {
-        int rounded = Math.round(value);
         switch (vectorIndex){
             case 0:
-                target.x = rounded;
+                target.x = value;
                 break;
             case 1:
-                target.y = rounded;
-                break;
-            case 2:
-                target.z = rounded;
+                target.y = value;
                 break;
         }
     }
 
     @NotNull
-    public GridPoint3Tween end (float endX, float endY, float endZ){
+    public Vector2Tween end (float endX, float endY){
         setEndValue(0, endX);
         setEndValue(1, endY);
-        setEndValue(2, endZ);
         return this;
     }
 
     @NotNull
-    public GridPoint3Tween end (@NotNull GridPoint3 end){
+    public Vector2Tween end (@NotNull Vector2 end){
         setEndValue(0, end.x);
         setEndValue(1, end.y);
-        setEndValue(2, end.z);
         return this;
     }
 
@@ -86,10 +80,6 @@ public class GridPoint3Tween extends TargetTween<GridPoint3, GridPoint3Tween> {
 
     public float getEndY (){
         return getEndValue(1);
-    }
-
-    public float getEndZ () {
-        return getEndValue(2);
     }
 
     @Override

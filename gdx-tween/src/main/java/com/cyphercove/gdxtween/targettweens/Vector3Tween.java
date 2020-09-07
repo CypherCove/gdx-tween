@@ -13,40 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.cyphercove.gdxtween.tweens;
+package com.cyphercove.gdxtween.targettweens;
 
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
-public class Vector2Tween extends TargetTween<Vector2, Vector2Tween> {
+public class Vector3Tween extends TargetTween<Vector3, Vector3Tween> {
 
-    private static final Pool<Vector2Tween> POOL = new Pool<Vector2Tween>() {
+    private static final Pool<Vector3Tween> POOL = new Pool<Vector3Tween>() {
         @Override
-        protected Vector2Tween newObject() {
-            return new Vector2Tween();
+        protected Vector3Tween newObject() {
+            return new Vector3Tween();
         }
     };
 
-    public static Vector2Tween newInstance() {
+    public static Vector3Tween newInstance() {
         return POOL.obtain();
     }
 
-    public Vector2Tween (){
-        super(2);
+    public Vector3Tween (){
+        super(3);
     }
 
     @Override
-    public @NotNull Class<Vector2> getTargetType() {
-        return Vector2.class;
+    public @NotNull Class<Vector3> getTargetType() {
+        return Vector3.class;
     }
 
     protected void begin () {
         super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
+        setStartValue(2, target.z);
     }
 
     protected void apply (int vectorIndex, float value) {
@@ -57,20 +58,25 @@ public class Vector2Tween extends TargetTween<Vector2, Vector2Tween> {
             case 1:
                 target.y = value;
                 break;
+            case 2:
+                target.z = value;
+                break;
         }
     }
 
     @NotNull
-    public Vector2Tween end (float endX, float endY){
+    public Vector3Tween end (float endX, float endY, float endZ){
         setEndValue(0, endX);
         setEndValue(1, endY);
+        setEndValue(2, endZ);
         return this;
     }
 
     @NotNull
-    public Vector2Tween end (@NotNull Vector2 end){
+    public Vector3Tween end (@NotNull Vector3 end){
         setEndValue(0, end.x);
         setEndValue(1, end.y);
+        setEndValue(2, end.z);
         return this;
     }
 
@@ -80,6 +86,10 @@ public class Vector2Tween extends TargetTween<Vector2, Vector2Tween> {
 
     public float getEndY (){
         return getEndValue(1);
+    }
+
+    public float getEndZ () {
+        return getEndValue(2);
     }
 
     @Override

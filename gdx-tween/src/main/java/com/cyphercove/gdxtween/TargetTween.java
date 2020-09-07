@@ -58,6 +58,7 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
     protected final int vectorSize;
     protected T target;
     private TargetTweenInterruptionListener<T> interruptionListener;
+    private float duration = 1f;
 
     /**
      * @param vectorSize The number of elements in the vector being modified, or 1 for a scalar.
@@ -125,6 +126,22 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
     protected void applyAfterComplete() {
     }
 
+    @Override
+    public final float getDuration() {
+        return duration;
+    }
+
+    /**
+     * Set the length of this tween, not accounting for repeats.
+     * @param duration The tween's length.
+     * @return This tween for chaining.
+     */
+    @SuppressWarnings("unchecked")
+    public final U duration(float duration) {
+        this.duration = duration;
+        return (U)this;
+    }
+
     /**
      * Return this tween to its pool. Drops all external references. Frees any configurable eases.
      */
@@ -134,6 +151,7 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
         ease.free();
         ease = Ease.linear;
         isBlended = false;
+        duration = 1f;
         Arrays.fill(endValues, 0f);
         interruptionListener = null;
     }
@@ -243,16 +261,15 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
         return (U) this;
     }
 
-    //TODO rely on checkInterruption for starting world speeds.
-
     /**
      * Called by TweenRunner when this tween is first submitted before it is started.
      *
      * @return Starting world speeds array if this tween expects to be started at the speed of the tween it interrupts.
      * Otherwise null.
      */
+    @Override
     @Nullable
-    float[] prepare() {
+    protected float[] prepareToInterrupt() {
         if (getDuration() == 0 || !(ease instanceof Ease.BlendableEase))
             return null;
         isBlended = true;
@@ -267,14 +284,20 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
         if (isComplete()) {
             throw new IllegalStateException("Interruption checked on a complete tween: " + this); // TODO remove check
         }
-        boolean shouldInterrupt = sourceTweenClass == getClass();
-        if (shouldInterrupt && requestedWorldSpeeds != null && isStarted()) {
-            getWorldSpeeds(requestedWorldSpeeds);
+        if (isInterrupted()){
+            return false;
         }
-        if (shouldInterrupt && interruptionListener != null) {
-            interruptionListener.onTweenInterrupted(this);
+        if (sourceTweenClass == getClass()) {
+            interrupt();
+            if (requestedWorldSpeeds != null && isStarted()){
+                getWorldSpeeds(requestedWorldSpeeds);
+            }
+            if (interruptionListener != null) {
+                interruptionListener.onTweenInterrupted(this);
+            }
+            return true;
         }
-        return shouldInterrupt;
+        return false;
     }
 
     protected void getWorldSpeeds(@NotNull float[] output) {

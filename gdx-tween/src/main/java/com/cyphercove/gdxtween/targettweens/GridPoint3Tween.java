@@ -13,60 +13,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.cyphercove.gdxtween.tweens;
+package com.cyphercove.gdxtween.targettweens;
 
+import com.badlogic.gdx.math.GridPoint3;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
-import com.cyphercove.gdxtween.math.ScalarInt;
 import org.jetbrains.annotations.NotNull;
 
-public class ScalarIntTween extends TargetTween<ScalarInt, ScalarIntTween> {
+public class GridPoint3Tween extends TargetTween<GridPoint3, GridPoint3Tween> {
 
-    private static final Pool<ScalarIntTween> POOL = new Pool<ScalarIntTween>() {
+    private static final Pool<GridPoint3Tween> POOL = new Pool<GridPoint3Tween>() {
         @Override
-        protected ScalarIntTween newObject() {
-            return new ScalarIntTween();
+        protected GridPoint3Tween newObject() {
+            return new GridPoint3Tween();
         }
     };
 
-    public static ScalarIntTween newInstance() {
+    public static GridPoint3Tween newInstance() {
         return POOL.obtain();
     }
 
-    public ScalarIntTween(){
-        super(1);
+    public GridPoint3Tween(){
+        super(3);
     }
 
     @Override
-    public @NotNull Class<ScalarInt> getTargetType() {
-        return ScalarInt.class;
+    public @NotNull Class<GridPoint3> getTargetType() {
+        return GridPoint3.class;
     }
 
-    @Override
     protected void begin () {
         super.begin();
         setStartValue(0, target.x);
+        setStartValue(1, target.y);
+        setStartValue(2, target.z);
     }
 
-    @Override
     protected void apply (int vectorIndex, float value) {
-        target.x = Math.round(value);
+        int rounded = Math.round(value);
+        switch (vectorIndex){
+            case 0:
+                target.x = rounded;
+                break;
+            case 1:
+                target.y = rounded;
+                break;
+            case 2:
+                target.z = rounded;
+                break;
+        }
     }
 
     @NotNull
-    public ScalarIntTween end (float end){
-        setEndValue(0, end);
+    public GridPoint3Tween end (float endX, float endY, float endZ){
+        setEndValue(0, endX);
+        setEndValue(1, endY);
+        setEndValue(2, endZ);
         return this;
     }
 
     @NotNull
-    public ScalarIntTween end (ScalarInt end){
+    public GridPoint3Tween end (@NotNull GridPoint3 end){
         setEndValue(0, end.x);
+        setEndValue(1, end.y);
+        setEndValue(2, end.z);
         return this;
     }
 
-    public float getEnd (){
+    public float getEndX (){
         return getEndValue(0);
+    }
+
+    public float getEndY (){
+        return getEndValue(1);
+    }
+
+    public float getEndZ () {
+        return getEndValue(2);
     }
 
     @Override

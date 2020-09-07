@@ -20,7 +20,7 @@ import com.cyphercove.gdxtween.TweenRunner;
 import com.cyphercove.gdxtween.desktop.ExampleScreen;
 import com.cyphercove.gdxtween.desktop.ExamplesParent;
 import com.cyphercove.gdxtween.desktop.SharedAssets;
-import com.cyphercove.gdxtween.tweens.Tweens;
+import com.cyphercove.gdxtween.Tweens;
 
 public class VectorInterruption extends ExampleScreen {
 
@@ -78,7 +78,7 @@ public class VectorInterruption extends ExampleScreen {
 
     @Override
     public void resize(int width, int height) {
-        tweenRunner.cancelTweens(position);
+        tweenRunner.cancelAllTweens();
         Camera camera = sharedAssets.getViewport().getCamera();
         position.set(camera.position.x, camera.position.y);
     }

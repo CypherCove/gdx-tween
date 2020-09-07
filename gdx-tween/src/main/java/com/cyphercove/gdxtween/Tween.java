@@ -30,10 +30,11 @@ public abstract class Tween<T, U> {
 
     private static final String DEFAULT_NAME = "Unnamed";
 
-    private boolean isAttached, isStarted, isComplete;
-    private float duration, time;
+    private boolean isAttached, isStarted, isComplete, isInterrupted;
+    private float time;
     private String name = DEFAULT_NAME;
     private TweenCompletionListener<U> completionListener;
+    private GroupTween<?> parent = null;
 
     /**
      * Whether the tween has been attached to a TweenRunner or to a parent. This is used to check for the error of
@@ -43,8 +44,8 @@ public abstract class Tween<T, U> {
         return isAttached;
     }
 
-    void setAttached(boolean attached) {
-        isAttached = attached;
+    void markAttached() {
+        isAttached = true;
     }
 
     /**
@@ -69,15 +70,30 @@ public abstract class Tween<T, U> {
     public abstract @Nullable T getTarget();
 
     /**
-     * Advances the Tween's time.
-     *
-     * @param deltaTime The time passed.
-     * @return Any leftover time if tween was completed, or 0.
+     * Gets the parent of this tween, or null if there is none.
+     * @return The parent tween or null.
+     */
+    public @Nullable GroupTween<?> getParent() {
+        return parent;
+    }
+
+    /**
+     * Sets the parent of this tween.
+     * @param parent The parent.
+     */
+    void setParent(GroupTween<?> parent) {
+        this.parent = parent;
+    }
+
+    /**
+     * Sets the tween's time to a specific value.
+     * @param newTime The target time to set.
+     * @return Any excess time left over by setting a time that is past the tween's duration, or 0.
      */
     @SuppressWarnings("unchecked")
-    protected float step(float deltaTime) {
+    final float goTo(float newTime) {
         if (isComplete) {
-            throw new IllegalStateException("Should no longer be stepping completed Tween."); // TODO remove after testing.
+            throw new IllegalStateException("Should no longer be modifying completed Tween."); // TODO remove after testing.
         }
         if (!isStarted) {
             if (getTarget() == null)
@@ -85,15 +101,16 @@ public abstract class Tween<T, U> {
             begin();
             isStarted = true;
         }
-        time += deltaTime;
+        time = Math.min(getDuration(), newTime); //TODO with repeat behavior, the time can loop. If it yo-yos, the time can be as much as twice the duration.
         float remaining = 0f;
-        if (time >= duration) { //TODO after adding repeat modes, criteria for completion will change.
+        if (time >= getDuration()) { //TODO after adding repeat modes, criteria for completion will change.
             isComplete = true;
-            remaining = time - duration;
-            time = duration; // Clamp interpolation to hit end values exactly.
+            remaining = time - getDuration();
+            time = getDuration(); // Clamp interpolation to hit end values exactly.
             //TODO yo yo with even number of repeats will end at 0 time.
         }
-        update();
+        if (!isInterrupted)
+            update();
         if (isComplete && completionListener != null) {
             completionListener.onTweenComplete((U)this);
         }
@@ -101,14 +118,15 @@ public abstract class Tween<T, U> {
     }
 
     /**
-     * Called after each time step. If {@link #isComplete()}, this is the last time this method will be called for this
-     * tween. The completion listener is called after this method.
+     * Called after each time step if not muted. This is where the new {@link #getTime()} time} should be applied. If
+     * {@link #isComplete()}, this is the last time this method will be called for this tween. The completion listener
+     * is called after this method.
      */
     protected void update(){
     }
 
     /**
-     * Called the first time {@link #step(float)} is called. This is a good place to set up parameters for calculating
+     * Called the first time {@link #goTo(float)} is called. This is a good place to set up parameters for calculating
      * interpolation.
      * */
     abstract protected void begin ();
@@ -137,20 +155,7 @@ public abstract class Tween<T, U> {
      * The set length of this tween. This does not include repeats.
      * @return This tween's length without accounting for any repeats.
      */
-    public final float getDuration() {
-        return duration;
-    }
-
-    /**
-     * Set the length of this tween, not accounting for repeats.
-     * @param duration The tween's length.
-     * @return This tween for chaining.
-     */
-    @SuppressWarnings("unchecked")
-    public final U duration(float duration) {
-        this.duration = duration;
-        return (U)this;
-    }
+    public abstract float getDuration();
 
     /**
      * The currrent time in the tween's life.
@@ -177,6 +182,22 @@ public abstract class Tween<T, U> {
     }
 
     /**
+     * Whether the tween is interrupted. When a tween is muted, it does not modify its target or children. It behaves as a
+     * delay. It will not fire its listeners.
+     * @return Whether the tween is currently interrupted.
+     */
+    public boolean isInterrupted() {
+        return isInterrupted;
+    }
+
+    /**
+     * Sets this tween as interrupted, which will mute it if it is a member of a parent that is still running.
+     */
+    protected void interrupt() {
+        isInterrupted = true;
+    }
+
+    /**
      * Sets a listener to be called when the tween is completed.
      * @param listener The listener to call when the tween completes, or null to clear any existing listener.
      * @return This tween for building.
@@ -189,9 +210,21 @@ public abstract class Tween<T, U> {
     }
 
     /**
-     * Called when starting a {@link TargetTween} to check whether it should interrupt this tween.
+     * Called by TweenRunner when this tween is first submitted before it is started.
      *
-     * @param sourceTweenClass  The type of tween that is being started.
+     * @return Starting world speeds array if this tween expects to be started at the speed of the tween it interrupts.
+     * Otherwise null.
+     */
+    @Nullable
+    protected float[] prepareToInterrupt () {
+        return null;
+    }
+
+    /**
+     * Called when starting a {@link Tween} to check whether this tween should be interrupted. It should call
+     * {@link #interrupt()} and return true if it is interrupted.
+     *
+     * @param sourceTweenClass  The type of tween (or child of that tween) that is being started.
      * @param requestedWorldSpeeds If not null and the source target is currently being manipulated by this tween and is being
      *                     interpolated by a TargetingTween of the same type, then the current speed should be filled
      *                     into the array. Otherwise, the array should not be modified.
@@ -211,9 +244,10 @@ public abstract class Tween<T, U> {
         isAttached = false;
         isComplete = false;
         isStarted = false;
+        isInterrupted = false;
         name = DEFAULT_NAME;
         time = 0f;
-        duration = 1f;
         completionListener = null;
+        parent = null;
     }
 }

@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween;
 import com.badlogic.gdx.utils.Array;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 
@@ -49,18 +48,14 @@ public class TweenRunner {
         if (tween.isAttached()) {
             throw new IllegalStateException("Tween was already started: " + tween);
         }
-        tween.setAttached(true);
+        tween.markAttached();
 
-        // Handle interruption by TargetTweens.
-        if (tween instanceof TargetTween) {
-            //TODO if tween is a sequence whose first member is a TargetTween, still need to do this. And if it's a parallel tween, need to check all children.
-            TargetTween<T, U> targetTween = (TargetTween<T, U>)tween;
-            float[] startWorldSpeeds = targetTween.prepare();
-            for (Tween<?, ?> candidate : tweens){
-                if (candidate.checkInterruption(targetTween.getClass(), startWorldSpeeds)){
-                    candidate.free();
-                    tmpTweens.add(candidate);
-                }
+        // Handle interruptions
+        float[] startWorldSpeeds = tween.prepareToInterrupt();
+        for (Tween<?, ?> candidate : tweens){
+            if (candidate.checkInterruption(tween.getClass(), startWorldSpeeds)){
+                candidate.free();
+                tmpTweens.add(candidate);
             }
         }
         tweens.removeAll(tmpTweens, true);
@@ -70,29 +65,18 @@ public class TweenRunner {
 
     }
 
-    public boolean cancelAllTweens() {
-        // TODO
-        return false;
-    }
-
     /**
-     * Removes any running or pending (delayed) tweens for the target object immediately. No listener will be called.
-     * @param target The target object whose associated tweens are to be removed.
-     * @return Whether a tween or tween chain existed and was removed.
+     * Removes all tweens immediately. No listener will be called.
+     * @return Whether any tweens existed and were removed.
      */
-    public boolean cancelTweens (@Nullable Object target){ //todo behavior choice to either mute tween or cancel tween's parents when tween is a child.
-        boolean removed = false;
-        Iterator<Tween<?, ?>> iterator = tweens.iterator();
-        while (iterator.hasNext()){
-            Tween<?, ?> tween = iterator.next();
-            if (tween.getTarget() == target) {
-                iterator.remove();
-                tween.free();
-                removed = true;
-                break;
-            }
+    public boolean cancelAllTweens() {
+        if (tweens.isEmpty())
+            return false;
+        for (Tween<?, ?> tween : tweens){
+            tween.free();
         }
-        return removed;
+        tweens.clear();
+        return true;
     }
 
     /**
@@ -104,7 +88,7 @@ public class TweenRunner {
         while (iterator.hasNext()){
             Tween<?, ?> tween = iterator.next();
             //TODO sequence version of this method should collect the left over time to pass to next item.
-            tween.step(delta);
+            tween.goTo(tween.getTime() + delta);
             if (tween.isComplete()){
                 iterator.remove();
             }

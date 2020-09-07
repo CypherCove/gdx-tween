@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package com.cyphercove.gdxtween.tweens;
+package com.cyphercove.gdxtween.targettweens;
 
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
@@ -44,7 +44,7 @@ public class AccessorTween extends TargetTween<AccessorTween.Accessor, AccessorT
     }
 
     @NotNull
-    static AccessorTween newInstance(int vectorSize) {
+    public static AccessorTween newInstance(int vectorSize) {
         return getPool(vectorSize).obtain();
     }
 
