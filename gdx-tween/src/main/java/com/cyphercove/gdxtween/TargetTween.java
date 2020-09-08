@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -267,7 +269,6 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
      * @return Starting world speeds array if this tween expects to be started at the speed of the tween it interrupts.
      * Otherwise null.
      */
-    @Override
     @Nullable
     protected float[] prepareToInterrupt() {
         if (getDuration() == 0 || !(ease instanceof Ease.BlendableEase))
@@ -280,14 +281,19 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
     }
 
     @Override
-    protected boolean checkInterruption(Class<?> sourceTweenClass, @Nullable float[] requestedWorldSpeeds) {
+    protected void collectInterrupters(Array<? super TargetTween<?, ?>> collection) {
+        collection.add(this);
+    }
+
+    @Override
+    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
         if (isComplete()) {
             throw new IllegalStateException("Interruption checked on a complete tween: " + this); // TODO remove check
         }
         if (isInterrupted()){
             return false;
         }
-        if (sourceTweenClass == getClass()) {
+        if (sourceTween.getClass() == getClass() && sourceTween.getTarget() == getTarget()) {
             interrupt();
             if (requestedWorldSpeeds != null && isStarted()){
                 getWorldSpeeds(requestedWorldSpeeds);
@@ -319,10 +325,5 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
             }
             output[i] = ease.speed(progress, startValues[i], endValues[i]) * getDuration();
         }
-    }
-
-    @Override
-    public String toString() {
-        return getName();
     }
 }

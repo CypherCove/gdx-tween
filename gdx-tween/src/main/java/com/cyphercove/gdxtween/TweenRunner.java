@@ -37,7 +37,8 @@ import java.util.Iterator;
 public class TweenRunner {
 
     private final Array<Tween<?, ?>> tweens = new Array<>();
-    private final Array<Tween<?, ?>> tmpTweens = new Array<>();
+    private final Array<Tween<?, ?>> tmpCanceledTweens = new Array<>();
+    private final Array<TargetTween<?, ?>> tmpInterrupterTweens = new Array<>();
 
     /**
      * Adds a tween or tween chain to the manager.
@@ -51,15 +52,19 @@ public class TweenRunner {
         tween.markAttached();
 
         // Handle interruptions
-        float[] startWorldSpeeds = tween.prepareToInterrupt();
-        for (Tween<?, ?> candidate : tweens){
-            if (candidate.checkInterruption(tween.getClass(), startWorldSpeeds)){
-                candidate.free();
-                tmpTweens.add(candidate);
+        tween.collectInterrupters(tmpInterrupterTweens);
+        for (TargetTween<?, ?> interruptingTween: tmpInterrupterTweens) {
+            float[] startWorldSpeeds = interruptingTween.prepareToInterrupt();
+            for (Tween<?, ?> candidate : tweens){
+                if (candidate.checkInterruption(interruptingTween, startWorldSpeeds)){
+                    candidate.free();
+                    tmpCanceledTweens.add(candidate);
+                }
             }
+            tweens.removeAll(tmpCanceledTweens, true);
+            tmpCanceledTweens.clear();
         }
-        tweens.removeAll(tmpTweens, true);
-        tmpTweens.clear();
+        tmpInterrupterTweens.clear();
 
         tweens.add(tween);
 
@@ -93,5 +98,19 @@ public class TweenRunner {
                 iterator.remove();
             }
         }
+    }
+
+    //TODO XXX
+    public String getStringContents() {
+        StringBuilder builder = new StringBuilder();
+        boolean first = true;
+        for (Tween<?, ?> tween : tweens) {
+            if (first)
+                first = false;
+            else
+                builder.append(", ");
+            builder.append(tween.toString());
+        }
+        return builder.toString();
     }
 }

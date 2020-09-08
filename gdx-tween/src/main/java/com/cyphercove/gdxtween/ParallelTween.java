@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,14 +65,27 @@ public class ParallelTween extends GroupTween<ParallelTween> {
     }
 
     @Override
-    protected boolean checkInterruption(Class<?> sourceTweenClass, @Nullable float[] requestedWorldSpeeds) {
+    protected void collectInterrupters(Array<? super TargetTween<?, ?>> collection) {
+        for (Tween<?, ?> tween : children) {
+            if (tween instanceof TargetTween){
+                collection.add((TargetTween<?, ?>)tween);
+            } else {
+                tween.collectInterrupters(collection);
+            }
+        }
+    }
+
+    @Override
+    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
         if (isInterrupted()){
             return false;
         }
         boolean foundInterruption = false;
         for (Tween<?, ?> tween : children) {
-            boolean interrupted = tween.checkInterruption(sourceTweenClass, requestedWorldSpeeds);
-            foundInterruption |= interrupted;
+            if (!tween.isComplete()) {
+                boolean interrupted = tween.checkInterruption(sourceTween, requestedWorldSpeeds);
+                foundInterruption |= interrupted;
+            }
         }
         if (foundInterruption && getChildInterruptionBehavior() == ChildInterruptionBehavior.CancelHierarchy){
             interrupt();

@@ -35,13 +35,11 @@ interface TweenManager {
     }
 
     /**
-     * Removes any running or pending (delayed) tweens for the target object immediately, from both runners. No listener
-     * will be called.
-     * @param target The target object whose tween or tween chain is to be removed.
-     * @return Whether a tween or tween chain existed and was removed.
+     * Removes all tweens immediately. No listener will be called.
+     * @return Whether any tween was removed.
      */
-    fun TweenManager.clearTweens(target: Any): Boolean {
-        return tweenRunner.clearTweens(target)
+    fun TweenManager.clearAllTweens(): Boolean {
+        return tweenRunner.cancelAllTweens()
     }
 }
 

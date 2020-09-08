@@ -62,6 +62,10 @@ public abstract class GroupTween<U> extends Tween<Targetless, U> {
      */
     @SuppressWarnings("unchecked")
     public U run (Tween<?, ?> childTween) {
+        if (childTween.isAttached()) {
+            throw new IllegalArgumentException("Cannot add child tween " + childTween.getName() + " to "
+                    + getName() + " because it has already been started.");
+        }
         childTween.setParent(this);
         children.add(childTween);
         return (U)this;
@@ -83,8 +87,10 @@ public abstract class GroupTween<U> extends Tween<Targetless, U> {
      * the top level parent in the hierarchy.
      * @param childInterruptionBehavior The behavior to set.
      */
-    public void setChildInterruptionBehavior(@NotNull ChildInterruptionBehavior childInterruptionBehavior) {
+    @SuppressWarnings("unchecked")
+    public U childInterruptionBehavior(@NotNull ChildInterruptionBehavior childInterruptionBehavior) {
         this.childInterruptionBehavior = childInterruptionBehavior;
+        return (U)this;
     }
 
     @Override
@@ -105,4 +111,5 @@ public abstract class GroupTween<U> extends Tween<Targetless, U> {
     public @Nullable Targetless getTarget() {
         return Targetless.INSTANCE;
     }
+
 }

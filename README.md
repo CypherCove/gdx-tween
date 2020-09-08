@@ -30,9 +30,98 @@ If using Kotlin, use gdx-tween-kt instead, which includes features for streamlin
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and LibGDX version increases.
 
-## Basic Usage
+## Usage
 
-Coming soon...
+### The basics
+
+First, you need a TweenRunner to run your tweens with. A TweenRunner is responsible for setting up tweens, interrupting
+tweens that target the same object as a new tween, stepping through the animation of the tweens, and freeing the tweens
+and related objects to a pool when they are finished.
+
+```java
+private final TweenRunner tweenRunner = new TweenRunner();
+```
+
+The `step` method must be called one time somewhere in the game loop:
+
+```java
+public void render(float deltaTime)
+    tweenRunner.step(deltaTime);
+    //...
+}
+```
+
+In gdx-tween, a single tween operates on a target object. The target is the object whose values the tween changes over 
+time. Start a tween by selecting a `to` method from `Tween`, customizing it, and calling `start()`:
+
+```java
+Tween.to(myVector2, 1f, 1f, 3f)
+    .start(tweenRunner);
+```
+
+### GroupTweens
+
+Tweens can be built into complex series of events using `Tweens.inSequence()` and `Tweens.inParallel()`:
+
+TODO ...
+
+### Automatic interruption
+
+Tweens that modify a single object (e.g. not SequenceTween, ParallelTween or DelayTween) are called TargetTweens, and they
+automatically interrupt other running tweens that modify the same object.
+
+TweenRunner automatically finds running TargetTweens that are a match for the newly submitted TargetTween and cancels 
+them.
+
+When a SequenceTween is submitted, only its first child is eligible to automatically interrupt running tweens. (This is
+to avoid the ambiguous behavior of when later children in the sequence should interrupt currently-running tweens.)
+
+When a ParallelTween is submitted, all of its children are eligible. If a ParallelTween is the first child of a 
+SequenceTween, then all its children are eligible.
+
+By default, if any child in the hierarchy of a GroupTween is interrupted, the whole hierarchy is canceled. This behavior
+can be changed to only mute the specific children that are interrupted, using `childInterruptionBehavior()`.
+
+### Eases and blends
+
+TODO ...
+
+### Color and alpha
+
+TODO ...
+
+### Callbacks
+
+TODO ...
+
+## Kotlin
+
+If you use Kotlin, you can use the `-kt` version of the library to get some helper extension functions that improve 
+conciseness.
+
+### TweenManager
+
+You can use the TweenManager with a DelegateTweenManager to simplify some calls. It results in an already-populated 
+`tweenRunner` property, one which will rarely need to be used directly, because the interface provides some extension
+functions that implicitly use it.
+
+```kotlin
+class MyScreen: Screen, TweenManager by DelegateTweenManager() {
+
+    // ...
+
+    override fun render(deltaTime: Float) {
+        stepTweens(deltaTime)
+        // ...
+    }
+
+    fun startSomeTween() {
+        Tween.to(someVector, 1f, 1f, 1f).start() // Don't have to pass TweenRunner to start()
+    }
+}
+
+}
+```
 
 ## License
 

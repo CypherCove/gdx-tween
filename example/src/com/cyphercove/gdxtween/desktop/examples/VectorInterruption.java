@@ -16,17 +16,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.cyphercove.gdxtween.Ease;
+import com.cyphercove.gdxtween.Tween;
 import com.cyphercove.gdxtween.TweenRunner;
 import com.cyphercove.gdxtween.desktop.ExampleScreen;
 import com.cyphercove.gdxtween.desktop.ExamplesParent;
 import com.cyphercove.gdxtween.desktop.SharedAssets;
-import com.cyphercove.gdxtween.Tweens;
+import com.cyphercove.gdxtween.math.Scalar;
 
 public class VectorInterruption extends ExampleScreen {
 
     private Stage stage;
     private final TweenRunner tweenRunner = new TweenRunner();
     private final Vector2 position = new Vector2();
+    private final Scalar scale = new Scalar(1f);
     private final Color clickColor = new Color(Color.ROYAL);
     private final Vector3 temp = new Vector3();
     private boolean shouldBlend = true;
@@ -91,6 +93,7 @@ public class VectorInterruption extends ExampleScreen {
 
         SpriteBatch batch = sharedAssets.getSpriteBatch();
         sprite.setOriginBasedPosition(position.x, position.y);
+        sprite.setScale(scale.x);
         clickSprite.setColor(clickColor);
         batch.enableBlending();
         batch.setColor(Color.WHITE);
@@ -109,11 +112,20 @@ int nameCounter;
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             sharedAssets.getViewport().getCamera().unproject(temp.set(screenX, screenY, 0));
             clickSprite.setOriginBasedPosition(temp.x, temp.y);
-            Tweens.to(position, temp.x, temp.y, 1f)
-                    .name("sprite position " + ++nameCounter)
-                    .ease(shouldBlend ? Ease.quintic() : Ease.smootherstep)
+            Tween.inParallel()
+                    .name("p " + ++nameCounter)
+                    .run(
+                        Tween.to(position, temp.x, temp.y, 1f)
+                            .name("sprite position " + ++nameCounter)
+                            .ease(shouldBlend ? Ease.quintic() : Ease.smootherstep)
+                    )
+                    .run(
+                        Tween.to(scale, 1.5f, 1f)
+                            .name("scale " + ++nameCounter)
+                            .ease(Ease.smoothstep)
+                    )
                     .start(tweenRunner);
-            Tweens.toAlpha(clickColor, 1f, 0.4f)//0.05f)
+            Tween.toAlpha(clickColor, 1f, 0.4f)//0.05f)
                     .name("indicator color " + ++nameCounter)
                     .ease(Ease.wrap(Interpolation.pow2In))
 //                    .thenTo(0f, 0.3f, null).delay(0.1f)
@@ -122,7 +134,4 @@ int nameCounter;
         }
     };
 
-    private void log(String msg) { //TODO XXX
-        Gdx.app.log("", msg);
-    }
 }
