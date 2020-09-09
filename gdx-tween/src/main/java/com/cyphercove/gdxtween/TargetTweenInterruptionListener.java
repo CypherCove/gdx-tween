@@ -22,8 +22,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> Tween target type
  */
 public interface TargetTweenInterruptionListener<T> {
-    /** Called when the associated tween is interrupted by a tween with the same target. The associated tween will
-     * not be completed. This method must not begin another tween with the same target.
+    /** Called when the associated tween is interrupted by a tween with the same target, or one of its children was
+     * interrupted. The associated tween will not be completed.
      * @param interruptedTween The target object of the tween that was interrupted.
      */
     void onTweenInterrupted (@NotNull Tween<T, ?> interruptedTween);

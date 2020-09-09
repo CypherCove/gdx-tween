@@ -1,6 +1,5 @@
 package com.cyphercove.gdxtween.desktop.examples;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
@@ -16,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.cyphercove.gdxtween.Ease;
-import com.cyphercove.gdxtween.Tween;
+import com.cyphercove.gdxtween.Tweens;
 import com.cyphercove.gdxtween.TweenRunner;
 import com.cyphercove.gdxtween.desktop.ExampleScreen;
 import com.cyphercove.gdxtween.desktop.ExamplesParent;
@@ -112,23 +111,30 @@ int nameCounter;
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
             sharedAssets.getViewport().getCamera().unproject(temp.set(screenX, screenY, 0));
             clickSprite.setOriginBasedPosition(temp.x, temp.y);
-            Tween.inParallel()
+            Tweens.inParallel()
                     .name("p " + ++nameCounter)
                     .run(
-                        Tween.to(position, temp.x, temp.y, 1f)
+                        Tweens.to(position, temp.x, temp.y, 1f)
                             .name("sprite position " + ++nameCounter)
                             .ease(shouldBlend ? Ease.quintic() : Ease.smootherstep)
                     )
                     .run(
-                        Tween.to(scale, 1.5f, 1f)
+                        Tweens.to(scale, 1.5f, 1f)
                             .name("scale " + ++nameCounter)
                             .ease(Ease.smoothstep)
                     )
                     .start(tweenRunner);
-            Tween.toAlpha(clickColor, 1f, 0.4f)//0.05f)
+            Tweens.inSequence()
                     .name("indicator color " + ++nameCounter)
-                    .ease(Ease.wrap(Interpolation.pow2In))
-//                    .thenTo(0f, 0.3f, null).delay(0.1f)
+                    .inParallel()
+                    .run(Tweens.toAlpha(clickColor, 1f, 0.2f)
+                            .ease(Ease.wrap(Interpolation.pow2In)))
+                    .run(Tweens.toRgb(clickColor, Color.RED, 0.2f))
+                    .then()
+                    .delay(0.1f)
+                    .inParallel()
+                    .run(Tweens.toAlpha(clickColor, 0f, 0.6f))
+                    .run(Tweens.toRgb(clickColor, Color.ROYAL, 0.2f))
                     .start(tweenRunner);
             return true;
         }

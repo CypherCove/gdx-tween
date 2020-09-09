@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
@@ -136,9 +135,10 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
     /**
      * Set the length of this tween, not accounting for repeats.
      * @param duration The tween's length.
-     * @return This tween for chaining.
+     * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
+    @NotNull
     public final U duration(float duration) {
         this.duration = duration;
         return (U)this;

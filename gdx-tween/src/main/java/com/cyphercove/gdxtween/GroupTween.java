@@ -16,12 +16,7 @@
 package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Pool;
-import com.cyphercove.gdxtween.ChildInterruptionBehavior;
-import com.cyphercove.gdxtween.Targetless;
-import com.cyphercove.gdxtween.Tween;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A tween that contains and directs other tweens.
@@ -108,7 +103,7 @@ public abstract class GroupTween<U> extends Tween<Targetless, U> {
     }
 
     @Override
-    public @Nullable Targetless getTarget() {
+    public Targetless getTarget() {
         return Targetless.INSTANCE;
     }
 

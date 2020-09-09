@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 
 /**
- * Runs submitted {@linkplain Tween Tweens}.
+ * Runs submitted {@linkplain Tweens Tweens}.
  * <p>
  * {@link #step(float)} should be called on the {@link TweenRunner} once per frame to update all Tweens.
  * <p>
@@ -45,7 +45,8 @@ public class TweenRunner {
      *
      * @param tween The tween to start.
      */
-    public <T, U> void start (@NotNull Tween<T, U> tween){
+    public void start (@NotNull Tween<?, ?> tween){
+        tween = tween.getTopLevelParent();
         if (tween.isAttached()) {
             throw new IllegalStateException("Tween was already started: " + tween);
         }
@@ -86,14 +87,15 @@ public class TweenRunner {
 
     /**
      * Must be called for every frame of animation to advance all of the tweens.
-     * @param delta The time passed since the last step.
+     * @param deltaTime The time passed since the last step.
      * */
-    public void step (float delta){
+    public void step (float deltaTime){
+        //TODO it needs to be safe to start a Tween from a callback. Use SnapshotArray?
         Iterator<Tween<?, ?>> iterator = tweens.iterator();
         while (iterator.hasNext()){
             Tween<?, ?> tween = iterator.next();
             //TODO sequence version of this method should collect the left over time to pass to next item.
-            tween.goTo(tween.getTime() + delta);
+            tween.goTo(tween.getTime() + deltaTime);
             if (tween.isComplete()){
                 iterator.remove();
             }

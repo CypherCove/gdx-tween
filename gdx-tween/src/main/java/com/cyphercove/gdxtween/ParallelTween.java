@@ -17,13 +17,12 @@ package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * A tween that runs its children at the same time. It has the duration of its longest child.
  */
-public class ParallelTween extends GroupTween<ParallelTween> {
+public final class ParallelTween extends GroupTween<ParallelTween> {
 
     private static final Pool<ParallelTween> POOL = new Pool<ParallelTween>() {
         @Override
@@ -48,7 +47,6 @@ public class ParallelTween extends GroupTween<ParallelTween> {
 
     @Override
     protected void update() {
-        super.update();
         for (Tween<?, ?> tween : children) {
             if (!tween.isComplete()) {
                 tween.goTo(getTime());
@@ -67,11 +65,7 @@ public class ParallelTween extends GroupTween<ParallelTween> {
     @Override
     protected void collectInterrupters(Array<? super TargetTween<?, ?>> collection) {
         for (Tween<?, ?> tween : children) {
-            if (tween instanceof TargetTween){
-                collection.add((TargetTween<?, ?>)tween);
-            } else {
-                tween.collectInterrupters(collection);
-            }
+            tween.collectInterrupters(collection);
         }
     }
 
@@ -101,12 +95,7 @@ public class ParallelTween extends GroupTween<ParallelTween> {
     }
 
     @Override
-    public @NotNull Class<Targetless> getTargetType() {
-        return Targetless.class;
-    }
-
-    @Override
-    public @Nullable Targetless getTarget() {
-        return Targetless.INSTANCE;
+    public String toString() {
+        return getName() + "(Parallel with " + children.size + " children)";
     }
 }
