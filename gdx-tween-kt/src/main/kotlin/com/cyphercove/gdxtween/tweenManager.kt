@@ -29,9 +29,9 @@ interface TweenManager {
 
     /** Must be called for every frame of animation to advance all of the tweens in both runners. When using this function,
      * the step functions of the two runners should not be called directly.
-     * @param delta The time passed since the last step. */
-    fun TweenManager.stepTweens(dt: Float) {
-        tweenRunner.step(dt)
+     * @param deltaTime The time passed since the last step. */
+    fun TweenManager.stepTweens(deltaTime: Float) {
+        tweenRunner.step(deltaTime)
     }
 
     /**
@@ -41,6 +41,15 @@ interface TweenManager {
     fun TweenManager.clearAllTweens(): Boolean {
         return tweenRunner.cancelAllTweens()
     }
+
+}
+
+/**
+ * Creates a tween using the passed function and starts it immediately.
+ * @return The created and started tween.
+ */
+inline fun <T: Tween<*, *>> TweenManager.startTween(tweenSetup: TweenBuilder.() -> T): T {
+    return tween(tweenSetup).also { it.start(tweenRunner) }
 }
 
 /** A basic implementation of [TweenManager] that can be used as a delegate. */

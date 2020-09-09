@@ -9,9 +9,8 @@ The main goals of this library:
  * Rely on existing LibGDX classes and idioms so integration in a LibGDX project is natural. 
  * Support second order tweening so tweens can be interrupted smoothly, without a sudden change in speed.
  * Handle pooling automatically to minimize garbage collection.
- 
+
  Planned features not yet implemented:
- * Builder for sequences of tweens that affect different targets.
  * Usable in Scene2D so the second order interrupting behavior can be used in Actions.
  
 For clean Kotlin interop: nullability annotations, functional interfaces, trailing lambdas, etc. have been used.
@@ -52,23 +51,58 @@ public void render(float deltaTime)
 ```
 
 In gdx-tween, a single tween operates on a target object. The target is the object whose values the tween changes over 
-time. Start a tween by selecting a `to` method from `Tween`, customizing it, and calling `start()`:
+time. Start a tween by selecting a `to` method from `Tweens`, customizing it, and calling `start()`:
 
 ```java
-Tween.to(myVector2, 1f, 1f, 3f)
+Tweens.to(myVector2, 1f, 1f, 3f)
     .start(tweenRunner);
 ```
 
 ### GroupTweens
 
-Tweens can be built into complex series of events using `Tweens.inSequence()` and `Tweens.inParallel()`:
+The API of setting up Tween sequences is heavily inspired by 
+[UniversalTweenEngine's](https://github.com/AurelienRibon/universal-tween-engine) Timeline API.
 
-TODO ...
+Tweens can be built into complex series of events using `Tween.inSequence()` and `Tween.inParallel()`:
+
+```java
+Tweens.inSequence()
+    .run(Tweens.to(playerPosition, 1f, 1f, 1f))
+    .run(Tweens.to(playerAlpha, 0.5f, 1f))
+    .delay(0.3f)
+    .thenInParallel()
+        .run(Tweens.to(playerPosition, -1f, -1f, 1f))
+        .run(Tweens.to(playerAlpha, 1f, 1f))
+    .then()
+    .run(Tweens.to(playerPosition, 1f, 1f, 1f))
+    .start(tweenManager);
+```
+
+A sequence can also be created using `then()` on a tween if it isn't already part of a sequence. If it is the direct 
+child of a sequence, its parent sequence is returned.
+
+```java
+Tween.to(playerPosition, 1f, 1f, 1f))
+    .then().run(Tween.to(playerPosition, 1f, 1f, 1f))
+    .start(tweenManager);
+```
+
+Calling `start()` on a tween that is the child of a group will actually submit the top level parent of the group:
+
+```java
+Tween.inSequence()
+    .run(Tweens.to(playerPosition, 1f, 1f, 1f).ease(Ease.cubic()))
+    .thenInParallel()
+        .run(Tweens.to(playerPosition, -1f, -1f, 1f).ease(Ease.cubic()))
+        .run(Tweens.to(playerAlpha, 1f, 1f).ease(Ease.cubic()))
+    // .then() OK to omit this line. The parent sequence will be started.
+    .start(tweenManager);
+```
 
 ### Automatic interruption
 
 Tweens that modify a single object (e.g. not SequenceTween, ParallelTween or DelayTween) are called TargetTweens, and they
-automatically interrupt other running tweens that modify the same object.
+automatically interrupt other running TargetTweens that modify the same object.
 
 TweenRunner automatically finds running TargetTweens that are a match for the newly submitted TargetTween and cancels 
 them.
@@ -116,11 +150,29 @@ class MyScreen: Screen, TweenManager by DelegateTweenManager() {
     }
 
     fun startSomeTween() {
-        Tween.to(someVector, 1f, 1f, 1f).start() // Don't have to pass TweenRunner to start()
+        Tweens.to(someVector, 1f, 1f, 1f).start() // Don't have to pass TweenRunner to start()
     }
 }
+```
 
-}
+### TweenBuilder
+
+The `tween` function can be used to build a tween using a `TweenBuilder`, which is utility class with access to all the
+members of `Tweens` and `Ease`, thereby allowing you to omit the `Tweens.` and `Ease.` prefixes within the passed lambda
+function (without having to do static imports that pollute autocomplete throughout the file you're working on).
+
+```kotlin
+tween { 
+    inSequence()
+    .run(to(playerPosition, 1f, 1f, 1f))
+    .run(to(playerAlpha, 0.5f, 1f))
+    .delay(0.3f)
+    .thenInParallel()
+        .run(to(playerPosition, -1f, -1f, 1f).ease(cubic()))
+        .run(to(playerAlpha, 1f, 1f).ease(smoothstep))
+    .then()
+    .run(Tween.to(playerPosition, 1f, 1f, 1f))
+}.start(tweenRunner)
 ```
 
 ## License
