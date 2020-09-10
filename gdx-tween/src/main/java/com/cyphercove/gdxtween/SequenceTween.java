@@ -56,8 +56,9 @@ public final class SequenceTween extends GroupTween<SequenceTween> {
         boolean isComplete = isComplete();
         for (int i = index; i < children.size; i++) {
             Tween<?, ?> tween = children.get(i);
-            tween.goTo(isComplete ? tween.getDuration() : time - timeAtIndex); // If sequence complete, ensure every child reaches completion, regardless of rounding error.
-            if (tween.isComplete()){
+            if (!tween.isCanceled())
+                tween.goTo(isComplete ? tween.getDuration() : time - timeAtIndex); // If sequence complete, ensure every child reaches completion, regardless of rounding error.
+            if (tween.isComplete() || (tween.isCanceled() && time > timeAtIndex + tween.getDuration())){
                 index++;
                 timeAtIndex = Math.min(timeAtIndex + tween.getDuration(), time); // Can't allow timeAtIndex to pass time from rounding error.
             } else {
@@ -96,9 +97,9 @@ public final class SequenceTween extends GroupTween<SequenceTween> {
 
     @Override
     protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
-        if (isInterrupted()){
-            return false;
-        }
+        // Even if canceled, children should be checked. There might be parallel tweens started that both interrupt
+        // members of this tween, so they will need to get world speeds.
+        boolean wasCanceled = isCanceled();
         boolean foundInterruption = false;
         for (int i = index; i < children.size; i++) {
             Tween<?, ?> tween = children.get(i);
@@ -106,8 +107,8 @@ public final class SequenceTween extends GroupTween<SequenceTween> {
             foundInterruption |= interrupted;
         }
         if (foundInterruption && getChildInterruptionBehavior() == ChildInterruptionBehavior.CancelHierarchy){
-            interrupt();
-            return true;
+            cancel();
+            return !wasCanceled;
         }
         return false;
     }

@@ -252,6 +252,8 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
      * Sets a listener to be called when the tween is interrupted by another tween. The interruption listener is only
      * called if this tween is currently running when interrupted. Queued tweens that haven't started will be cancelled
      * instead.
+     * <p>
+     * This listener is not called when the tween is interrupted by a call to {@link #cancel()}.
      *
      * @param listener The listener to call when the tween is interrupted, or null to clear any existing listener.
      * @return This tween for building.
@@ -290,11 +292,11 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
         if (isComplete()) {
             throw new IllegalStateException("Interruption checked on a complete tween: " + this); // TODO remove check
         }
-        if (isInterrupted()){
+        if (isCanceled()){
             return false;
         }
         if (sourceTween.getClass() == getClass() && sourceTween.getTarget() == getTarget()) {
-            interrupt();
+            cancel();
             if (requestedWorldSpeeds != null && isStarted()){
                 getWorldSpeeds(requestedWorldSpeeds);
             }

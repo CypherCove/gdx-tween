@@ -17,6 +17,7 @@ package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.utils.SnapshotArray;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -36,9 +37,8 @@ import java.util.Iterator;
  */
 public class TweenRunner {
 
-    private final Array<Tween<?, ?>> tweens = new Array<>();
-    private final Array<Tween<?, ?>> tmpCanceledTweens = new Array<>();
-    private final Array<TargetTween<?, ?>> tmpInterrupterTweens = new Array<>();
+    private final SnapshotArray<Tween<?, ?>> tweens = new SnapshotArray<>(true, 64, Tween.class);
+    private final Array<TargetTween<?, ?>> interrupterTweens = new Array<>();
 
     /**
      * Adds a tween or tween chain to the manager.
@@ -52,23 +52,20 @@ public class TweenRunner {
         }
         tween.markAttached();
 
-        // Handle interruptions
-        tween.collectInterrupters(tmpInterrupterTweens);
-        for (TargetTween<?, ?> interruptingTween: tmpInterrupterTweens) {
+        // Snapshot is used to check interruptions so it is safe for callbacks to start new tweens.
+        tween.collectInterrupters(interrupterTweens);
+        Tween<?, ?>[] snapshotTweens = tweens.begin();
+        int snapshotTweensCount = tweens.size;
+        for (TargetTween<?, ?> interruptingTween: interrupterTweens) {
             float[] startWorldSpeeds = interruptingTween.prepareToInterrupt();
-            for (Tween<?, ?> candidate : tweens){
-                if (candidate.checkInterruption(interruptingTween, startWorldSpeeds)){
-                    candidate.free();
-                    tmpCanceledTweens.add(candidate);
-                }
+            for (int i = 0; i < snapshotTweensCount; i++) {
+                snapshotTweens[i].checkInterruption(interruptingTween, startWorldSpeeds);
             }
-            tweens.removeAll(tmpCanceledTweens, true);
-            tmpCanceledTweens.clear();
         }
-        tmpInterrupterTweens.clear();
+        tweens.end();
+        interrupterTweens.clear();
 
         tweens.add(tween);
-
     }
 
     /**
@@ -79,9 +76,8 @@ public class TweenRunner {
         if (tweens.isEmpty())
             return false;
         for (Tween<?, ?> tween : tweens){
-            tween.free();
+            tween.cancel();
         }
-        tweens.clear();
         return true;
     }
 
@@ -90,16 +86,22 @@ public class TweenRunner {
      * @param deltaTime The time passed since the last step.
      * */
     public void step (float deltaTime){
-        //TODO it needs to be safe to start a Tween from a callback. Use SnapshotArray?
         Iterator<Tween<?, ?>> iterator = tweens.iterator();
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             Tween<?, ?> tween = iterator.next();
-            //TODO sequence version of this method should collect the left over time to pass to next item.
-            tween.goTo(tween.getTime() + deltaTime);
-            if (tween.isComplete()){
+            if (tween.isCanceled() || tween.isComplete()) {
+                tween.free();
                 iterator.remove();
             }
         }
+
+        // SnapshotArray is used so callbacks can safely start new tweens.
+        Tween<?, ?>[] snapshotTweens = tweens.begin();
+        for (int i = 0, n = tweens.size; i < n; i++) {
+            Tween<?, ?> tween = snapshotTweens[i];
+            tween.goTo(tween.getTime() + deltaTime);
+        }
+        tweens.end();
     }
 
     //TODO XXX

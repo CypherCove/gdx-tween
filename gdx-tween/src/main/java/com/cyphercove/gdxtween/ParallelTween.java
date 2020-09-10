@@ -48,7 +48,7 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
     @Override
     protected void update() {
         for (Tween<?, ?> tween : children) {
-            if (!tween.isComplete()) {
+            if (!tween.isComplete() && !tween.isCanceled()) {
                 tween.goTo(getTime());
             }
         }
@@ -71,9 +71,9 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
 
     @Override
     protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
-        if (isInterrupted()){
-            return false;
-        }
+        // Even if canceled, children should be checked. There might be parallel tweens started that both interrupt
+        // members of this tween, so they will need to get world speeds.
+        boolean wasCanceled = isCanceled();
         boolean foundInterruption = false;
         for (Tween<?, ?> tween : children) {
             if (!tween.isComplete()) {
@@ -82,8 +82,8 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
             }
         }
         if (foundInterruption && getChildInterruptionBehavior() == ChildInterruptionBehavior.CancelHierarchy){
-            interrupt();
-            return true;
+            cancel();
+            return !wasCanceled;
         }
         return false;
     }

@@ -32,7 +32,7 @@ public abstract class Tween<T, U> {
 
     private static final String DEFAULT_NAME = "Unnamed";
 
-    private boolean isAttached, isStarted, isComplete, isInterrupted;
+    private boolean isAttached, isStarted, isComplete, isCanceled;
     private float time;
     private String name = DEFAULT_NAME;
     private TweenCompletionListener<U> completionListener;
@@ -123,7 +123,7 @@ public abstract class Tween<T, U> {
             time = getDuration(); // Clamp interpolation to hit end values exactly.
             //TODO yo yo with even number of repeats will end at 0 time.
         }
-        if (!isInterrupted)
+        if (!isCanceled)
             update();
         if (isComplete && completionListener != null) {
             completionListener.onTweenComplete((U) this);
@@ -199,20 +199,21 @@ public abstract class Tween<T, U> {
     }
 
     /**
-     * Whether the tween is interrupted. When a tween is muted, it does not modify its target or children. It behaves as a
+     * Whether the tween is canceled, either by interruption or a direct call to {@link #cancel}. When a tween is muted, it does not modify its target or children. It behaves as a
      * delay. It will not fire its listeners.
      *
      * @return Whether the tween is currently interrupted.
      */
-    public boolean isInterrupted() {
-        return isInterrupted;
+    public boolean isCanceled() {
+        return isCanceled;
     }
 
     /**
-     * Sets this tween as interrupted, which will mute it if it is a member of a parent that is still running.
+     * Sets this tween as canceled, which will mute it if it is a member of a parent that is still running. If it has
+     * no parent, it will be removed by the TweenRunner on the next step.
      */
-    protected void interrupt() {
-        isInterrupted = true;
+    protected void cancel() {
+        isCanceled = true;
     }
 
     /**
@@ -236,7 +237,7 @@ public abstract class Tween<T, U> {
 
     /**
      * Called when starting a {@link TargetTween} to check whether this tween should be interrupted. It should call
-     * {@link #interrupt()} and return true if it is interrupted.
+     * {@link #cancel()} and return true if it is interrupted.
      *
      * @param sourceTween    The tween that that is being started.
      * @param requestedWorldSpeeds If not null and the source target is currently being manipulated by this tween and is being
@@ -258,7 +259,7 @@ public abstract class Tween<T, U> {
         isAttached = false;
         isComplete = false;
         isStarted = false;
-        isInterrupted = false;
+        isCanceled = false;
         name = DEFAULT_NAME;
         time = 0f;
         completionListener = null;
