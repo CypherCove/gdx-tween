@@ -26,5 +26,5 @@ public interface TargetTweenInterruptionListener<T> {
      * interrupted. The associated tween will not be completed.
      * @param interruptedTween The target object of the tween that was interrupted.
      */
-    void onTweenInterrupted (@NotNull Tween<T, ?> interruptedTween);
+    void onTweenInterrupted (@NotNull TargetTween<T, ?> interruptedTween);
 }

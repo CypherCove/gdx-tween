@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.Pool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class DelayTween extends Tween<Targetless, DelayTween> {
+public final class DelayTween extends Tween<DelayTween> {
 
     private static final Pool<DelayTween> POOL = new Pool<DelayTween>() {
         @Override
@@ -35,16 +35,6 @@ public final class DelayTween extends Tween<Targetless, DelayTween> {
     }
 
     private float duration = 0f;
-
-    @Override
-    public @NotNull Class<Targetless> getTargetType() {
-        return Targetless.class;
-    }
-
-    @Override
-    public Targetless getTarget() {
-        return Targetless.INSTANCE;
-    }
 
     @Override
     protected void update() {

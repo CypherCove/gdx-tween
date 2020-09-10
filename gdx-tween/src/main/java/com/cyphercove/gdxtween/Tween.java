@@ -25,10 +25,9 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * A tween should not be reused or submitted to multiple TweenRunners.
  *
- * @param <T> The type of target the tween operates on. For Tweens with no target, the type {@link Targetless} is used.
  * @param <U> The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
  */
-public abstract class Tween<T, U> {
+public abstract class Tween<U> {
 
     private static final String DEFAULT_NAME = "Unnamed";
 
@@ -60,20 +59,6 @@ public abstract class Tween<T, U> {
     }
 
     /**
-     * Gets the reified type of the Tween's target.
-     *
-     * @return The type of target the tween operates on, or if it has no target, {@link Targetless}.
-     */
-    public abstract @NotNull Class<T> getTargetType();
-
-    /**
-     * Gets the target of this tween, or {@link Targetless} if it has none. Is null if the Tween has not been started.
-     *
-     * @return Twe tween target if it has been set.
-     */
-    public abstract @Nullable T getTarget();
-
-    /**
      * Gets the parent of this tween, or null if there is none.
      *
      * @return The parent tween or null.
@@ -86,7 +71,7 @@ public abstract class Tween<T, U> {
     /**
      * @return The top level parent of this tween, or itself if it has none.
      */
-    @NotNull Tween<?, ?> getTopLevelParent() {
+    @NotNull Tween<?> getTopLevelParent() {
         if (parent != null)
             return parent.getTopLevelParent();
         return this;
@@ -112,8 +97,6 @@ public abstract class Tween<T, U> {
             throw new IllegalStateException("Should no longer be modifying completed Tween."); // TODO remove after testing.
         }
         if (!isStarted) {
-            if (getTarget() == null)
-                throw new IllegalStateException("Tween was started without setting a target: " + this);
             begin();
             isStarted = true;
         }
@@ -273,7 +256,7 @@ public abstract class Tween<T, U> {
      */
     @NotNull
     public SequenceTween then(){
-        Tween<?, ?> parent = getParent();
+        Tween<?> parent = getParent();
         if (parent instanceof SequenceTween)
             return (SequenceTween)parent;
         return Tweens.inSequence().run(this);

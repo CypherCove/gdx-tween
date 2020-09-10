@@ -44,7 +44,7 @@ public final class SequenceTween extends GroupTween<SequenceTween> {
     @Override
     protected float calculateDuration() {
         float totalDuration = 0f;
-        for (Tween<?, ?> tween : children)
+        for (Tween<?> tween : children)
             totalDuration += tween.getDuration();
         return totalDuration;
     }
@@ -55,7 +55,7 @@ public final class SequenceTween extends GroupTween<SequenceTween> {
         float time = getTime();
         boolean isComplete = isComplete();
         for (int i = index; i < children.size; i++) {
-            Tween<?, ?> tween = children.get(i);
+            Tween<?> tween = children.get(i);
             if (!tween.isCanceled())
                 tween.goTo(isComplete ? tween.getDuration() : time - timeAtIndex); // If sequence complete, ensure every child reaches completion, regardless of rounding error.
             if (tween.isComplete() || (tween.isCanceled() && time > timeAtIndex + tween.getDuration())){
@@ -102,7 +102,7 @@ public final class SequenceTween extends GroupTween<SequenceTween> {
         boolean wasCanceled = isCanceled();
         boolean foundInterruption = false;
         for (int i = index; i < children.size; i++) {
-            Tween<?, ?> tween = children.get(i);
+            Tween<?> tween = children.get(i);
             boolean interrupted = tween.checkInterruption(sourceTween, requestedWorldSpeeds);
             foundInterruption |= interrupted;
         }

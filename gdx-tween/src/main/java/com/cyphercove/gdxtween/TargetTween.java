@@ -29,7 +29,7 @@ import java.util.Arrays;
  * @param <T> The type of target the tween operates on.
  * @param <U> The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
  */
-public abstract class TargetTween<T, U> extends Tween<T, U> {
+public abstract class TargetTween<T, U> extends Tween<U> {
     private @NotNull Ease ease = Ease.linear;
     /**
      * If true, the tween is using a BlendableEase and also interrupted another Tween, so the Ease's start speeds are
@@ -74,6 +74,8 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
 
     @Override
     protected void begin() {
+        if (getTarget() == null)
+            throw new IllegalStateException("Tween was started without setting a target: " + this);
         for (int i = 0; i < vectorSize; i++) {
             startSpeeds[i] = startWorldSpeeds[i] / getDuration();
         }
@@ -134,6 +136,7 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
 
     /**
      * Set the length of this tween, not accounting for repeats.
+     *
      * @param duration The tween's length.
      * @return This tween for building.
      */
@@ -141,7 +144,7 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
     @NotNull
     public final U duration(float duration) {
         this.duration = duration;
-        return (U)this;
+        return (U) this;
     }
 
     /**
@@ -158,7 +161,19 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
         interruptionListener = null;
     }
 
-    @Override
+    /**
+     * Gets the reified type of the Tween's target.
+     *
+     * @return The type of target the tween operates on.
+     */
+    public abstract @NotNull Class<T> getTargetType();
+
+    /**
+     * Gets the target of this tween. Is null if the Tween has not been started.
+     *
+     * @return Twe tween target if it has been set.
+     */
+    @Nullable
     public final T getTarget() {
         return target;
     }
@@ -292,12 +307,12 @@ public abstract class TargetTween<T, U> extends Tween<T, U> {
         if (isComplete()) {
             throw new IllegalStateException("Interruption checked on a complete tween: " + this); // TODO remove check
         }
-        if (isCanceled()){
+        if (isCanceled()) {
             return false;
         }
         if (sourceTween.getClass() == getClass() && sourceTween.getTarget() == getTarget()) {
             cancel();
-            if (requestedWorldSpeeds != null && isStarted()){
+            if (requestedWorldSpeeds != null && isStarted()) {
                 getWorldSpeeds(requestedWorldSpeeds);
             }
             if (interruptionListener != null) {

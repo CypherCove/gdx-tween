@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <U> The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
  */
-public abstract class GroupTween<U> extends Tween<Targetless, U> {
+public abstract class GroupTween<U> extends Tween<U> {
 
-    protected final Array<Tween<?, ?>> children;
+    protected final Array<Tween<?>> children;
     private ChildInterruptionBehavior childInterruptionBehavior = ChildInterruptionBehavior.CancelHierarchy;
     private float duration = 0f;
 
@@ -56,7 +56,7 @@ public abstract class GroupTween<U> extends Tween<Targetless, U> {
      * @return This group for building.
      */
     @SuppressWarnings("unchecked")
-    public U run (Tween<?, ?> childTween) {
+    public U run (Tween<?> childTween) {
         if (childTween.isAttached()) {
             throw new IllegalArgumentException("Cannot add child tween " + childTween.getName() + " to "
                     + getName() + " because it has already been started.");
@@ -92,19 +92,9 @@ public abstract class GroupTween<U> extends Tween<Targetless, U> {
     public void free() {
         super.free();
         duration = 0f;
-        for (Tween<?, ?> tween : children)
+        for (Tween<?> tween : children)
             tween.free();
         children.clear();
-    }
-
-    @Override
-    public @NotNull Class<Targetless> getTargetType() {
-        return Targetless.class;
-    }
-
-    @Override
-    public Targetless getTarget() {
-        return Targetless.INSTANCE;
     }
 
 }

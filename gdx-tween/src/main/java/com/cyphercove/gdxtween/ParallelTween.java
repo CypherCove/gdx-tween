@@ -47,7 +47,7 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
 
     @Override
     protected void update() {
-        for (Tween<?, ?> tween : children) {
+        for (Tween<?> tween : children) {
             if (!tween.isComplete() && !tween.isCanceled()) {
                 tween.goTo(getTime());
             }
@@ -57,14 +57,14 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
     @Override
     protected float calculateDuration () {
         float maxDuration = 0f;
-        for (Tween<?, ?> tween : children)
+        for (Tween<?> tween : children)
             maxDuration = Math.max(maxDuration, tween.getDuration());
         return maxDuration;
     }
 
     @Override
     protected void collectInterrupters(Array<? super TargetTween<?, ?>> collection) {
-        for (Tween<?, ?> tween : children) {
+        for (Tween<?> tween : children) {
             tween.collectInterrupters(collection);
         }
     }
@@ -75,7 +75,7 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
         // members of this tween, so they will need to get world speeds.
         boolean wasCanceled = isCanceled();
         boolean foundInterruption = false;
-        for (Tween<?, ?> tween : children) {
+        for (Tween<?> tween : children) {
             if (!tween.isComplete()) {
                 boolean interrupted = tween.checkInterruption(sourceTween, requestedWorldSpeeds);
                 foundInterruption |= interrupted;

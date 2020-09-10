@@ -37,7 +37,7 @@ import java.util.Iterator;
  */
 public class TweenRunner {
 
-    private final SnapshotArray<Tween<?, ?>> tweens = new SnapshotArray<>(true, 64, Tween.class);
+    private final SnapshotArray<Tween<?>> tweens = new SnapshotArray<>(true, 64, Tween.class);
     private final Array<TargetTween<?, ?>> interrupterTweens = new Array<>();
 
     /**
@@ -45,7 +45,7 @@ public class TweenRunner {
      *
      * @param tween The tween to start.
      */
-    public void start (@NotNull Tween<?, ?> tween){
+    public void start (@NotNull Tween<?> tween){
         tween = tween.getTopLevelParent();
         if (tween.isAttached()) {
             throw new IllegalStateException("Tween was already started: " + tween);
@@ -54,7 +54,7 @@ public class TweenRunner {
 
         // Snapshot is used to check interruptions so it is safe for callbacks to start new tweens.
         tween.collectInterrupters(interrupterTweens);
-        Tween<?, ?>[] snapshotTweens = tweens.begin();
+        Tween<?>[] snapshotTweens = tweens.begin();
         int snapshotTweensCount = tweens.size;
         for (TargetTween<?, ?> interruptingTween: interrupterTweens) {
             float[] startWorldSpeeds = interruptingTween.prepareToInterrupt();
@@ -75,7 +75,7 @@ public class TweenRunner {
     public boolean cancelAllTweens() {
         if (tweens.isEmpty())
             return false;
-        for (Tween<?, ?> tween : tweens){
+        for (Tween<?> tween : tweens){
             tween.cancel();
         }
         return true;
@@ -86,9 +86,9 @@ public class TweenRunner {
      * @param deltaTime The time passed since the last step.
      * */
     public void step (float deltaTime){
-        Iterator<Tween<?, ?>> iterator = tweens.iterator();
+        Iterator<Tween<?>> iterator = tweens.iterator();
         while (iterator.hasNext()) {
-            Tween<?, ?> tween = iterator.next();
+            Tween<?> tween = iterator.next();
             if (tween.isCanceled() || tween.isComplete()) {
                 tween.free();
                 iterator.remove();
@@ -96,9 +96,9 @@ public class TweenRunner {
         }
 
         // SnapshotArray is used so callbacks can safely start new tweens.
-        Tween<?, ?>[] snapshotTweens = tweens.begin();
+        Tween<?>[] snapshotTweens = tweens.begin();
         for (int i = 0, n = tweens.size; i < n; i++) {
-            Tween<?, ?> tween = snapshotTweens[i];
+            Tween<?> tween = snapshotTweens[i];
             tween.goTo(tween.getTime() + deltaTime);
         }
         tweens.end();
@@ -108,7 +108,7 @@ public class TweenRunner {
     public String getStringContents() {
         StringBuilder builder = new StringBuilder();
         boolean first = true;
-        for (Tween<?, ?> tween : tweens) {
+        for (Tween<?> tween : tweens) {
             if (first)
                 first = false;
             else
