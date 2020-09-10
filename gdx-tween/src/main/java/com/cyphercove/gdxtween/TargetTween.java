@@ -26,10 +26,10 @@ import java.util.Arrays;
  * Base class for tweens that target and interpolate a specific single object. An Ease function can be set to affect the
  * speed of the change over time.
  *
- * @param <T> The type of target the tween operates on.
- * @param <U> The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
+ * @param <T> The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
+ * @param <TG> The type of target the tween operates on.
  */
-public abstract class TargetTween<T, U> extends Tween<U> {
+public abstract class TargetTween<T, TG> extends Tween<T> {
     private @NotNull Ease ease = Ease.linear;
     /**
      * If true, the tween is using a BlendableEase and also interrupted another Tween, so the Ease's start speeds are
@@ -57,8 +57,8 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      */
     private final float[] endValues;
     protected final int vectorSize;
-    protected T target;
-    private TargetTweenInterruptionListener<T> interruptionListener;
+    protected TG target;
+    private TargetTweenInterruptionListener<TG> interruptionListener;
     private float duration = 1f;
 
     /**
@@ -142,9 +142,9 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public final U duration(float duration) {
+    public final T duration(float duration) {
         this.duration = duration;
-        return (U) this;
+        return (T) this;
     }
 
     /**
@@ -166,7 +166,7 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      *
      * @return The type of target the tween operates on.
      */
-    public abstract @NotNull Class<T> getTargetType();
+    public abstract @NotNull Class<TG> getTargetType();
 
     /**
      * Gets the target of this tween. Is null if the Tween has not been started.
@@ -174,7 +174,7 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      * @return Twe tween target if it has been set.
      */
     @Nullable
-    public final T getTarget() {
+    public final TG getTarget() {
         return target;
     }
 
@@ -188,9 +188,9 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public final U target(@NotNull T target) {
+    public final T target(@NotNull TG target) {
         this.target = target;
-        return (U) this;
+        return (T) this;
     }
 
     /**
@@ -215,9 +215,9 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public U ease(@NotNull Ease ease) {
+    public T ease(@NotNull Ease ease) {
         this.ease = ease;
-        return (U) this;
+        return (T) this;
     }
 
     /**
@@ -228,9 +228,9 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public U ease(@NotNull Interpolation interpolation) {
+    public T ease(@NotNull Interpolation interpolation) {
         this.ease = Ease.wrap(interpolation);
-        return (U) this;
+        return (T) this;
     }
 
     /**
@@ -275,9 +275,9 @@ public abstract class TargetTween<T, U> extends Tween<U> {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public U interruptionListener(@Nullable TargetTweenInterruptionListener<T> listener) {
+    public T interruptionListener(@Nullable TargetTweenInterruptionListener<TG> listener) {
         this.interruptionListener = listener;
-        return (U) this;
+        return (T) this;
     }
 
     /**

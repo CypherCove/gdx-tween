@@ -48,7 +48,7 @@ interface TweenManager {
  * Creates a tween using the passed function and starts it immediately.
  * @return The created and started tween.
  */
-inline fun <T: Tween<*, *>> TweenManager.startTween(tweenSetup: TweenBuilder.() -> T): T {
+inline fun <T: Tween<*>> TweenManager.startTween(tweenSetup: TweenBuilder.() -> T): T {
     return tween(tweenSetup).also { it.start(tweenRunner) }
 }
 

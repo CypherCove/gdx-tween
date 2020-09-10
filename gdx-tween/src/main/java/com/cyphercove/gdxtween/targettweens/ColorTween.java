@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A tween for interpolating the components of a {@linkplain Color}.
  * */
-public class ColorTween extends TargetTween<Color, ColorTween> {
+public class ColorTween extends TargetTween<ColorTween, Color> {
 
     private static final Pool<ColorTween> POOL = new Pool<ColorTween>() {
         @Override

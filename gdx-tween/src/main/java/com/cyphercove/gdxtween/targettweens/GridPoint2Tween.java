@@ -20,7 +20,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
-public class GridPoint2Tween extends TargetTween<GridPoint2, GridPoint2Tween> {
+public class GridPoint2Tween extends TargetTween<GridPoint2Tween, GridPoint2> {
 
     private static final Pool<GridPoint2Tween> POOL = new Pool<GridPoint2Tween>() {
         @Override

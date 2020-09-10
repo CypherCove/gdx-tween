@@ -20,7 +20,7 @@ import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.math.Scalar;
 import org.jetbrains.annotations.NotNull;
 
-public class ScalarTween extends TargetTween<Scalar, ScalarTween> {
+public class ScalarTween extends TargetTween<ScalarTween, Scalar> {
 
     private static final Pool<ScalarTween> POOL = new Pool<ScalarTween>() {
         @Override

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * RGB components. Since there cannot be multiple Tweens targeting the same object, it will interrupt other types of
  * Color tweens. To treat RGB and Alpha independently, a second {@link com.cyphercove.gdxtween.TweenRunner TweenRunner}
  * dedicated to AlphaTweens may be used.*/
-public class AlphaTween extends TargetTween<Color, AlphaTween> {
+public class AlphaTween extends TargetTween<AlphaTween, Color> {
 
     private static final Pool<AlphaTween> POOL = new Pool<AlphaTween>() {
         @Override

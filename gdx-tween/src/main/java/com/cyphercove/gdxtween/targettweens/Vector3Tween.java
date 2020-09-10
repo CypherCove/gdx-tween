@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import org.jetbrains.annotations.NotNull;
 
-public class Vector3Tween extends TargetTween<Vector3, Vector3Tween> {
+public class Vector3Tween extends TargetTween<Vector3Tween, Vector3> {
 
     private static final Pool<Vector3Tween> POOL = new Pool<Vector3Tween>() {
         @Override

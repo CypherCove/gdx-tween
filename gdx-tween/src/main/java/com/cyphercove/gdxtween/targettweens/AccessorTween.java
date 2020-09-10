@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * of an object without making the object the tween's target. This is necessary if an object has fields that should be
  * modified independently.
  */
-public class AccessorTween extends TargetTween<AccessorTween.Accessor, AccessorTween> {
+public class AccessorTween extends TargetTween<AccessorTween, AccessorTween.Accessor> {
 
     static private final IntMap<Pool<AccessorTween>> accessorPools = new IntMap<>();
 
