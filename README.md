@@ -54,7 +54,7 @@ In gdx-tween, a single tween operates on a target object. The target is the obje
 time. Start a tween by selecting a `to` method from `Tweens`, customizing it, and calling `start()`:
 
 ```java
-Tweens.to(myVector2, 1f, 1f, 3f)
+Tweens.to(myVector2, 1f, 1f).duration(3f)
     .start(tweenRunner);
 ```
 
@@ -67,14 +67,25 @@ Tweens can be built into complex series of events using `Tween.inSequence()` and
 
 ```java
 Tweens.inSequence()
-    .run(Tweens.to(playerPosition, 1f, 1f, 1f))
-    .run(Tweens.to(playerAlpha, 0.5f, 1f))
+    .run(Tweens.to(playerPosition, 1f, 1f).duration(1f))
+    .run(Tweens.to(playerAlpha, 0.5f).duration(1f))
     .delay(0.3f)
-    .thenInParallel()
-        .run(Tweens.to(playerPosition, -1f, -1f, 1f))
-        .run(Tweens.to(playerAlpha, 1f, 1f))
+    .inParallel()
+        .run(Tweens.to(playerPosition, -1f, -1f).duration(1f))
+        .run(Tweens.to(playerAlpha, 1f).duration(1f))
     .then()
-    .run(Tweens.to(playerPosition, 1f, 1f, 1f))
+    .run(Tweens.to(playerPosition, 1f, 1f).duration(1f))
+    .start(tweenManager);
+```
+
+Calling `.duration()`, `.ease()`, or `.using()` on a GroupTween sets a default value to use for the children if they
+have none set. This is especially useful for ParallelTweens, since they often run several tweens of the same length.
+
+```java
+Tweens.inParallel()
+    .duration(3f)
+    .run(Tweens.to(playerPosition, -1f, -1f))
+    .run(Tweens.to(playerAlpha, 1f))
     .start(tweenManager);
 ```
 
@@ -92,7 +103,7 @@ Calling `start()` on a tween that is the child of a group will actually submit t
 ```java
 Tween.inSequence()
     .run(Tweens.to(playerPosition, 1f, 1f, 1f).ease(Ease.cubic()))
-    .thenInParallel()
+    .inParallel()
         .run(Tweens.to(playerPosition, -1f, -1f, 1f).ease(Ease.cubic()))
         .run(Tweens.to(playerAlpha, 1f, 1f).ease(Ease.cubic()))
     // .then() OK to omit this line. The parent sequence will be started.
@@ -164,12 +175,14 @@ function (without having to do static imports that pollute autocomplete througho
 ```kotlin
 tween { 
     inSequence()
-    .run(to(playerPosition, 1f, 1f, 1f))
-    .run(to(playerAlpha, 0.5f, 1f))
+    .ease(cubic)
+    .run(to(playerPosition, 1f, 1f).duration(1f))
+    .run(to(playerAlpha, 0.5f).duration(1f))
     .delay(0.3f)
-    .thenInParallel()
-        .run(to(playerPosition, -1f, -1f, 1f).ease(cubic()))
-        .run(to(playerAlpha, 1f, 1f).ease(smoothstep))
+    .inParallel()
+        .using(1f, cubic())
+        .run(to(playerPosition, -1f, -1f))
+        .run(to(playerAlpha, 1f, 1f))
     .then()
     .run(Tween.to(playerPosition, 1f, 1f, 1f))
 }.start(tweenRunner)

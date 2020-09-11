@@ -36,7 +36,7 @@ public abstract class Ease {
      * @param end   Where the value should be when {@code a} is 1
      * @return the interpolated value between the given start and end values
      */
-    public abstract float apply (float a, float start, float end);
+    public abstract float apply(float a, float start, float end);
 
     /**
      * Provides the derivative of the ease function at a given amount of progress.
@@ -49,61 +49,110 @@ public abstract class Ease {
      * value change over fraction of total duration. Multiplying this value by the total duration of
      * the ease gives the world speed of the ease.
      */
-    public abstract float speed (float a, float start, float end);
+    public abstract float speed(float a, float start, float end);
 
     /**
-     * If the ease is poolable, this returns it to its pool. This is called automatically when an Ease
-     * is assigned to a {@link TargetTween} and that tween is freed (which in turn happens automatically
-     * when the Tween is completed, cancelled or interrupted).
+     * If the ease is poolable, this returns it to its pool. The provided immutable eases are not poolable. This is
+     * called automatically when an Ease is assigned to a {@link TargetTween} and that tween is freed (which in turn
+     * happens automatically when the Tween is completed, cancelled or interrupted).
      */
-    public void free () {}
+    public void free() {
+    }
 
     /**
-     * Eases that are blendable support setting the starting speed of the function so it can smoothly
-     * blend from another Ease that it is interrupting.
+     * If this Ease is mutable, returns another instance from a pool with duplicate settings. Otherwise, returns
+     * itself.
+     * @return An Ease of the same type as this one that is safe to pass to a different tween than the original.
      */
-    public abstract static class BlendableEase extends Ease {
+    @NotNull
+    public Ease copyOrSelf() {
+        return this;
+    }
+
+    /**
+     * A mutable Ease that supports setting the starting speed of the function.
+     */
+    public abstract static class BlendInEase extends Ease {
         /**
          * Set the start speed of the function, in units of value change over total duration. World
          * speed should be divided by total ease duration before passing it in.
+         *
          * @param startSpeed The beginning speed for the transition.
          * @return The Ease for building.
          */
         @NotNull
-        public abstract BlendableEase startSpeed (float startSpeed);
+        public abstract BlendInEase startSpeed(float startSpeed);
 
-        /** @return the start speed of the function. */
-        public abstract float getStartSpeed ();
+        /**
+         * @return the start speed of the function.
+         */
+        public abstract float getStartSpeed();
+
+        @Override
+        @NotNull
+        public abstract BlendInEase copyOrSelf();
+    }
+
+    /**
+     * A BlendInEase that also supports setting the ending speed of the function.
+     */
+    public abstract static class BlendInOutEase extends BlendInEase {
+
+        /**
+         * Set the end speed of the function, in units of value change over total duration. World
+         * speed should be divided by total ease duration before passing it in.
+         *
+         * @param endSpeed The final speed for the transition.
+         * @return The Ease for building.
+         */
+        @NotNull
+        public abstract BlendInOutEase endSpeed(float endSpeed);
+
+        /**
+         * @return the end speed of the function.
+         */
+        public abstract float getEndSpeed();
     }
 
     /* Immutable static eases --------------------------------------------------------------------*/
 
-    @NotNull
-    public static Ease linear = new Ease() {
+    private static Ease createLinear() {
+        return new Ease() {
 
-        @Override
-        public float apply (float a, float start, float end) {
-            if (a <= 0)
-                return start;
-            if (a >= 1)
-                return end;
-            return a * (end - start) + start;
-        }
+            @Override
+            public float apply(float a, float start, float end) {
+                if (a <= 0)
+                    return start;
+                if (a >= 1)
+                    return end;
+                return a * (end - start) + start;
+            }
 
-        @Override
-        public float speed (float a, float start, float end) {
-            return end - start;
-        }
+            @Override
+            public float speed(float a, float start, float end) {
+                return end - start;
+            }
 
-    };
+        };
+    }
 
     /**
-     * A cubic Hermite spline that starts and ends with zero speed.
+     * The default Ease used by TargetTweens if none is set. This is checked by identity to see if one has been
+     * explicitly set on the tween.
+     */
+    @NotNull
+    static Ease DEFAULT = createLinear();
+
+    @NotNull
+    public static Ease linear = createLinear();
+
+    /**
+     * A cubic Hermite polynomial that starts and ends with zero speed.
      */
     @NotNull
     public static Ease smoothstep = new Ease() {
         @Override
-        public float apply (float a, float start, float end) {
+        public float apply(float a, float start, float end) {
             if (a <= 0)
                 return start;
             if (a >= 1)
@@ -112,7 +161,7 @@ public abstract class Ease {
         }
 
         @Override
-        public float speed (float a, float start, float end) {
+        public float speed(float a, float start, float end) {
             if (a <= 0 || a >= 1)
                 return 0;
             return a * (6 - 6 * a) * (end - start);
@@ -121,12 +170,12 @@ public abstract class Ease {
     };
 
     /**
-     * A quintic Hermite spline that starts and ends with zero speed and zero acceleration. By Ken Perlin.
+     * A quintic Hermite polynomial that starts and ends with zero speed and zero acceleration. By Ken Perlin.
      */
     @NotNull
     public static Ease smootherstep = new Ease() {
         @Override
-        public float apply (float a, float start, float end) {
+        public float apply(float a, float start, float end) {
             if (a <= 0)
                 return start;
             if (a >= 1)
@@ -135,7 +184,7 @@ public abstract class Ease {
         }
 
         @Override
-        public float speed (float a, float start, float end) {
+        public float speed(float a, float start, float end) {
             if (a <= 0 || a >= 1)
                 return 0;
             return a * a * (a * (a * 30 - 60) + 30) * (end - start);
@@ -143,46 +192,54 @@ public abstract class Ease {
 
     };
 
-    /* Blendable eases --------------------------------------------------------------------------*/
+    /* Mutable eases --------------------------------------------------------------------------*/
 
-    public static class CubicHermite extends BlendableEase {
+    /**
+     * A cubic Hermite polynomial function whose starting and ending speeds can be specified.  The
+     * function is equivalent to {@link #smoothstep} if the starting and ending speeds are 0. This ease can
+     * be freed to a pool. Do not assign a single instance to multiple {@linkplain Tween Tweens}.
+     */
+    public static class CubicHermite extends BlendInOutEase {
         float startSpeed, endSpeed;
 
         @Override
         @NotNull
-        public CubicHermite startSpeed (float startSpeed) {
+        public CubicHermite startSpeed(float startSpeed) {
             this.startSpeed = startSpeed;
             return this;
         }
 
-        /**
-         * Set the end speed of the function, in units of value change over total duration. World
-         * speed should be divided by total ease duration before passing it in.
-         * @param endSpeed The final speed for the transition.
-         * @return The Ease for building.
-         */
+        @Override
         @NotNull
-        public CubicHermite endSpeed (float endSpeed) {
+        public CubicHermite endSpeed(float endSpeed) {
             this.endSpeed = endSpeed;
             return this;
         }
 
-        public float getStartSpeed () {
+        @Override
+        public float getStartSpeed() {
             return startSpeed;
         }
 
-        public float getEndSpeed () {
+        @Override
+        public float getEndSpeed() {
             return endSpeed;
         }
 
-        public void free () {
+        @Override
+        public @NotNull CubicHermite copyOrSelf() {
+            return cubicPool.obtain().startSpeed(startSpeed).endSpeed(endSpeed);
+        }
+
+        @Override
+        public void free() {
             startSpeed = 0;
             endSpeed = 0;
             cubicPool.free(this);
         }
 
         @Override
-        public float apply (float a, float start, float end) {
+        public float apply(float a, float start, float end) {
             if (startSpeed == 0 && endSpeed == 0)
                 return smoothstep.apply(a, start, end);
             if (a <= 0)
@@ -199,7 +256,7 @@ public abstract class Ease {
         }
 
         @Override
-        public float speed (float a, float start, float end) {
+        public float speed(float a, float start, float end) {
             if (a <= 0)
                 return startSpeed;
             if (a >= 1)
@@ -213,7 +270,7 @@ public abstract class Ease {
         }
     }
 
-    private static Pool<CubicHermite> cubicPool = new Pool<CubicHermite>() {
+    private static final Pool<CubicHermite> cubicPool = new Pool<CubicHermite>() {
         @Override
         protected CubicHermite newObject() {
             return new CubicHermite();
@@ -221,40 +278,60 @@ public abstract class Ease {
     };
 
     /**
-     * A cubic Hermite function whose starting and ending speeds can be specified.  The
-     * function is equivalent to smoothstep if the starting and ending speeds are 0. This ease can
-     * be freed to a pool. Do not assign a single instance to multiple {@linkplain TargetTween Tweens}.
-     *
-     * @return A cubic hermite ease
+     * @return A mutable cubic Hermite polynomial ease. Do not assign to multiple tweens.
      */
     @NotNull
-    public static CubicHermite cubic () {
+    public static CubicHermite cubic() {
         return cubicPool.obtain();
     }
 
-    public static class QuinticHermite extends CubicHermite {
+    /**
+     * A quintic Hermite polynomial function whose starting and ending speeds can be specified. The starting and
+     * ending acceleration will be zero. The function is equivalent to {@link #smootherstep} if the starting
+     * and ending speeds are 0. This ease can be freed to a pool. Do not assign a single instance to
+     * multiple {@linkplain TargetTween Tweens}.
+     */
+    public static class QuinticHermite extends BlendInOutEase {
+        float startSpeed, endSpeed;
 
         @Override
         @NotNull
-        public QuinticHermite startSpeed (float startSpeed) {
-            super.startSpeed(startSpeed);
+        public QuinticHermite startSpeed(float startSpeed) {
+            this.startSpeed = startSpeed;
             return this;
         }
 
         @Override
+        public float getStartSpeed() {
+            return startSpeed;
+        }
+
+        @Override
         @NotNull
-        public QuinticHermite endSpeed (float startSpeed) {
-            super.endSpeed(startSpeed);
+        public QuinticHermite endSpeed(float endSpeed) {
+            this.endSpeed = endSpeed;
             return this;
         }
 
         @Override
-        public void free () {
-            cubicPool.free(this);
+        public float getEndSpeed() {
+            return endSpeed;
         }
 
         @Override
-        public float apply (float a, float start, float end) {
+        public @NotNull QuinticHermite copyOrSelf() {
+            return quinticPool.obtain().startSpeed(startSpeed).endSpeed(endSpeed);
+        }
+
+        @Override
+        public void free() {
+            startSpeed = 0f;
+            endSpeed = 0f;
+            quinticPool.free(this);
+        }
+
+        @Override
+        public float apply(float a, float start, float end) {
             if (startSpeed == 0 && endSpeed == 0)
                 return smootherstep.apply(a, start, end);
             if (a <= 0)
@@ -273,7 +350,7 @@ public abstract class Ease {
         }
 
         @Override
-        public float speed (float a, float start, float end) {
+        public float speed(float a, float start, float end) {
             if (a <= 0)
                 return startSpeed;
             if (a >= 1)
@@ -285,11 +362,11 @@ public abstract class Ease {
             return 30 * (end - start) * (a4 - 2 * a3 + a2) +
                     startSpeed * (-15 * a4 + 32 * a3 - 18 * a2 + 1) +
                     endSpeed * (-15 * a4 + 28 * a3 - 12 * a2) +
-                    2.5f * a4 + 4 * a3 - 1.5f * a2;
+                    2.5f * a4 + 4 * a3 - 1.5f * a2; //TODO there is an error here. If start speed and end speed are zero, this term is non-zero.
         }
     }
 
-    private static Pool<QuinticHermite> quniticPool = new Pool<QuinticHermite>() {
+    private static final Pool<QuinticHermite> quinticPool = new Pool<QuinticHermite>() {
         @Override
         protected QuinticHermite newObject() {
             return new QuinticHermite();
@@ -297,16 +374,11 @@ public abstract class Ease {
     };
 
     /**
-     * A quintic Hermite function whose starting and ending speeds can be specified. The starting and
-     * ending acceleration will be zero. The function is equivalent to smootherstep if the starting
-     * and ending speeds are 0. This ease can be freed to a pool. Do not assign a single instance to
-     * multiple {@linkplain TargetTween Tweens}.
-     *
-     * @return A quintic hermite ease
+     * @return A mutable quintic Hermite polynomial ease. Do not assign to multiple tweens.
      */
     @NotNull
-    public static QuinticHermite quintic () {
-        return quniticPool.obtain();
+    public static QuinticHermite quintic() {
+        return quinticPool.obtain();
     }
 
     public static class InterpolationWrapper extends Ease {
@@ -319,12 +391,12 @@ public abstract class Ease {
             return interpolation;
         }
 
-        public void setInterpolation (@NotNull Interpolation interpolation) {
+        public void setInterpolation(@NotNull Interpolation interpolation) {
             this.interpolation = interpolation;
         }
 
         @Override
-        public void free () {
+        public void free() {
             interpolation = Interpolation.linear;
             precision = 0.001f;
             halfPrecision = 0.0005f;
@@ -337,18 +409,18 @@ public abstract class Ease {
          *
          * @param precision The new precision.
          */
-        public void setSpeedPrecision (float precision) {
+        public void setSpeedPrecision(float precision) {
             this.precision = precision;
             halfPrecision = 0.5f * precision;
         }
 
         @Override
-        public float apply (float a, float start, float end) {
+        public float apply(float a, float start, float end) {
             return interpolation.apply(start, end, MathUtils.clamp(a, 0f, 1f));
         }
 
         @Override
-        public float speed (float a, float start, float end) {
+        public float speed(float a, float start, float end) {
             if (a <= halfPrecision)
                 return interpolation.apply(precision) * (end - start) / precision;
 
@@ -368,7 +440,7 @@ public abstract class Ease {
      * @return An Ease that uses the function of an Interpolation.
      */
     @NotNull
-    public static InterpolationWrapper wrap (@NotNull Interpolation interpolation) {
+    public static InterpolationWrapper wrap(@NotNull Interpolation interpolation) {
         InterpolationWrapper ease = Pools.obtain(InterpolationWrapper.class);
         ease.setInterpolation(interpolation);
         return ease;
@@ -384,7 +456,7 @@ public abstract class Ease {
      * @return An Ease that uses the function of an Interpolation.
      */
     @NotNull
-    public static InterpolationWrapper wrap (@NotNull Interpolation interpolation, float speedPrecision) {
+    public static InterpolationWrapper wrap(@NotNull Interpolation interpolation, float speedPrecision) {
         InterpolationWrapper ease = Pools.obtain(InterpolationWrapper.class);
         ease.setInterpolation(interpolation);
         ease.setSpeedPrecision(speedPrecision);

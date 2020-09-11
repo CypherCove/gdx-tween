@@ -30,10 +30,10 @@ import java.util.Arrays;
  * @param <TG> The type of target the tween operates on.
  */
 public abstract class TargetTween<T, TG> extends Tween<T> {
-    private @NotNull Ease ease = Ease.linear;
+    private @NotNull Ease ease = Ease.DEFAULT;
     /**
-     * If true, the tween is using a BlendableEase and also interrupted another Tween, so the Ease's start speeds are
-     * to be overwritten the first time the tween begins.
+     * If true, the tween is using a {@link com.cyphercove.gdxtween.Ease.BlendInEase} and also interrupted another tween,
+     * so the Ease's start speeds are to be overwritten the first time the tween begins.
      */
     private boolean isBlended;
     /**
@@ -59,7 +59,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     protected final int vectorSize;
     protected TG target;
     private TargetTweenInterruptionListener<TG> interruptionListener;
-    private float duration = 1f;
+    private float duration = -1f;
 
     /**
      * @param vectorSize The number of elements in the vector being modified, or 1 for a scalar.
@@ -76,8 +76,9 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     protected void begin() {
         if (getTarget() == null)
             throw new IllegalStateException("Tween was started without setting a target: " + this);
+        duration = getDuration(); // Ensure duration is set (Default 0).
         for (int i = 0; i < vectorSize; i++) {
-            startSpeeds[i] = startWorldSpeeds[i] / getDuration();
+            startSpeeds[i] = startWorldSpeeds[i] / duration;
         }
     }
 
@@ -91,11 +92,11 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
             applyAfterComplete();
             return;
         }
-        float progress = getTime() / getDuration();
+        float progress = getTime() / duration;
         if (isBlended) {
-            Ease.BlendableEase blendable = (Ease.BlendableEase) ease;
+            Ease.BlendInEase blendInEase = (Ease.BlendInEase) ease;
             for (int i = 0; i < vectorSize; i++) {
-                blendable.startSpeed(startSpeeds[i]);
+                blendInEase.startSpeed(startSpeeds[i]);
                 apply(i, ease.apply(progress, startValues[i], endValues[i]));
             }
         } else {
@@ -127,38 +128,6 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * calculations used for #{@link #apply(int, float)} having rounding error.
      */
     protected void applyAfterComplete() {
-    }
-
-    @Override
-    public final float getDuration() {
-        return duration;
-    }
-
-    /**
-     * Set the length of this tween, not accounting for repeats.
-     *
-     * @param duration The tween's length.
-     * @return This tween for building.
-     */
-    @SuppressWarnings("unchecked")
-    @NotNull
-    public final T duration(float duration) {
-        this.duration = duration;
-        return (T) this;
-    }
-
-    /**
-     * Return this tween to its pool. Drops all external references. Frees any configurable eases.
-     */
-    @Override
-    public void free() {
-        super.free();
-        ease.free();
-        ease = Ease.linear;
-        isBlended = false;
-        duration = 1f;
-        Arrays.fill(endValues, 0f);
-        interruptionListener = null;
     }
 
     /**
@@ -193,9 +162,28 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
         return (T) this;
     }
 
+    @Override
+    public final float getDuration() {
+        return Math.max(duration, 0f);
+    }
+
+    /**
+     * Set the length of this tween, not accounting for repeats.
+     *
+     * @param duration The tween's length.
+     * @return This tween for building.
+     */
+    @SuppressWarnings("unchecked")
+    @NotNull
+    public final T duration(float duration) {
+        this.duration = duration;
+        return (T) this;
+    }
+
     /**
      * Gets the currently set Ease function. The Ease instance should not be reused for other tweens because it might be
-     * released to a Pool.
+     * released to a Pool. If none is set and this tween is a child of a GroupTween with a default Ease, calling this
+     * getter will automatically set the ease to a copy of its parent's default.
      *
      * @return The Ease function.
      */
@@ -205,10 +193,13 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     }
 
     /**
-     * Sets the ease function to use for the transition. If the Ease is {@linkplain Ease.BlendableEase blendable}, and
+     * Sets the ease function to use for the transition. If the Ease is {@linkplain Ease.BlendInEase blendable}, and
      * this tween interrupts an ongoing tween, then the tween will begin at the speed of the tween it is interrupting,
      * ignoring any start speed that is set on the ease. If the tween repeats, the original start speed of the ease will
      * be used when it repeats.
+     *
+     * If the Ease is mutable, it should not be shared with other tweens. Its start speed will be modified if it this
+     * tween interrupts another.
      *
      * @param ease The ease function to use.
      * @return This tween for building.
@@ -223,7 +214,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     /**
      * Sets the ease by wrapping an Interpolation as an Ease.
      *
-     * @param interpolation Interpolation functino to use.
+     * @param interpolation Interpolation function to use.
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
@@ -231,6 +222,50 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     public T ease(@NotNull Interpolation interpolation) {
         this.ease = Ease.wrap(interpolation);
         return (T) this;
+    }
+
+    /**
+     * Sets the duration and the ease function to use for the transition.
+     *
+     * @param duration The tween's length.
+     * @param ease The ease function to use.
+     * @return This tween for building.
+     * @see #duration(float)
+     * @see #ease(Ease)
+     */
+    @SuppressWarnings("unchecked")
+    @NotNull
+    public T using(float duration, @NotNull Ease ease) {
+        this.duration = duration;
+        this.ease = ease;
+        return (T) this;
+    }
+
+    /**
+     * Sets the duration and the ease function to use for the transition. The ease function is set by wrapping the
+     * provided Interpolation.
+     *
+     * @param duration The tween's length.
+     * @param interpolation Interpolation function to use.
+     * @return This tween for building.
+     * @see #duration(float)
+     * @see #ease(Interpolation)
+     */
+    @SuppressWarnings("unchecked")
+    @NotNull
+    public T using(float duration, @NotNull Interpolation interpolation) {
+        this.duration = duration;
+        this.ease = Ease.wrap(interpolation);
+        return (T) this;
+    }
+
+    @Override
+    void setParent(GroupTween<?> parent) {
+        super.setParent(parent);
+        if (ease == Ease.DEFAULT)
+            ease = parent.getDefaultEase().copyOrSelf();
+        if (duration < 0f)
+            duration = parent.getDefaultDuration();
     }
 
     /**
@@ -281,6 +316,32 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     }
 
     /**
+     * Fills the current world speeds into the provided array.
+     * @param output The array to fill the world speeds into.
+     */
+    protected final void getWorldSpeeds(@NotNull float[] output) {
+        if (isComplete()) {
+            Arrays.fill(output, 0, vectorSize, 0f);
+            return;
+        }
+        if (!isStarted() || getDuration() == 0f) {
+            if (isBlended) {
+                System.arraycopy(startWorldSpeeds, 0, output, 0, vectorSize);
+            }
+            Arrays.fill(output, 0, vectorSize, 0f);
+            return;
+        }
+        float progress = getTime() / getDuration();
+        for (int i = 0; i < vectorSize; i++) {
+            Ease localEase = getEase();
+            if (isBlended) {
+                ((Ease.BlendInEase) localEase).startSpeed(startSpeeds[i]);
+            }
+            output[i] = localEase.speed(progress, startValues[i], endValues[i]) * getDuration();
+        }
+    }
+
+    /**
      * Called by TweenRunner when this tween is first submitted before it is started.
      *
      * @return Starting world speeds array if this tween expects to be started at the speed of the tween it interrupts.
@@ -288,11 +349,13 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      */
     @Nullable
     protected float[] prepareToInterrupt() {
-        if (getDuration() == 0 || !(ease instanceof Ease.BlendableEase))
+        float localDuration = getDuration();
+        Ease localEase = getEase();
+        if (localDuration == 0 || !(localEase instanceof Ease.BlendInEase))
             return null;
         isBlended = true;
-        originalStartSpeed = ((Ease.BlendableEase) ease).getStartSpeed();
-        float originalWorldStartSpeed = originalStartSpeed * getDuration();
+        originalStartSpeed = ((Ease.BlendInEase) localEase).getStartSpeed();
+        float originalWorldStartSpeed = originalStartSpeed * localDuration;
         Arrays.fill(startWorldSpeeds, 0, vectorSize, originalWorldStartSpeed);
         return startWorldSpeeds;
     }
@@ -323,24 +386,18 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
         return false;
     }
 
-    protected void getWorldSpeeds(@NotNull float[] output) {
-        if (isComplete()) {
-            Arrays.fill(output, 0, vectorSize, 0f);
-            return;
-        }
-        if (!isStarted() || getDuration() == 0f) {
-            if (isBlended) {
-                System.arraycopy(startWorldSpeeds, 0, output, 0, vectorSize);
-            }
-            Arrays.fill(output, 0, vectorSize, 0f);
-            return;
-        }
-        float progress = getTime() / getDuration();
-        for (int i = 0; i < vectorSize; i++) {
-            if (isBlended) {
-                ((Ease.BlendableEase) ease).startSpeed(startSpeeds[i]);
-            }
-            output[i] = ease.speed(progress, startValues[i], endValues[i]) * getDuration();
-        }
+    /**
+     * Return this tween to its pool. Drops all external references. Frees any configurable eases.
+     */
+    @Override
+    public void free() {
+        super.free();
+        ease.free();
+        ease = Ease.DEFAULT;
+        isBlended = false;
+        duration = -1f;
+        Arrays.fill(endValues, 0f);
+        interruptionListener = null;
     }
+
 }

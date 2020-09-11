@@ -113,28 +113,27 @@ int nameCounter;
             clickSprite.setOriginBasedPosition(temp.x, temp.y);
             Tweens.inParallel()
                     .name("p " + ++nameCounter)
+                    .using(1f, shouldBlend ? Ease.cubic() : Ease.smootherstep)
                     .run(
-                        Tweens.to(position, temp.x, temp.y, 1f)
+                        Tweens.to(position, temp.x, temp.y)
                             .name("sprite position " + ++nameCounter)
-                            .ease(shouldBlend ? Ease.quintic() : Ease.smootherstep)
                     )
                     .run(
-                        Tweens.to(scale, 1.5f, 1f)
+                        Tweens.to(scale, 1f)
                             .name("scale " + ++nameCounter)
-                            .ease(Ease.smoothstep)
                     )
                     .start(tweenRunner);
             Tweens.inSequence()
                     .name("indicator color " + ++nameCounter)
                     .inParallel()
-                    .run(Tweens.toAlpha(clickColor, 1f, 0.2f)
-                            .ease(Ease.wrap(Interpolation.pow2In)))
-                    .run(Tweens.toRgb(clickColor, Color.RED, 0.2f))
+                    .using(0.2f, Ease.wrap(Interpolation.pow2In))
+                    .run(Tweens.toAlpha(clickColor, 1f))
+                    .run(Tweens.toRgb(clickColor, Color.RED))
                     .then()
                     .delay(0.1f)
                     .inParallel()
-                    .run(Tweens.toAlpha(clickColor, 0f, 0.6f))
-                    .run(Tweens.toRgb(clickColor, Color.ROYAL, 0.2f))
+                    .run(Tweens.toAlpha(clickColor, 0f).duration(0.6f))
+                    .run(Tweens.toRgb(clickColor, Color.ROYAL).duration(0.2f))
                     .start(tweenRunner);
             return true;
         }

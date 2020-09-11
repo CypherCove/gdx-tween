@@ -15,8 +15,10 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -42,7 +44,6 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
     @Override
     protected void begin() {
         super.begin();
-
     }
 
     @Override
