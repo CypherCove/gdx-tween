@@ -26,7 +26,7 @@ import java.util.Arrays;
  * Base class for tweens that target and interpolate a specific single object. An Ease function can be set to affect the
  * speed of the change over time.
  *
- * @param <T> The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
+ * @param <T>  The type of this tween. A non-abstract subclass must specify itself as this type. This is not checked.
  * @param <TG> The type of target the tween operates on.
  */
 public abstract class TargetTween<T, TG> extends Tween<T> {
@@ -58,7 +58,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     private final float[] endValues;
     protected final int vectorSize;
     protected TG target;
-    private TargetTweenInterruptionListener<TG> interruptionListener;
+    private TweenInterruptionListener<T> interruptionListener;
     private float duration = -1f;
 
     /**
@@ -158,7 +158,10 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     @SuppressWarnings("unchecked")
     @NotNull
     public final T target(@NotNull TG target) {
-        this.target = target;
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.target = target;
         return (T) this;
     }
 
@@ -176,7 +179,10 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     @SuppressWarnings("unchecked")
     @NotNull
     public final T duration(float duration) {
-        this.duration = duration;
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.duration = duration;
         return (T) this;
     }
 
@@ -197,7 +203,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * this tween interrupts an ongoing tween, then the tween will begin at the speed of the tween it is interrupting,
      * ignoring any start speed that is set on the ease. If the tween repeats, the original start speed of the ease will
      * be used when it repeats.
-     *
+     * <p>
      * If the Ease is mutable, it should not be shared with other tweens. Its start speed will be modified if it this
      * tween interrupts another.
      *
@@ -207,7 +213,10 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     @SuppressWarnings("unchecked")
     @NotNull
     public T ease(@NotNull Ease ease) {
-        this.ease = ease;
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.ease = ease;
         return (T) this;
     }
 
@@ -220,7 +229,10 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     @SuppressWarnings("unchecked")
     @NotNull
     public T ease(@NotNull Interpolation interpolation) {
-        this.ease = Ease.wrap(interpolation);
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.ease = Ease.wrap(interpolation);
         return (T) this;
     }
 
@@ -228,7 +240,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * Sets the duration and the ease function to use for the transition.
      *
      * @param duration The tween's length.
-     * @param ease The ease function to use.
+     * @param ease     The ease function to use.
      * @return This tween for building.
      * @see #duration(float)
      * @see #ease(Ease)
@@ -236,8 +248,12 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     @SuppressWarnings("unchecked")
     @NotNull
     public T using(float duration, @NotNull Ease ease) {
-        this.duration = duration;
-        this.ease = ease;
+        if (isAttached())
+            logMutationAfterAttachment();
+        else {
+            this.duration = duration;
+            this.ease = ease;
+        }
         return (T) this;
     }
 
@@ -245,7 +261,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * Sets the duration and the ease function to use for the transition. The ease function is set by wrapping the
      * provided Interpolation.
      *
-     * @param duration The tween's length.
+     * @param duration      The tween's length.
      * @param interpolation Interpolation function to use.
      * @return This tween for building.
      * @see #duration(float)
@@ -254,8 +270,12 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     @SuppressWarnings("unchecked")
     @NotNull
     public T using(float duration, @NotNull Interpolation interpolation) {
-        this.duration = duration;
-        this.ease = Ease.wrap(interpolation);
+        if (isAttached())
+            logMutationAfterAttachment();
+        else {
+            this.duration = duration;
+            this.ease = Ease.wrap(interpolation);
+        }
         return (T) this;
     }
 
@@ -310,13 +330,17 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public T interruptionListener(@Nullable TargetTweenInterruptionListener<TG> listener) {
-        this.interruptionListener = listener;
+    public T interruptionListener(@Nullable TweenInterruptionListener<T> listener) {
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.interruptionListener = listener;
         return (T) this;
     }
 
     /**
      * Fills the current world speeds into the provided array.
+     *
      * @param output The array to fill the world speeds into.
      */
     protected final void getWorldSpeeds(@NotNull float[] output) {
@@ -365,6 +389,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
         collection.add(this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
         if (isComplete()) {
@@ -379,7 +404,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
                 getWorldSpeeds(requestedWorldSpeeds);
             }
             if (interruptionListener != null) {
-                interruptionListener.onTweenInterrupted(this);
+                interruptionListener.onTweenInterrupted((T)this, (T)sourceTween);
             }
             return true;
         }

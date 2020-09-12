@@ -65,8 +65,12 @@ public abstract class GroupTween<T> extends Tween<T> {
             throw new IllegalArgumentException("Cannot add child tween " + childTween.getName() + " to "
                     + getName() + " because it has already been started.");
         }
-        childTween.setParent(this);
-        children.add(childTween);
+        if (isAttached())
+            logMutationAfterAttachment();
+        else {
+            childTween.setParent(this);
+            children.add(childTween);
+        }
         return (T)this;
     }
 
@@ -191,7 +195,10 @@ public abstract class GroupTween<T> extends Tween<T> {
      */
     @SuppressWarnings("unchecked")
     public T childInterruptionBehavior(@NotNull ChildInterruptionBehavior childInterruptionBehavior) {
-        this.childInterruptionBehavior = childInterruptionBehavior;
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.childInterruptionBehavior = childInterruptionBehavior;
         return (T)this;
     }
 

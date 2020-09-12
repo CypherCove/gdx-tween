@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,8 +39,8 @@ public abstract class Tween<U> {
     private GroupTween<?> parent = null;
 
     /**
-     * Whether the tween has been attached to a TweenRunner or to a parent. This is used to check for the error of
-     * starting a tween more than once.
+     * Whether the tween has been attached to a TweenRunner or to a parent. A tween must not be modified after
+     * attachment.
      */
     boolean isAttached() {
         return isAttached;
@@ -208,7 +209,10 @@ public abstract class Tween<U> {
     @SuppressWarnings("unchecked")
     @NotNull
     public U completionListener(@Nullable TweenCompletionListener<U> listener) {
-        this.completionListener = listener;
+        if (isAttached)
+            logMutationAfterAttachment();
+        else
+            this.completionListener = listener;
         return (U) this;
     }
 
@@ -247,6 +251,12 @@ public abstract class Tween<U> {
         time = 0f;
         completionListener = null;
         parent = null;
+    }
+
+    protected void logMutationAfterAttachment() {
+        Gdx.app.error("gdx-tween", "Warning: Tweens must not be modified after attachment to a GroupTween" +
+                "or the TweenRunner, and this call will be ignored. Tween: " + getName() +
+                ", method: " + Thread.currentThread().getStackTrace()[2].getMethodName());
     }
 
     /**

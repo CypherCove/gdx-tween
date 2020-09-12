@@ -16,7 +16,7 @@
 package com.cyphercove.gdxtween;
 
 /**
- * Available behaviors for how to react to a child tween being interrupted by another tween.
+ * Available behaviors for how to react to a child {@link TargetTween} being interrupted by another TargetTween.
  */
 public enum ChildInterruptionBehavior {
     /**

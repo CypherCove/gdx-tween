@@ -58,6 +58,9 @@ Tweens.to(myVector2, 1f, 1f).duration(3f)
     .start(tweenRunner);
 ```
 
+A tween's parameters must not be modified after starting it or adding it to a group. These parameter changes are ignored, 
+but log a warning.
+
 ### GroupTweens
 
 The API of setting up Tween sequences is heavily inspired by 
@@ -137,7 +140,11 @@ TODO ...
 
 ### Callbacks
 
-TODO ...
+TweenCompletionListener can be added to any tween using `.completionListener()`. It fires when a tween reaches its end.
+Children of a GroupTween can have their own individual listeners that fire as they are completed.
+
+TargetInterruptionListener can be added to TargetTweens using `.interruptionListener()`. It fires when another 
+TargetTween interrupts its owner.
 
 ## Kotlin
 

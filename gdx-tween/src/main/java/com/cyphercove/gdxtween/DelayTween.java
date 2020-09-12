@@ -58,7 +58,10 @@ public final class DelayTween extends Tween<DelayTween> {
      */
     @NotNull
     public final DelayTween duration(float duration) {
-        this.duration = duration;
+        if (isAttached())
+            logMutationAfterAttachment();
+        else
+            this.duration = duration;
         return this;
     }
 

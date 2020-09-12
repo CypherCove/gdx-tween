@@ -42,11 +42,6 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
     }
 
     @Override
-    protected void begin() {
-        super.begin();
-    }
-
-    @Override
     protected void update() {
         for (Tween<?> tween : children) {
             if (!tween.isComplete() && !tween.isCanceled()) {
