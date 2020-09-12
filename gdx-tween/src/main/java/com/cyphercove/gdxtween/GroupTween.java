@@ -38,6 +38,13 @@ public abstract class GroupTween<T> extends Tween<T> {
     }
 
     @Override
+    void markAttached() {
+        super.markAttached();
+        for (Tween<?> tween : children)
+            tween.markAttached();
+    }
+
+    @Override
     protected void begin() {
         duration = calculateDuration();
     }
@@ -64,6 +71,9 @@ public abstract class GroupTween<T> extends Tween<T> {
         if (childTween.isAttached()) {
             throw new IllegalArgumentException("Cannot add child tween " + childTween.getName() + " to "
                     + getName() + " because it has already been started.");
+        } else if (childTween.getParent() != null) {
+            throw new IllegalArgumentException("Cannot add child tween " + childTween.getName() + " to "
+                    + getName() + " because it has already been added to a group.");
         }
         if (isAttached())
             logMutationAfterAttachment();

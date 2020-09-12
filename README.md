@@ -88,7 +88,7 @@ have none set. This is especially useful for ParallelTweens, since they often ru
 Tweens.inParallel()
     .duration(3f)
     .run(Tweens.to(playerPosition, -1f, -1f))
-    .run(Tweens.to(playerAlpha, 1f))
+    .run(Tweens.toAlpha(playerColor, 1f))
     .start(tweenManager);
 ```
 
@@ -97,7 +97,7 @@ child of a sequence, its parent sequence is returned.
 
 ```java
 Tween.to(playerPosition, 1f, 1f, 1f))
-    .then().run(Tween.to(playerPosition, 1f, 1f, 1f))
+    .then().run(Tweens.to(playerPosition, 1f, 1f, 1f))
     .start(tweenManager);
 ```
 
@@ -108,7 +108,7 @@ Tween.inSequence()
     .run(Tweens.to(playerPosition, 1f, 1f, 1f).ease(Ease.cubic()))
     .inParallel()
         .run(Tweens.to(playerPosition, -1f, -1f, 1f).ease(Ease.cubic()))
-        .run(Tweens.to(playerAlpha, 1f, 1f).ease(Ease.cubic()))
+        .run(Tweens.toAlpha(playerColor, 1f, 1f).ease(Ease.cubic()))
     // .then() OK to omit this line. The parent sequence will be started.
     .start(tweenManager);
 ```
@@ -153,7 +153,7 @@ conciseness and readability.
 
 ### Target extensions
 
-Target object extension functions are available for all the provided TargetTweens. These can be used to start tweens 
+Target object extension functions are available for all the library TargetTweens. These can be used to start tweens 
 with more natural syntax. For example:
 
 ```kotlin
@@ -182,25 +182,32 @@ class MyScreen: Screen, TweenManager by DelegateTweenManager() {
 }
 ```
 
-### TweenBuilder
+### Building GroupTweens
 
-The `tween` function can be used to build a tween using a `TweenBuilder`, which is a utility class with access to all the
-members of `Tweens` and `Ease`, thereby allowing you to omit the `Tweens.` and `Ease.` prefixes within the passed lambda
-function (without having to do static imports that pollute autocomplete throughout the file you're working on).
+Top level functions `inSequence` and `inBuilder` allow creation of complex tweens using lambda functions, which is more
+concise and allows the IDE to indent nested tweens for you. Extension functions for creating and adding all the library 
+TargetTweens are also provided for GroupTween, meaning they can be added without wrapping them in `run()`, and 
+ParallelTweens don't need to be followed by a call to `.then()`. (Note `run()` is still required if using the target 
+extension functions above.) GroupTween also has extensions for the library Eases, so the `Ease.` prefix can be omitted
+inside the lambda.
 
 ```kotlin
-tween { 
-    inSequence()
-    .ease(cubic)
-    .run(to(playerPosition, 1f, 1f).duration(1f))
-    .run(to(playerAlpha, 0.5f).duration(1f))
-    .delay(0.3f)
-    .inParallel()
-        .using(1f, cubic())
-        .run(to(playerPosition, -1f, -1f))
-        .run(to(playerAlpha, 1f, 1f))
-    .then()
-    .run(Tween.to(playerPosition, 1f, 1f, 1f))
+inSequence { 
+    ease(cubic())
+    to(playerPosition, 1f, 1f).duration(1f)
+    toAlpha(playerColor, 0.5f).duration(0.5f)
+    delay(0.3f)
+    inParallel {
+        using(1f, cubic())
+        to(playerPosition, -1f, -1f)
+        toAlpha(playerColor, 1f, 1f)
+        inSequence {
+            delay(0.2f)
+            toRgb(playerColor, Color.RED)
+            toRgb(playerColor, Color.WHITE)
+        }
+    }
+    to(playerPosition, 1f, 1f, 1f)
 }.start(tweenRunner)
 ```
 
