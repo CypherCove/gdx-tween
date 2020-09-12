@@ -249,9 +249,8 @@ public abstract class Ease {
 
             float a2 = a * a;
             float a3 = a2 * a;
-            return start * (2 * a3 - 3 * a2 + 1) +
+            return start + (end - start) * (-2 * a3 + 3 * a2) +
                     startSpeed * (a3 - 2 * a2 + a) +
-                    end * (-2 * a3 + 3 * a2) +
                     endSpeed * (a3 - a2);
         }
 
@@ -263,10 +262,10 @@ public abstract class Ease {
                 return endSpeed;
 
             float a2 = a * a;
-            return start * (6 * a2 - 6 * a) +
-                    startSpeed * (3 * a2 - 4 * a + 1) +
-                    end * (-6 * a2 + 6 * a) +
-                    endSpeed * (3 * a2 - 2 * a);
+            float a2x3 = a2 * 3;
+            return 6 * (end - start) * (a - a2) +
+                    startSpeed * (a2x3 - 4 * a + 1) +
+                    endSpeed * (a2x3 - 2 * a);
         }
     }
 
@@ -341,12 +340,10 @@ public abstract class Ease {
 
             float a3 = a * a * a;
             float a4 = a3 * a;
-            float a5 = a4 * a;
-            return start * (-6 * a5 + 15 * a4 - 10 * a3 + 1) +
-                    startSpeed * (-3 * a5 + 8 * a4 - 6 * a3 + a) +
-                    end * (6 * a5 - 15 * a4 + 10 * a3) +
-                    endSpeed * (-3 * a5 + 7 * a4 - 4 * a3) +
-                    a4 - 0.5f * (a5 + a3);
+            float a5x3 = a4 * a * 3;
+            return start + (end - start) * (2 * a5x3 - 15 * a4 + 10 * a3) +
+                    startSpeed * (-a5x3 + 8 * a4 - 6 * a3 + a) +
+                    endSpeed * (-a5x3 + 7 * a4 - 4 * a3);
         }
 
         @Override
@@ -359,10 +356,10 @@ public abstract class Ease {
             float a2 = a * a;
             float a3 = a2 * a;
             float a4 = a2 * a2;
+            float minusA4x15 = -15 * a4;
             return 30 * (end - start) * (a4 - 2 * a3 + a2) +
-                    startSpeed * (-15 * a4 + 32 * a3 - 18 * a2 + 1) +
-                    endSpeed * (-15 * a4 + 28 * a3 - 12 * a2) +
-                    2.5f * a4 + 4 * a3 - 1.5f * a2; //TODO there is an error here. If start speed and end speed are zero, this term is non-zero.
+                    startSpeed * (minusA4x15 + 32 * a3 - 18 * a2 + 1) +
+                    endSpeed * (minusA4x15 + 28 * a3 - 12 * a2);
         }
     }
 

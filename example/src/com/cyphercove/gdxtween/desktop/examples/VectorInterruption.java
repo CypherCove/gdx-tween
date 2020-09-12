@@ -113,13 +113,13 @@ int nameCounter;
             clickSprite.setOriginBasedPosition(temp.x, temp.y);
             Tweens.inParallel()
                     .name("p " + ++nameCounter)
-                    .using(1f, shouldBlend ? Ease.cubic() : Ease.smootherstep)
+                    .using(1f, shouldBlend ? Ease.quintic() : Ease.smootherstep)
                     .run(
                         Tweens.to(position, temp.x, temp.y)
                             .name("sprite position " + ++nameCounter)
                     )
                     .run(
-                        Tweens.to(scale, 1f)
+                        Tweens.to(scale, 1.5f)
                             .name("scale " + ++nameCounter)
                     )
                     .start(tweenRunner);
