@@ -209,7 +209,7 @@ public final class Tweens {
      * @return A GridPoint3Tween that will automatically be returned to a pool when complete.
      */
     @NotNull
-    static public GridPoint3Tween to(@NotNull GridPoint3 target, float endX, float endY, float endZ) {
+    static public GridPoint3Tween to(@NotNull GridPoint3 target, int endX, int endY, int endZ) {
         return GridPoint3Tween.newInstance()
                 .target(target)
                 .end(endX, endY, endZ);

@@ -61,7 +61,7 @@ public class GridPoint2Tween extends TargetTween<GridPoint2Tween, GridPoint2> {
     }
 
     @NotNull
-    public GridPoint2Tween end (float endX, float endY){
+    public GridPoint2Tween end (int endX, int endY){
         setEndValue(0, endX);
         setEndValue(1, endY);
         return this;
