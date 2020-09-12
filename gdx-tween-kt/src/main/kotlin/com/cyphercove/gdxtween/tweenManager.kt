@@ -27,18 +27,19 @@ interface TweenManager {
      */
     fun TargetTween<*, *>.start() = start(tweenRunner)
 
-    /** Must be called for every frame of animation to advance all of the tweens in both runners. When using this function,
-     * the step functions of the two runners should not be called directly.
-     * @param deltaTime The time passed since the last step. */
+    /**
+     * Must be called for every frame of animation to advance all of the tweens.
+     * @param deltaTime The time passed since the last step.
+     */
     fun TweenManager.stepTweens(deltaTime: Float) {
         tweenRunner.step(deltaTime)
     }
 
     /**
-     * Removes all tweens immediately. No listener will be called.
+     * Cancels all tweens immediately. No listener will be called.
      * @return Whether any tween was removed.
      */
-    fun TweenManager.clearAllTweens(): Boolean {
+    fun TweenManager.cancelAllTweens(): Boolean {
         return tweenRunner.cancelAllTweens()
     }
 

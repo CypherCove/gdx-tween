@@ -69,7 +69,7 @@ public class TweenRunner {
     }
 
     /**
-     * Removes all tweens immediately. No listener will be called.
+     * Cancels all tweens immediately. No listener will be called.
      * @return Whether any tweens existed and were removed.
      */
     public boolean cancelAllTweens() {

@@ -149,7 +149,16 @@ TargetTween interrupts its owner.
 ## Kotlin
 
 If you use Kotlin, you can use the `-kt` version of the library to get some helper extension functions that improve 
-conciseness.
+conciseness and readability.
+
+### Target extensions
+
+Target object extension functions are available for all the provided TargetTweens. These can be used to start tweens 
+with more natural syntax. For example:
+
+```kotlin
+val myTween = myPosition.tweenTo(4f, 5f).duration(2f)
+```
 
 ### TweenManager
 
@@ -175,7 +184,7 @@ class MyScreen: Screen, TweenManager by DelegateTweenManager() {
 
 ### TweenBuilder
 
-The `tween` function can be used to build a tween using a `TweenBuilder`, which is utility class with access to all the
+The `tween` function can be used to build a tween using a `TweenBuilder`, which is a utility class with access to all the
 members of `Tweens` and `Ease`, thereby allowing you to omit the `Tweens.` and `Ease.` prefixes within the passed lambda
 function (without having to do static imports that pollute autocomplete throughout the file you're working on).
 
