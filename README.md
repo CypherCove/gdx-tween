@@ -14,7 +14,9 @@ The main goals of this library:
  * Usable in Scene2D so the second order interrupting behavior can be used in Actions.
 
 ## Installation
-When stable, gdx-tween will be available on JCenter. For now, you can publish to Maven local and use:
+Currently, the library is not stable. The API is rapidly evolving with breaking changes and no change log. Use at your own risk.
+
+gdx-tween is available on JCenter. For now, you can publish to Maven local and use:
 
     implementation "com.cyphercove.gdxtween:gdxtween:0.1.0"
     
