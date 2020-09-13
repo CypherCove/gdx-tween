@@ -202,6 +202,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * Sets the behavior for reacting to children that are interrupted. This setting is ignored if this tween is not
      * the top level parent in the hierarchy.
      * @param childInterruptionBehavior The behavior to set.
+     * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
     public T childInterruptionBehavior(@NotNull ChildInterruptionBehavior childInterruptionBehavior) {

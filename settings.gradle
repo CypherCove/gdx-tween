@@ -1,1 +1,1 @@
-include 'example', 'gdx-tween', 'gdx-tween-kt'
+include 'example', 'gdxtween', 'gdxtween-kt'

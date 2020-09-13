@@ -21,11 +21,11 @@ them in IntelliJ at **Settings | Editor | Inspections | Java | Probable bugs**.
 ## Installation
 When stable, gdx-tween will be available on JCenter. For now, you can publish to Maven local and use:
 
-    implementation "com.cyphercove.gdx-tween:gdx-tween:0.1.0"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.0"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.cyphercove.gdx-tween:gdx-tween-kt:0.1.0"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.0"
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and libGDX version increases.
 
@@ -240,4 +240,6 @@ inSequence {
 gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the GtColor class were 
 ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by the 
 [MIT license](LICENSE-AC-COLORS.md).
+
+The example uses [VisUI](https://github.com/kotcrab/vis-ui) and the default VisUI skin.
 

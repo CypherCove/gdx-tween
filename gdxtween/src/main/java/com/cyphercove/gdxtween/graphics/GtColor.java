@@ -62,13 +62,14 @@ public final class GtColor {
     }
 
     /**
-     * Linearly interpolates RGB between the two colors in gamma-corrected RGB color space. Alpha is not modified.
+     * Linearly interpolates RGB between the two colors in linear RGB color space (gamma correction removed). Alpha is
+     * not modified.
      *
      * @param startAndResult The starting color. The result is placed in this color object.
      * @param end            The target color.
      * @param t              The interpolation coefficient. Must be in the range 0..1.
      */
-    public static void lerpRgbGamma(Color startAndResult, Color end, float t) {
+    public static void lerpLinearRgb(Color startAndResult, Color end, float t) {
         float red = invertGammaCorrection(startAndResult.r);
         float green = invertGammaCorrection(startAndResult.g);
         float blue = invertGammaCorrection(startAndResult.b);
@@ -86,7 +87,7 @@ public final class GtColor {
      * @param t              The interpolation coefficient. Must be in the range 0..1.
      */
     public static void lerpRgbAGamma(Color startAndResult, Color end, float t) {
-        lerpRgbGamma(startAndResult, end, t);
+        lerpLinearRgb(startAndResult, end, t);
         startAndResult.a = startAndResult.a + t * (end.a - startAndResult.a);
     }
 

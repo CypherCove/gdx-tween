@@ -12,8 +12,6 @@ compileKotlin {
 }
 
 dependencies {
-    api project(":gdx-tween")
-//    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-//    implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+    api project(":gdxtween")
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

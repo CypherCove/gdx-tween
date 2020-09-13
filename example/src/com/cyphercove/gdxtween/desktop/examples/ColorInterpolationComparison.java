@@ -1,14 +1,17 @@
 package com.cyphercove.gdxtween.desktop.examples;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.cyphercove.covetools.utils.Disposal;
 import com.cyphercove.gdxtween.desktop.ExampleScreen;
 import com.cyphercove.gdxtween.desktop.ExamplesParent;
 import com.cyphercove.gdxtween.desktop.SharedAssets;
 import com.cyphercove.gdxtween.graphics.GtColor;
+import com.kotcrab.vis.ui.widget.color.BasicColorPicker;
+import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
 
 public class ColorInterpolationComparison extends ExampleScreen {
 
@@ -16,6 +19,8 @@ public class ColorInterpolationComparison extends ExampleScreen {
 		super(sharedAssets, examplesParent);
 	}
 
+	BasicColorPicker firstColorPicker = new BasicColorPicker();
+	BasicColorPicker secondColorPicker = new BasicColorPicker();
 	Color color = new Color();
 	Color firstColor = new Color(Color.BLUE);
 	Color secondColor = new Color(Color.YELLOW);
@@ -38,56 +43,84 @@ public class ColorInterpolationComparison extends ExampleScreen {
 	}
 
 	private void setupUI () {
+		Table table = new Table();
+		table.setFillParent(true);
+		table.pad(15);
+		table.add(firstColorPicker).center().pad(20);
+		firstColorPicker.setColor(firstColor);
+		firstColorPicker.setListener(new ColorPickerAdapter() {
+			@Override
+			public void changed(Color newColor) {
+				firstColor.set(newColor);
+			}
+		});
 
+		Table innerTable = new Table(sharedAssets.getSkin());
+		String[] types = { "Rgb", "LinearRgb", "Hsv", "Lab", "Lch" };
+		for (int i = 0; i < types.length; i++) {
+			innerTable.add(types[i]).center();
+			innerTable.add(new ColorTransition(i)).growX().height(50).space(10);
+			innerTable.row();
+		}
+		table.add(innerTable).grow();
+
+		table.add(secondColorPicker).center().pad(20);
+		secondColorPicker.setColor(secondColor);
+		secondColorPicker.setListener(new ColorPickerAdapter() {
+			@Override
+			public void changed(Color newColor) {
+				secondColor.set(newColor);
+			}
+		});
+		stage.addActor(table);
 	}
 
-	@Override
-	public void render (float dt) {
-		SpriteBatch batch = sharedAssets.getSpriteBatch();
-		Viewport viewport = sharedAssets.getViewport();
-		Texture white = sharedAssets.getWhite();
+	private class ColorTransition extends Actor {
+		int spaceType;
 
-		batch.enableBlending();
-		batch.setProjectionMatrix(viewport.getCamera().combined);
-		batch.begin();
+		public ColorTransition(int spaceType) {
+			this.spaceType = spaceType;
+		}
 
-		int types = 5;
-		float topBottomPadding = 0.15f; // as fraction of screen height
-		float rowSpacing = 0.15f; // as fraction of screen height
-		float width = viewport.getCamera().viewportWidth * 0.5f;
-		float height = viewport.getCamera().viewportHeight * (1f - topBottomPadding * 2f);
-		float rowSpace = rowSpacing * height / (types - 1);
-		float rowHeight = height * (1f - rowSpacing) / types;
-		float left = viewport.getCamera().position.x - width / 2;
-		float bottom = viewport.getCamera().position.y - height / 2;
-		int segments = 20;
-		float segmentWidth = width / segments;
-		for (int type = 0; type < types; type++) {
+		@Override
+		public void draw(Batch batch, float parentAlpha) {
+			int segments = 80;
+			float segmentWidth = getWidth() / segments;
 			for (int i = 0; i < segments; i++) {
 				float progress = (float)i / (segments - 1);
 				tmpColor.set(firstColor);
-				switch (type) {
-					case 4:
+				switch (spaceType) {
+					case 0:
 						GtColor.lerpRgb(tmpColor, secondColor, progress);
 						break;
-					case 3:
-						GtColor.lerpRgbGamma(tmpColor, secondColor, progress);
+					case 1:
+						GtColor.lerpLinearRgb(tmpColor, secondColor, progress);
 						break;
 					case 2:
 						GtColor.lerpHsv(tmpColor, secondColor, progress);
 						break;
-					case 1:
+					case 3:
 						GtColor.lerpLab(tmpColor, secondColor, progress);
 						break;
-					case 0:
+					case 4:
 						GtColor.lerpLch(tmpColor, secondColor, progress);
 						break;
 				}
 				batch.setColor(tmpColor);
-				batch.draw(white, i * segmentWidth + left, type * (rowHeight + rowSpace) + bottom, segmentWidth, rowHeight);
+				batch.draw(sharedAssets.getWhite(), getX() + segmentWidth * i, getY(), segmentWidth, getHeight());
 			}
 		}
+	}
 
-		batch.end();
+	@Override
+	public void render (float dt) {
+		stage.act(dt);
+		stage.draw();
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+		Disposal.clear(this);
 	}
 }

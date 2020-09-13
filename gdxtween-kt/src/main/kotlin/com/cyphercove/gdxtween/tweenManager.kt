@@ -45,14 +45,6 @@ interface TweenManager {
 
 }
 
-/**
- * Creates a tween using the passed function and starts it immediately.
- * @return The created and started tween.
- */
-inline fun <T: Tween<*>> TweenManager.startTween(tweenSetup: TweenBuilder.() -> T): T {
-    return tween(tweenSetup).also { it.start(tweenRunner) }
-}
-
 /** A basic implementation of [TweenManager] that can be used as a delegate. */
 class DelegateTweenManager : TweenManager {
     override val tweenRunner = TweenRunner()

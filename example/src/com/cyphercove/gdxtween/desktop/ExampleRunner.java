@@ -25,11 +25,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.cyphercove.covetools.utils.Disposal;
 import com.cyphercove.gdxtween.desktop.examples.ColorInterpolationComparison;
 import com.cyphercove.gdxtween.desktop.examples.VectorInterruption;
+import com.kotcrab.vis.ui.VisUI;
 
 import static com.badlogic.gdx.math.MathUtils.random;
 
@@ -38,17 +40,19 @@ public class ExampleRunner extends Game implements ExamplesParent {
 	final SharedAssets assets = new SharedAssets();
 	final InputMultiplexer inputMultiplexer = new InputMultiplexer();
 
-	final ExampleScreen[] screens = {
-			new ColorInterpolationComparison(assets, this),
-			new VectorInterruption(assets, this)
-	};
+	final Array<ExampleScreen> screens = new Array<>();
 
 	@Override
 	public void create() {
+		VisUI.load();
+		screens.addAll(
+				new ColorInterpolationComparison(assets, this),
+				new VectorInterruption(assets, this)
+		);
 		assets.create();
 		setupUI();
 		Gdx.input.setInputProcessor(inputMultiplexer);
-		setScreen(screens[0]);
+		setScreen(screens.first());
 	}
 
 	private void setupUI() {
@@ -112,7 +116,10 @@ public class ExampleRunner extends Game implements ExamplesParent {
 
 	@Override
 	public void dispose() {
+		for (Screen screen: screens)
+			screen.dispose();
 		Disposal.clear(this);
+		VisUI.dispose();
 	}
 
 }

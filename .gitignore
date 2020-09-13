@@ -126,5 +126,5 @@ Thumbs.db
 
 ## Project specific
 /example/build/
-/gdx-tween/build/
-/gdx-tween-kt/build/
+/gdxtween/build/
+/gdxtween-kt/build/

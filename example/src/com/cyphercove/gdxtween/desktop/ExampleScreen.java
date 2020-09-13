@@ -17,6 +17,7 @@ package com.cyphercove.gdxtween.desktop;
 
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.utils.Disposable;
 
 public abstract class ExampleScreen extends ScreenAdapter {
 

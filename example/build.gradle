@@ -1,11 +1,12 @@
 apply plugin: "java"
 
 dependencies {
-    implementation project(":gdx-tween")
+    implementation project(":gdxtween")
     implementation "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
     implementation "com.cyphercove.covetools:covetools:1.2.2"
+    compile "com.kotcrab.vis:vis-ui:1.4.6"
 }
 
 sourceCompatibility = 1.8

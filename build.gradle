@@ -22,7 +22,7 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "java"
 
-    group = 'com.cyphercove.gdx-tween'
+    group = 'com.cyphercove.gdxtween'
     version = '0.1.0'
 
     ext {
@@ -111,3 +111,4 @@ configure(subprojects.findAll {it.name != 'example'}) {
         }
     }
 }
+
