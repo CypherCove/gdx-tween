@@ -15,15 +15,20 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id "com.jfrog.bintray" version "1.8.4"
+    id "com.jfrog.bintray" version "1.8.5"
+}
+
+project.ext {
+    libraryGroupId = 'com.cyphercove.gdxtween'
+    libraryVersion = '0.1.0'
+    librarySubProjects = subprojects.findAll{
+        it.name == 'gdxtween' || it.name == 'gdxtween-kt'
+    }
 }
 
 subprojects {
     apply plugin: "idea"
     apply plugin: "java"
-
-    group = 'com.cyphercove.gdxtween'
-    version = '0.1.0'
 
     ext {
         gdxVersion = '1.9.11'
@@ -42,7 +47,7 @@ subprojects {
     }
 }
 
-configure(subprojects.findAll {it.name != 'example'}) {
+configure(project.librarySubProjects) {
     apply plugin: "java-library"
 
     task sourcesJar(type: Jar) {
@@ -58,9 +63,9 @@ configure(subprojects.findAll {it.name != 'example'}) {
     publishing {
         publications {
             "$projectId"(MavenPublication) {
-                groupId = project.group
+                groupId = project.libraryGroupId
                 artifactId = projectId
-                version = project.version
+                version = project.libraryVersion
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
@@ -91,18 +96,18 @@ configure(subprojects.findAll {it.name != 'example'}) {
     bintray {
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
+        publications = ["$projectId"]
         pkg {
             repo = 'maven'
             name = projectId
             userOrg = 'cyphercove'
             version {
-                name = rootProject.getVersion()
+                name = project.libraryVersion
                 released  = new Date()
             }
             licenses = ['Apache-2.0']
             vcsUrl = 'https://github.com/cyphercove/gdx-tween/'
         }
-        publications = ['mavenJava']
     }
 
     javadoc {
