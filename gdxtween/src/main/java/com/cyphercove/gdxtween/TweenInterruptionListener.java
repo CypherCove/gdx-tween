@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * A listener that fires for {@link TargetTween TargetTweens} when they are interrupted by other TargetTweens.
  * @param <T> The type of tween being interrupted. To specify a listener that can be shared by different types of
@@ -28,5 +26,5 @@ public interface TweenInterruptionListener<T> {
      * @param interruptedTween The tween that was interrupted.
      * @param interruptionSource The tween that interrupted the other tween.
      */
-    void onTweenInterrupted (@NotNull T interruptedTween, @NotNull T interruptionSource);
+    void onTweenInterrupted (T interruptedTween, T interruptionSource);
 }

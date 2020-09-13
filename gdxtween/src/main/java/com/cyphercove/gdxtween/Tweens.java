@@ -23,7 +23,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.cyphercove.gdxtween.math.Scalar;
 import com.cyphercove.gdxtween.math.ScalarInt;
 import com.cyphercove.gdxtween.targettweens.*;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A utility class containing entry-points for creating tweens.
@@ -32,23 +31,22 @@ public final class Tweens {
 
     /**
      * Create a SequenceTween.
+     *
      * @return A SequenceTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
     static public SequenceTween inSequence() {
         return SequenceTween.newInstance();
     }
 
     /**
      * Create a ParallelTween.
+     *
      * @return A ParallelTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
     static public ParallelTween inParallel() {
         return ParallelTween.newInstance();
     }
 
-    @NotNull
     static public DelayTween delay(float duration) {
         return DelayTween.newInstance().duration(duration);
     }
@@ -56,11 +54,10 @@ public final class Tweens {
     /**
      * Create an AccessorTween for the given target.
      *
-     * @param target   The Accessor that will targeted.
+     * @param target The Accessor that will targeted.
      * @return An AccessorTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public AccessorTween to(@NotNull AccessorTween.Accessor target) {
+    static public AccessorTween to(AccessorTween.Accessor target) {
         return AccessorTween.newInstance(target.getNumberOfValues())
                 .target(target);
     }
@@ -68,12 +65,11 @@ public final class Tweens {
     /**
      * Create a ScalarTween for the given target.
      *
-     * @param target   The Scalar whose value will be modified.
-     * @param endX     Final value.
+     * @param target The Scalar whose value will be modified.
+     * @param endX   Final value.
      * @return A ScalarTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public ScalarTween to(@NotNull Scalar target, float endX) {
+    static public ScalarTween to(Scalar target, float endX) {
         return ScalarTween.newInstance()
                 .target(target)
                 .end(endX);
@@ -82,25 +78,23 @@ public final class Tweens {
     /**
      * Create a ScalarTween for the given target.
      *
-     * @param target   The Scalar whose value will be modified.
-     * @param end      A Scalar containing the target value. The reference is not retained by the tween.
+     * @param target The Scalar whose value will be modified.
+     * @param end    A Scalar containing the target value. The reference is not retained by the tween.
      * @return A ScalarTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public ScalarTween to(@NotNull Scalar target, @NotNull Scalar end) {
+    static public ScalarTween to(Scalar target, Scalar end) {
         return to(target, end.x);
     }
 
     /**
      * Create a Vector2Tween for the given target.
      *
-     * @param target   The Vector2 whose values will be modified.
-     * @param endX     Final x value.
-     * @param endY     Final y value.
+     * @param target The Vector2 whose values will be modified.
+     * @param endX   Final x value.
+     * @param endY   Final y value.
      * @return A Vector2Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public Vector2Tween to(@NotNull Vector2 target, float endX, float endY) {
+    static public Vector2Tween to(Vector2 target, float endX, float endY) {
         return Vector2Tween.newInstance()
                 .target(target)
                 .end(endX, endY);
@@ -109,26 +103,24 @@ public final class Tweens {
     /**
      * Create a Vector2Tween for the given target.
      *
-     * @param target   The Vector2 whose values will be modified.
-     * @param end      A Vector2 containing the target values. The reference is not retained by the tween.
+     * @param target The Vector2 whose values will be modified.
+     * @param end    A Vector2 containing the target values. The reference is not retained by the tween.
      * @return A Vector2Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public Vector2Tween to(@NotNull Vector2 target, Vector2 end) {
+    static public Vector2Tween to(Vector2 target, Vector2 end) {
         return to(target, end.x, end.y);
     }
 
     /**
      * Create a Vector3Tween for the given target.
      *
-     * @param target   The Vector3 whose values will be modified.
-     * @param endX     Final x value.
-     * @param endY     Final y value.
-     * @param endZ     Final z value.
+     * @param target The Vector3 whose values will be modified.
+     * @param endX   Final x value.
+     * @param endY   Final y value.
+     * @param endZ   Final z value.
      * @return A Vector3Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public Vector3Tween to(@NotNull Vector3 target, float endX, float endY, float endZ) {
+    static public Vector3Tween to(Vector3 target, float endX, float endY, float endZ) {
         return Vector3Tween.newInstance()
                 .target(target)
                 .end(endX, endY, endZ);
@@ -137,24 +129,22 @@ public final class Tweens {
     /**
      * Create a Vector3Tween for the given target.
      *
-     * @param target   The Vector3 whose values will be modified.
-     * @param end      A Vector3 containing the target values. The reference is not retained by the tween.
+     * @param target The Vector3 whose values will be modified.
+     * @param end    A Vector3 containing the target values. The reference is not retained by the tween.
      * @return A Vector3Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public Vector3Tween to(@NotNull Vector3 target, @NotNull Vector3 end) {
+    static public Vector3Tween to(Vector3 target, Vector3 end) {
         return to(target, end.x, end.y, end.z);
     }
 
     /**
      * Create a ScalarIntTween for the given target.
      *
-     * @param target   The ScalarInt whose value will be modified.
-     * @param endX     Final value.
+     * @param target The ScalarInt whose value will be modified.
+     * @param endX   Final value.
      * @return A ScalarIntTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public ScalarIntTween to(@NotNull ScalarInt target, int endX) {
+    static public ScalarIntTween to(ScalarInt target, int endX) {
         return ScalarIntTween.newInstance()
                 .target(target)
                 .end(endX);
@@ -163,25 +153,23 @@ public final class Tweens {
     /**
      * Create a ScalarIntTween for the given target.
      *
-     * @param target   The ScalarInt whose value will be modified.
-     * @param end      A ScalarInt containing the target value. The reference is not retained by the tween.
+     * @param target The ScalarInt whose value will be modified.
+     * @param end    A ScalarInt containing the target value. The reference is not retained by the tween.
      * @return A ScalarIntTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public ScalarIntTween to(@NotNull ScalarInt target, @NotNull ScalarInt end) {
+    static public ScalarIntTween to(ScalarInt target, ScalarInt end) {
         return to(target, end.x);
     }
 
     /**
      * Create a GridPoint2Tween for the given target.
      *
-     * @param target   The GridPoint2 whose values will be modified.
-     * @param endX     Final x value.
-     * @param endY     Final y value.
+     * @param target The GridPoint2 whose values will be modified.
+     * @param endX   Final x value.
+     * @param endY   Final y value.
      * @return A GridPoint2Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public GridPoint2Tween to(@NotNull GridPoint2 target, int endX, int endY) {
+    static public GridPoint2Tween to(GridPoint2 target, int endX, int endY) {
         return GridPoint2Tween.newInstance()
                 .target(target)
                 .end(endX, endY);
@@ -190,26 +178,24 @@ public final class Tweens {
     /**
      * Create a GridPoint2Tween for the given target.
      *
-     * @param target   The GridPoint2 whose values will be modified.
-     * @param end      A GridPoint2 containing the target values. The reference is not retained by the tween.
+     * @param target The GridPoint2 whose values will be modified.
+     * @param end    A GridPoint2 containing the target values. The reference is not retained by the tween.
      * @return A GridPoint2Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public GridPoint2Tween to(@NotNull GridPoint2 target, GridPoint2 end) {
+    static public GridPoint2Tween to(GridPoint2 target, GridPoint2 end) {
         return to(target, end.x, end.y);
     }
 
     /**
      * Create a GridPoint3Tween for the given target.
      *
-     * @param target   The GridPoint3 whose values will be modified.
-     * @param endX     Final x value.
-     * @param endY     Final y value.
-     * @param endZ     Final z value.
+     * @param target The GridPoint3 whose values will be modified.
+     * @param endX   Final x value.
+     * @param endY   Final y value.
+     * @param endZ   Final z value.
      * @return A GridPoint3Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public GridPoint3Tween to(@NotNull GridPoint3 target, int endX, int endY, int endZ) {
+    static public GridPoint3Tween to(GridPoint3 target, int endX, int endY, int endZ) {
         return GridPoint3Tween.newInstance()
                 .target(target)
                 .end(endX, endY, endZ);
@@ -218,12 +204,11 @@ public final class Tweens {
     /**
      * Create a GridPoint3Tween for the given target.
      *
-     * @param target   The GridPoint3 whose values will be modified.
-     * @param end      A GridPoint3 containing the target values. The reference is not retained by the tween.
+     * @param target The GridPoint3 whose values will be modified.
+     * @param end    A GridPoint3 containing the target values. The reference is not retained by the tween.
      * @return A GridPoint3Tween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public GridPoint3Tween to(@NotNull GridPoint3 target, @NotNull GridPoint3 end) {
+    static public GridPoint3Tween to(GridPoint3 target, GridPoint3 end) {
         return to(target, end.x, end.y, end.z);
     }
 
@@ -231,14 +216,13 @@ public final class Tweens {
      * Create a ColorTween for the given target, which only modifies the RGB channels of a Color. Defaults to LinearRgb
      * color space. A ColorTween can run on the same target as an {@link AlphaTween} without them interrupting each other.
      *
-     * @param target   The Color whose RGB will be modified.
-     * @param endR     Final red value.
-     * @param endG     Final green value.
-     * @param endB     Final blue value.
+     * @param target The Color whose RGB will be modified.
+     * @param endR   Final red value.
+     * @param endG   Final green value.
+     * @param endB   Final blue value.
      * @return A ColorTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public ColorTween toRgb(@NotNull Color target, float endR, float endG, float endB) {
+    static public ColorTween toRgb(Color target, float endR, float endG, float endB) {
         return ColorTween.newInstance()
                 .target(target)
                 .end(endR, endG, endB);
@@ -248,13 +232,12 @@ public final class Tweens {
      * Create a ColorTween for the given target, which only modifies the RGB channels of a Color. Defaults to LinearRgb
      * color space. A ColorTween can run on the same target as an {@link AlphaTween} without them interrupting each other.
      *
-     * @param target   The Color whose RGB will be modified.
-     * @param end      A Color containing the the target values. The alpha value is ignored. The reference is not
-     *                 retained by the tween.
+     * @param target The Color whose RGB will be modified.
+     * @param end    A Color containing the the target values. The alpha value is ignored. The reference is not
+     *               retained by the tween.
      * @return A ColorTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public ColorTween toRgb(@NotNull Color target, @NotNull Color end) {
+    static public ColorTween toRgb(Color target, Color end) {
         return ColorTween.newInstance()
                 .target(target)
                 .end(end.r, end.g, end.b);
@@ -264,12 +247,11 @@ public final class Tweens {
      * Create an AlphaTween for the givenTarget, which modifies the alpha channel of the Color target only. An AlphaTween
      * can run on the same target as a {@link ColorTween} without them interrupting each other.
      *
-     * @param target   The Color whose alpha will be modified.
-     * @param endA     Final alpha value.
+     * @param target The Color whose alpha will be modified.
+     * @param endA   Final alpha value.
      * @return An AlphaTween that will automatically be returned to a pool when complete.
      */
-    @NotNull
-    static public AlphaTween toAlpha(@NotNull Color target, float endA) {
+    static public AlphaTween toAlpha(Color target, float endA) {
         return AlphaTween.newInstance()
                 .target(target)
                 .end(endA);

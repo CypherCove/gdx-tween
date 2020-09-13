@@ -19,7 +19,6 @@ import com.badlogic.gdx.math.Vector2;
 
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
-import org.jetbrains.annotations.NotNull;
 
 public class Vector2Tween extends TargetTween<Vector2Tween, Vector2> {
 
@@ -34,23 +33,23 @@ public class Vector2Tween extends TargetTween<Vector2Tween, Vector2> {
         return POOL.obtain();
     }
 
-    public Vector2Tween (){
+    public Vector2Tween() {
         super(2);
     }
 
     @Override
-    public @NotNull Class<Vector2> getTargetType() {
+    public Class<Vector2> getTargetType() {
         return Vector2.class;
     }
 
-    protected void begin () {
+    protected void begin() {
         super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
     }
 
-    protected void apply (int vectorIndex, float value) {
-        switch (vectorIndex){
+    protected void apply(int vectorIndex, float value) {
+        switch (vectorIndex) {
             case 0:
                 target.x = value;
                 break;
@@ -60,25 +59,23 @@ public class Vector2Tween extends TargetTween<Vector2Tween, Vector2> {
         }
     }
 
-    @NotNull
-    public Vector2Tween end (float endX, float endY){
+    public Vector2Tween end(float endX, float endY) {
         setEndValue(0, endX);
         setEndValue(1, endY);
         return this;
     }
 
-    @NotNull
-    public Vector2Tween end (@NotNull Vector2 end){
+    public Vector2Tween end(Vector2 end) {
         setEndValue(0, end.x);
         setEndValue(1, end.y);
         return this;
     }
 
-    public float getEndX (){
+    public float getEndX() {
         return getEndValue(0);
     }
 
-    public float getEndY (){
+    public float getEndY() {
         return getEndValue(1);
     }
 

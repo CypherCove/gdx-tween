@@ -15,11 +15,8 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A tween that runs its children at the same time. It has the duration of its longest child.
@@ -66,7 +63,7 @@ public final class ParallelTween extends GroupTween<ParallelTween> {
     }
 
     @Override
-    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
+    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, float[] requestedWorldSpeeds) {
         // Even if canceled, children should be checked. There might be parallel tweens started that both interrupt
         // members of this tween, so they will need to get world speeds.
         boolean wasCanceled = isCanceled();

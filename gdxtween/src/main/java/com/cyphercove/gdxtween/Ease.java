@@ -20,8 +20,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Easing functions that can be used with {@linkplain TargetTween Tweens}. Non-configurable eases are provided
  * as static immutable members. Configurable eases are provided via function calls. These configurable
@@ -62,9 +60,9 @@ public abstract class Ease {
     /**
      * If this Ease is mutable, returns another instance from a pool with duplicate settings. Otherwise, returns
      * itself.
+     *
      * @return An Ease of the same type as this one that is safe to pass to a different tween than the original.
      */
-    @NotNull
     public Ease copyOrSelf() {
         return this;
     }
@@ -80,7 +78,6 @@ public abstract class Ease {
          * @param startSpeed The beginning speed for the transition.
          * @return The Ease for building.
          */
-        @NotNull
         public abstract BlendInEase startSpeed(float startSpeed);
 
         /**
@@ -89,7 +86,6 @@ public abstract class Ease {
         public abstract float getStartSpeed();
 
         @Override
-        @NotNull
         public abstract BlendInEase copyOrSelf();
     }
 
@@ -105,7 +101,6 @@ public abstract class Ease {
          * @param endSpeed The final speed for the transition.
          * @return The Ease for building.
          */
-        @NotNull
         public abstract BlendInOutEase endSpeed(float endSpeed);
 
         /**
@@ -140,16 +135,13 @@ public abstract class Ease {
      * The default Ease used by TargetTweens if none is set. This is checked by identity to see if one has been
      * explicitly set on the tween.
      */
-    @NotNull
     static Ease DEFAULT = createLinear();
 
-    @NotNull
     public static Ease linear = createLinear();
 
     /**
      * A cubic Hermite polynomial that starts and ends with zero speed.
      */
-    @NotNull
     public static Ease smoothstep = new Ease() {
         @Override
         public float apply(float a, float start, float end) {
@@ -172,7 +164,6 @@ public abstract class Ease {
     /**
      * A quintic Hermite polynomial that starts and ends with zero speed and zero acceleration. By Ken Perlin.
      */
-    @NotNull
     public static Ease smootherstep = new Ease() {
         @Override
         public float apply(float a, float start, float end) {
@@ -203,14 +194,12 @@ public abstract class Ease {
         float startSpeed, endSpeed;
 
         @Override
-        @NotNull
         public CubicHermite startSpeed(float startSpeed) {
             this.startSpeed = startSpeed;
             return this;
         }
 
         @Override
-        @NotNull
         public CubicHermite endSpeed(float endSpeed) {
             this.endSpeed = endSpeed;
             return this;
@@ -227,7 +216,7 @@ public abstract class Ease {
         }
 
         @Override
-        public @NotNull CubicHermite copyOrSelf() {
+        public CubicHermite copyOrSelf() {
             return cubicPool.obtain().startSpeed(startSpeed).endSpeed(endSpeed);
         }
 
@@ -279,7 +268,6 @@ public abstract class Ease {
     /**
      * @return A mutable cubic Hermite polynomial ease. Do not assign to multiple tweens.
      */
-    @NotNull
     public static CubicHermite cubic() {
         return cubicPool.obtain();
     }
@@ -294,7 +282,6 @@ public abstract class Ease {
         float startSpeed, endSpeed;
 
         @Override
-        @NotNull
         public QuinticHermite startSpeed(float startSpeed) {
             this.startSpeed = startSpeed;
             return this;
@@ -306,7 +293,6 @@ public abstract class Ease {
         }
 
         @Override
-        @NotNull
         public QuinticHermite endSpeed(float endSpeed) {
             this.endSpeed = endSpeed;
             return this;
@@ -318,7 +304,7 @@ public abstract class Ease {
         }
 
         @Override
-        public @NotNull QuinticHermite copyOrSelf() {
+        public QuinticHermite copyOrSelf() {
             return quinticPool.obtain().startSpeed(startSpeed).endSpeed(endSpeed);
         }
 
@@ -373,7 +359,6 @@ public abstract class Ease {
     /**
      * @return A mutable quintic Hermite polynomial ease. Do not assign to multiple tweens.
      */
-    @NotNull
     public static QuinticHermite quintic() {
         return quinticPool.obtain();
     }
@@ -383,12 +368,11 @@ public abstract class Ease {
         float precision = 0.001f;
         float halfPrecision = 0.0005f;
 
-        @NotNull
         public Interpolation getInterpolation() {
             return interpolation;
         }
 
-        public void setInterpolation(@NotNull Interpolation interpolation) {
+        public void setInterpolation(Interpolation interpolation) {
             this.interpolation = interpolation;
         }
 
@@ -436,8 +420,7 @@ public abstract class Ease {
      * @param interpolation The Interpolation to wrap.
      * @return An Ease that uses the function of an Interpolation.
      */
-    @NotNull
-    public static InterpolationWrapper wrap(@NotNull Interpolation interpolation) {
+    public static InterpolationWrapper wrap(Interpolation interpolation) {
         InterpolationWrapper ease = Pools.obtain(InterpolationWrapper.class);
         ease.setInterpolation(interpolation);
         return ease;
@@ -452,8 +435,7 @@ public abstract class Ease {
      *                       step size to use as a fraction of total duration.
      * @return An Ease that uses the function of an Interpolation.
      */
-    @NotNull
-    public static InterpolationWrapper wrap(@NotNull Interpolation interpolation, float speedPrecision) {
+    public static InterpolationWrapper wrap(Interpolation interpolation, float speedPrecision) {
         InterpolationWrapper ease = Pools.obtain(InterpolationWrapper.class);
         ease.setInterpolation(interpolation);
         ease.setSpeedPrecision(speedPrecision);

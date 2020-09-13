@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween.targettweens;
 import com.badlogic.gdx.math.GridPoint3;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
-import org.jetbrains.annotations.NotNull;
 
 public class GridPoint3Tween extends TargetTween<GridPoint3Tween, GridPoint3> {
 
@@ -33,25 +32,25 @@ public class GridPoint3Tween extends TargetTween<GridPoint3Tween, GridPoint3> {
         return POOL.obtain();
     }
 
-    public GridPoint3Tween(){
+    public GridPoint3Tween() {
         super(3);
     }
 
     @Override
-    public @NotNull Class<GridPoint3> getTargetType() {
+    public Class<GridPoint3> getTargetType() {
         return GridPoint3.class;
     }
 
-    protected void begin () {
+    protected void begin() {
         super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
         setStartValue(2, target.z);
     }
 
-    protected void apply (int vectorIndex, float value) {
+    protected void apply(int vectorIndex, float value) {
         int rounded = Math.round(value);
-        switch (vectorIndex){
+        switch (vectorIndex) {
             case 0:
                 target.x = rounded;
                 break;
@@ -64,31 +63,29 @@ public class GridPoint3Tween extends TargetTween<GridPoint3Tween, GridPoint3> {
         }
     }
 
-    @NotNull
-    public GridPoint3Tween end (int endX, int endY, int endZ){
+    public GridPoint3Tween end(int endX, int endY, int endZ) {
         setEndValue(0, endX);
         setEndValue(1, endY);
         setEndValue(2, endZ);
         return this;
     }
 
-    @NotNull
-    public GridPoint3Tween end (@NotNull GridPoint3 end){
+    public GridPoint3Tween end(GridPoint3 end) {
         setEndValue(0, end.x);
         setEndValue(1, end.y);
         setEndValue(2, end.z);
         return this;
     }
 
-    public float getEndX (){
+    public float getEndX() {
         return getEndValue(0);
     }
 
-    public float getEndY (){
+    public float getEndY() {
         return getEndValue(1);
     }
 
-    public float getEndZ () {
+    public float getEndZ() {
         return getEndValue(2);
     }
 

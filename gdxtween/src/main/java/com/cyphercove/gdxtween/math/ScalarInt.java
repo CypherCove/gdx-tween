@@ -16,11 +16,12 @@
 package com.cyphercove.gdxtween.math;
 
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 
-/** A mutable int wrapper. */
+/**
+ * A mutable int wrapper.
+ */
 public class ScalarInt implements Serializable {
     private static final long serialVersionUID = -3782199586747300873L;
 
@@ -38,15 +39,15 @@ public class ScalarInt implements Serializable {
         this.x = x;
     }
 
-    public ScalarInt(@NotNull ScalarInt scalar) {
+    public ScalarInt(ScalarInt scalar) {
         this.x = scalar.x;
     }
 
-    @NotNull public ScalarInt cpy () {
+    public ScalarInt cpy() {
         return new ScalarInt(x);
     }
 
-    @NotNull public ScalarInt limit (int limit) {
+    public ScalarInt limit(int limit) {
         if (x > limit)
             x = limit;
         else if (x < -limit)
@@ -54,65 +55,71 @@ public class ScalarInt implements Serializable {
         return this;
     }
 
-    @NotNull public ScalarInt setLength (int len) {
-        x = (int)Math.signum(x) * len;
+    public ScalarInt setLength(int len) {
+        x = (int) Math.signum(x) * len;
         return this;
     }
 
-    @NotNull public ScalarInt clamp (int min, int max) {
+    public ScalarInt clamp(int min, int max) {
         int abs = Math.abs(x);
         if (abs < min)
-            x = (int)Math.signum(x) * min;
+            x = (int) Math.signum(x) * min;
         else if (abs > max)
-            x = (int)Math.signum(x) * max;
+            x = (int) Math.signum(x) * max;
         return this;
     }
 
-    @NotNull public ScalarInt set (ScalarInt v) {
+    public ScalarInt set(ScalarInt v) {
         x = v.x;
         return this;
     }
 
-    @NotNull public ScalarInt set (int x){
+    public ScalarInt set(int x) {
         this.x = x;
         return this;
     }
 
-    @NotNull public ScalarInt sub (ScalarInt v) {
+    public ScalarInt sub(ScalarInt v) {
         x -= v.x;
         return this;
     }
 
-    @NotNull public ScalarInt sub (int x) {
+    public ScalarInt sub(int x) {
         this.x -= x;
         return this;
     }
 
-    @NotNull public ScalarInt add (ScalarInt v) {
+    public ScalarInt add(ScalarInt v) {
         x += v.x;
         return this;
     }
 
-    @NotNull public ScalarInt add (int x) {
+    public ScalarInt add(int x) {
         this.x += x;
         return this;
     }
 
-    public float dst (ScalarInt v) {
+    public float dst(ScalarInt v) {
         return Math.abs(x - v.x);
     }
 
-    /** Converts this {@code ScalarInt} to a string in the format {@code (x)}.
-     * @return a string representation of this object. */
+    /**
+     * Converts this {@code ScalarInt} to a string in the format {@code (x)}.
+     *
+     * @return a string representation of this object.
+     */
     @Override
-    @NotNull public String toString () {
+    public String toString() {
         return "(" + x + ")";
     }
 
-    /** Sets this {@code ScalarInt} to the value represented by the specified string according to the format of {@link #toString()}.
+    /**
+     * Sets this {@code ScalarInt} to the value represented by the specified string according to the format of {@link #toString()}.
+     *
      * @param v the string.
-     * @return this vector for chaining */
-    @NotNull public ScalarInt fromString (String v) {
+     * @return this vector for chaining
+     */
+    public ScalarInt fromString(String v) {
         int s = v.indexOf(',', 1);
         if (s != -1 && v.charAt(0) == '(' && v.charAt(v.length() - 1) == ')') {
             try {
@@ -126,15 +133,15 @@ public class ScalarInt implements Serializable {
     }
 
     @Override
-    public int hashCode () {
+    public int hashCode() {
         return x;
     }
 
     @Override
-    public boolean equals (Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        return x == ((ScalarInt)obj).x;
+        return x == ((ScalarInt) obj).x;
     }
 }

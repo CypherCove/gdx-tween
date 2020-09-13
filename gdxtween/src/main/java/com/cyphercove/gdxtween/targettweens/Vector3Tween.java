@@ -19,7 +19,6 @@ import com.badlogic.gdx.math.Vector3;
 
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
-import org.jetbrains.annotations.NotNull;
 
 public class Vector3Tween extends TargetTween<Vector3Tween, Vector3> {
 
@@ -39,7 +38,7 @@ public class Vector3Tween extends TargetTween<Vector3Tween, Vector3> {
     }
 
     @Override
-    public @NotNull Class<Vector3> getTargetType() {
+    public Class<Vector3> getTargetType() {
         return Vector3.class;
     }
 
@@ -64,7 +63,6 @@ public class Vector3Tween extends TargetTween<Vector3Tween, Vector3> {
         }
     }
 
-    @NotNull
     public Vector3Tween end (float endX, float endY, float endZ){
         setEndValue(0, endX);
         setEndValue(1, endY);
@@ -72,8 +70,7 @@ public class Vector3Tween extends TargetTween<Vector3Tween, Vector3> {
         return this;
     }
 
-    @NotNull
-    public Vector3Tween end (@NotNull Vector3 end){
+    public Vector3Tween end (Vector3 end){
         setEndValue(0, end.x);
         setEndValue(1, end.y);
         setEndValue(2, end.z);

@@ -22,11 +22,10 @@ import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.graphics.ColorSpace;
 import com.cyphercove.gdxtween.graphics.GtColor;
 import com.cyphercove.gdxtween.math.GtMathUtils;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A tween for interpolating the components of a {@linkplain Color}.
- * */
+ */
 public class ColorTween extends TargetTween<ColorTween, Color> {
 
     private static final Pool<ColorTween> POOL = new Pool<ColorTween>() {
@@ -49,17 +48,17 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
     private static final float[] TMP_SHARED_2 = new float[3];
     private static final Color TMP_SHARED_3 = new Color();
 
-    public ColorTween(){
+    public ColorTween() {
         super(3);
     }
 
     @Override
-    public @NotNull Class<Color> getTargetType() {
+    public Class<Color> getTargetType() {
         return Color.class;
     }
 
     @Override
-    protected void begin () {
+    protected void begin() {
         super.begin();
         switch (colorSpace) {
             case Rgb:
@@ -113,14 +112,14 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
     }
 
     @Override
-    protected void apply (int vectorIndex, float value) {
+    protected void apply(int vectorIndex, float value) {
         switch (colorSpace) {
             case LinearRgb:
                 value = GtColor.applyGammaCorrection(value);
                 // fall through
             case Rgb:
                 value = MathUtils.clamp(value, 0f, 1f);
-                switch (vectorIndex){
+                switch (vectorIndex) {
                     case 0:
                         target.r = value;
                         break;
@@ -150,7 +149,7 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
 
     @Override
     protected void applyAfter() {
-        switch (colorSpace){
+        switch (colorSpace) {
             case Hsv:
                 target.fromHsv(accumulator[0], accumulator[1], accumulator[2]);
                 break;
@@ -173,8 +172,7 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
         }
     }
 
-    @NotNull
-    public ColorTween end (float r, float g, float b){
+    public ColorTween end(float r, float g, float b) {
         endR = r;
         endG = g;
         endB = b;
@@ -184,30 +182,39 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
     /**
      * Sets the type of color space the color is interpolated in. If using a BlendableEase and interrupting another
      * ColorTween, they can only blend if they use the same color space.
+     *
      * @param colorSpace The value to set.
      * @return This ColorTween for chaining.
      */
-    public ColorTween colorSpace (ColorSpace colorSpace) {
+    public ColorTween colorSpace(ColorSpace colorSpace) {
         this.colorSpace = colorSpace;
         return this;
     }
 
-    /** @return the final red value set. */
-    public float getEndR (){
+    /**
+     * @return the final red value set.
+     */
+    public float getEndR() {
         return endR;
     }
 
-    /** @return the final green value set. */
-    public float getEndG () {
+    /**
+     * @return the final green value set.
+     */
+    public float getEndG() {
         return endG;
     }
 
-    /** @return the final blue value set. */
-    public float getEndB () {
+    /**
+     * @return the final blue value set.
+     */
+    public float getEndB() {
         return endB;
     }
 
-    /** @return the type of color space the color is interpolated in. */
+    /**
+     * @return the type of color space the color is interpolated in.
+     */
     public ColorSpace getColorSpace() {
         return colorSpace;
     }

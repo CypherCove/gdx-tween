@@ -17,8 +17,6 @@ package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the basic functionality of all Tweens. They can be submitted to a TweenRunner, freed to a pool, interrupted,
@@ -55,7 +53,7 @@ public abstract class Tween<U> {
      *
      * @param tweenRunner The {@link TweenRunner} to run this Tween.
      */
-    public final void start(@NotNull TweenRunner tweenRunner) {
+    public final void start(TweenRunner tweenRunner) {
         tweenRunner.start(this);
     }
 
@@ -64,7 +62,7 @@ public abstract class Tween<U> {
      *
      * @return The parent tween or null.
      */
-    public @Nullable GroupTween<?> getParent() {
+    public GroupTween<?> getParent() {
         return parent;
     }
 
@@ -72,7 +70,7 @@ public abstract class Tween<U> {
     /**
      * @return The top level parent of this tween, or itself if it has none.
      */
-    @NotNull Tween<?> getTopLevelParent() {
+    Tween<?> getTopLevelParent() {
         if (parent != null)
             return parent.getTopLevelParent();
         return this;
@@ -207,8 +205,7 @@ public abstract class Tween<U> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public U completionListener(@Nullable TweenCompletionListener<U> listener) {
+    public U completionListener(TweenCompletionListener<U> listener) {
         if (isAttached)
             logMutationAfterAttachment();
         else
@@ -232,7 +229,7 @@ public abstract class Tween<U> {
      *                             into the array. Otherwise, the array should not be modified.
      * @return True if this tween was interrupted.
      */
-    protected abstract boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds);
+    protected abstract boolean checkInterruption(TargetTween<?, ?> sourceTween, float[] requestedWorldSpeeds);
 
     /**
      * Returns this Tween to its pool when it is no longer used to avoid releasing it to the garbage collector. This is
@@ -255,8 +252,7 @@ public abstract class Tween<U> {
 
     protected void logMutationAfterAttachment() {
         Gdx.app.error("gdx-tween", "Warning: Tweens must not be modified after attachment to a GroupTween" +
-                "or the TweenRunner, and this call will be ignored. Tween: " + getName() +
-                ", method: " + Thread.currentThread().getStackTrace()[2].getMethodName());
+                "or the TweenRunner, and this call will be ignored. Tween: " + getName());
     }
 
     /**
@@ -264,7 +260,6 @@ public abstract class Tween<U> {
      * then that parent is returned. Otherwise, a new SequenceTween is obtained and this tween is added to it.
      * @return A SequenceTween containing this tween at the end.
      */
-    @NotNull
     public SequenceTween then(){
         Tween<?> parent = getParent();
         if (parent instanceof SequenceTween)

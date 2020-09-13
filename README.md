@@ -12,11 +12,6 @@ The main goals of this library:
 
  Planned features not yet implemented:
  * Usable in Scene2D so the second order interrupting behavior can be used in Actions.
- 
-For clean Kotlin interop: nullability annotations, functional interfaces, trailing lambdas, etc. have been used.
-
-Note: gdx-tween uses Jetbrains' nullability annotations. If you're using Java and don't want to use them, you can disable
-them in IntelliJ at **Settings | Editor | Inspections | Java | Probable bugs**.
 
 ## Installation
 When stable, gdx-tween will be available on JCenter. For now, you can publish to Maven local and use:

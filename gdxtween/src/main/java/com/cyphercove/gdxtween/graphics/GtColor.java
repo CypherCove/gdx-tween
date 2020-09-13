@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween.graphics;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
 import com.cyphercove.gdxtween.math.GtMathUtils;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Utilities for modifying {@linkplain Color Colors} in color spaces other than RGB and HSV.
@@ -204,7 +203,7 @@ public final class GtColor {
      * @param lchIn Input color array, with Luminance, chroma and hue angle in the first three indices respectively.
      *              Length must be at least 3. The hue angle is in radians.
      */
-    public static void fromLch(@NotNull Color color, @NotNull float[] lchIn) {
+    public static void fromLch(Color color, float[] lchIn) {
         float c = lchIn[1];
         float h = lchIn[2];
         lchIn[1] = c * MathUtils.cos(h);
@@ -220,7 +219,7 @@ public final class GtColor {
      *               respectively. Length must be at least 3. The hue angle is in radians to save the step of converting
      *               to degrees. The angle is in the range -PI..PI.
      */
-    public static void toLch(@NotNull Color color, @NotNull float[] lchOut) {
+    public static void toLch(Color color, float[] lchOut) {
         toLab(color, lchOut);
         float a = lchOut[1];
         float b = lchOut[2];
@@ -228,7 +227,7 @@ public final class GtColor {
         lchOut[2] = GtMathUtils.atan2(b, a);
     }
 
-    public static void fromLab(@NotNull Color color, float l, float a, float b) {
+    public static void fromLab(Color color, float l, float a, float b) {
         float yF = (l + 16f) / 116f;
         float zF = yF - b / 200f;
         float xF = yF + a / 500f;
@@ -246,15 +245,15 @@ public final class GtColor {
         else if (color.b > 1) color.b = 1;
     }
 
-    public static void fromLab(@NotNull Color color, @NotNull float[] labIn) {
+    public static void fromLab(Color color, float[] labIn) {
         fromLab(color, labIn[0], labIn[1], labIn[2]);
     }
 
-    public static void toLab(@NotNull Color color, @NotNull float[] labOut) {
+    public static void toLab(Color color, float[] labOut) {
         toLab(color.r, color.g, color.b, labOut);
     }
 
-    public static void toLab(float r, float g, float b, @NotNull float[] labOut) {
+    public static void toLab(float r, float g, float b, float[] labOut) {
         float red = invertGammaCorrection(r);
         float green = invertGammaCorrection(g);
         float blue = invertGammaCorrection(b);
@@ -271,15 +270,17 @@ public final class GtColor {
 
     /**
      * Converts a color channel from gamma-corrected to linear scale.
+     *
      * @param component The color channel to make linear.
      * @return The color value in linear scale.
-     * */
+     */
     public static float invertGammaCorrection(float component) {
         return (component <= 0.04045f) ? component / 12.92f : (float) Math.pow((component + 0.055f) / 1.055f, 2.4);
     }
 
     /**
      * Converts a color channel from linear to gamma-corrected scale.
+     *
      * @param component The color channel to gamma-correct.
      * @return The color value with gamma correction.
      */

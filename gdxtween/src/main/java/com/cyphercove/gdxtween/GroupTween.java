@@ -17,8 +17,6 @@ package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A tween that contains and directs other tweens.
@@ -34,7 +32,7 @@ public abstract class GroupTween<T> extends Tween<T> {
     private float defaultDuration = -1f;
 
     protected GroupTween (int initialCapacity) {
-        children = new Array<>(initialCapacity);
+        children = new Array<Tween<?>>(initialCapacity);
     }
 
     @Override
@@ -104,7 +102,6 @@ public abstract class GroupTween<T> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
     public final T duration(float defaultDuration) {
         this.defaultDuration = defaultDuration;
         return (T)this;
@@ -115,7 +112,6 @@ public abstract class GroupTween<T> extends Tween<T> {
      *
      * @return The Ease function.
      */
-    @NotNull
     public final Ease getDefaultEase() {
         if (defaultEase != null)
             return defaultEase;
@@ -132,8 +128,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public final T ease(@NotNull Ease ease) {
+    public final T ease(Ease ease) {
         this.defaultEase = ease;
         return (T)this;
     }
@@ -146,8 +141,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T ease(@NotNull Interpolation interpolation) {
+    public T ease(Interpolation interpolation) {
         this.defaultEase = Ease.wrap(interpolation);
         return (T)this;
     }
@@ -162,8 +156,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * @see #ease(Ease)
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T using(float duration, @NotNull Ease ease) {
+    public T using(float duration, Ease ease) {
         this.defaultDuration = duration;
         this.defaultEase = ease;
         return (T)this;
@@ -180,8 +173,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * @see #ease(Interpolation)
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T using(float duration, @NotNull Interpolation interpolation) {
+    public T using(float duration, Interpolation interpolation) {
         this.defaultDuration = duration;
         this.defaultEase = Ease.wrap(interpolation);
         return (T)this;
@@ -192,7 +184,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * setting from the parent.
      * @return the behavior
      */
-    public @NotNull ChildInterruptionBehavior getChildInterruptionBehavior() {
+    public ChildInterruptionBehavior getChildInterruptionBehavior() {
         if (getParent() != null)
             return getParent().getChildInterruptionBehavior();
         return childInterruptionBehavior;
@@ -205,7 +197,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    public T childInterruptionBehavior(@NotNull ChildInterruptionBehavior childInterruptionBehavior) {
+    public T childInterruptionBehavior(ChildInterruptionBehavior childInterruptionBehavior) {
         if (isAttached())
             logMutationAfterAttachment();
         else

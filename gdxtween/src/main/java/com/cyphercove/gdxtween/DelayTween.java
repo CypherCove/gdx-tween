@@ -17,8 +17,6 @@ package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class DelayTween extends Tween<DelayTween> {
 
@@ -29,7 +27,6 @@ public final class DelayTween extends Tween<DelayTween> {
         }
     };
 
-    @NotNull
     public static DelayTween newInstance() {
         return POOL.obtain();
     }
@@ -56,7 +53,6 @@ public final class DelayTween extends Tween<DelayTween> {
      * @param duration The DelayTween's length.
      * @return This tween for building.
      */
-    @NotNull
     public final DelayTween duration(float duration) {
         if (isAttached())
             logMutationAfterAttachment();
@@ -71,7 +67,7 @@ public final class DelayTween extends Tween<DelayTween> {
     }
 
     @Override
-    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
+    protected boolean checkInterruption(TargetTween<?, ?> sourceTween,  float[] requestedWorldSpeeds) {
         return false;
     }
 

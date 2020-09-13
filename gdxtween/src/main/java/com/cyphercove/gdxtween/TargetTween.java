@@ -17,8 +17,6 @@ package com.cyphercove.gdxtween;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Array;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -30,7 +28,7 @@ import java.util.Arrays;
  * @param <TG> The type of target the tween operates on.
  */
 public abstract class TargetTween<T, TG> extends Tween<T> {
-    private @NotNull Ease ease = Ease.DEFAULT;
+    private Ease ease = Ease.DEFAULT;
     /**
      * If true, the tween is using a {@link com.cyphercove.gdxtween.Ease.BlendInEase} and also interrupted another tween,
      * so the Ease's start speeds are to be overwritten the first time the tween begins.
@@ -135,14 +133,13 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      *
      * @return The type of target the tween operates on.
      */
-    public abstract @NotNull Class<TG> getTargetType();
+    public abstract Class<TG> getTargetType();
 
     /**
      * Gets the target of this tween. Is null if the Tween has not been started.
      *
      * @return Twe tween target if it has been set.
      */
-    @Nullable
     public final TG getTarget() {
         return target;
     }
@@ -156,8 +153,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public final T target(@NotNull TG target) {
+    public final T target(TG target) {
         if (isAttached())
             logMutationAfterAttachment();
         else
@@ -177,7 +173,6 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
     public final T duration(float duration) {
         if (isAttached())
             logMutationAfterAttachment();
@@ -193,7 +188,6 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      *
      * @return The Ease function.
      */
-    @NotNull
     public Ease getEase() {
         return ease;
     }
@@ -211,8 +205,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T ease(@NotNull Ease ease) {
+    public T ease(Ease ease) {
         if (isAttached())
             logMutationAfterAttachment();
         else
@@ -227,8 +220,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T ease(@NotNull Interpolation interpolation) {
+    public T ease(Interpolation interpolation) {
         if (isAttached())
             logMutationAfterAttachment();
         else
@@ -246,8 +238,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @see #ease(Ease)
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T using(float duration, @NotNull Ease ease) {
+    public T using(float duration, Ease ease) {
         if (isAttached())
             logMutationAfterAttachment();
         else {
@@ -268,8 +259,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @see #ease(Interpolation)
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T using(float duration, @NotNull Interpolation interpolation) {
+    public T using(float duration, Interpolation interpolation) {
         if (isAttached())
             logMutationAfterAttachment();
         else {
@@ -329,8 +319,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @return This tween for building.
      */
     @SuppressWarnings("unchecked")
-    @NotNull
-    public T interruptionListener(@Nullable TweenInterruptionListener<T> listener) {
+    public T interruptionListener(TweenInterruptionListener<T> listener) {
         if (isAttached())
             logMutationAfterAttachment();
         else
@@ -343,7 +332,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      *
      * @param output The array to fill the world speeds into.
      */
-    protected final void getWorldSpeeds(@NotNull float[] output) {
+    protected final void getWorldSpeeds(float[] output) {
         if (isComplete()) {
             Arrays.fill(output, 0, vectorSize, 0f);
             return;
@@ -371,7 +360,6 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
      * @return Starting world speeds array if this tween expects to be started at the speed of the tween it interrupts.
      * Otherwise null.
      */
-    @Nullable
     protected float[] prepareToInterrupt() {
         float localDuration = getDuration();
         Ease localEase = getEase();
@@ -391,7 +379,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, @Nullable float[] requestedWorldSpeeds) {
+    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, float[] requestedWorldSpeeds) {
         if (isComplete()) {
             throw new IllegalStateException("Interruption checked on a complete tween: " + this); // TODO remove check
         }
@@ -404,7 +392,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
                 getWorldSpeeds(requestedWorldSpeeds);
             }
             if (interruptionListener != null) {
-                interruptionListener.onTweenInterrupted((T)this, (T)sourceTween);
+                interruptionListener.onTweenInterrupted((T) this, (T) sourceTween);
             }
             return true;
         }

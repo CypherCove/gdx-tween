@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween;
 import com.badlogic.gdx.utils.Array;
 
 import com.badlogic.gdx.utils.SnapshotArray;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 
@@ -37,15 +36,15 @@ import java.util.Iterator;
  */
 public class TweenRunner {
 
-    private final SnapshotArray<Tween<?>> tweens = new SnapshotArray<>(true, 64, Tween.class);
-    private final Array<TargetTween<?, ?>> interrupterTweens = new Array<>();
+    private final SnapshotArray<Tween<?>> tweens = new SnapshotArray<Tween<?>>(true, 64, Tween.class);
+    private final Array<TargetTween<?, ?>> interrupterTweens = new Array<TargetTween<?, ?>>();
 
     /**
      * Adds a tween or tween chain to the manager.
      *
      * @param tween The tween to start.
      */
-    public void start (@NotNull Tween<?> tween){
+    public void start (Tween<?> tween){
         tween = tween.getTopLevelParent();
         if (tween.isAttached()) {
             throw new IllegalStateException("Tween was already started: " + tween);

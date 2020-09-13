@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween.targettweens;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
-import org.jetbrains.annotations.NotNull;
 
 /** An AccessorTween uses an Accessor as its target. An Accessor provides an indirect way to target specific fields
  * of an object without making the object the tween's target. This is necessary if an object has fields that should be
@@ -26,9 +25,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class AccessorTween extends TargetTween<AccessorTween, AccessorTween.Accessor> {
 
-    static private final IntMap<Pool<AccessorTween>> accessorPools = new IntMap<>();
+    static private final IntMap<Pool<AccessorTween>> accessorPools = new IntMap<Pool<AccessorTween>>();
 
-    @NotNull
     static private Pool<AccessorTween> getPool(final int vectorSize) {
         Pool<AccessorTween> pool = accessorPools.get(vectorSize);
         if (pool == null) {
@@ -43,7 +41,6 @@ public class AccessorTween extends TargetTween<AccessorTween, AccessorTween.Acce
         return pool;
     }
 
-    @NotNull
     public static AccessorTween newInstance(int vectorSize) {
         return getPool(vectorSize).obtain();
     }
@@ -90,7 +87,6 @@ public class AccessorTween extends TargetTween<AccessorTween, AccessorTween.Acce
         target.setValue(vectorIndex, value);
     }
 
-    @NotNull
     public AccessorTween end (int vectorIndex, float value){
         super.setEndValue(vectorIndex, value);
         return this;
@@ -101,7 +97,7 @@ public class AccessorTween extends TargetTween<AccessorTween, AccessorTween.Acce
     }
 
     @Override
-    public @NotNull Class<Accessor> getTargetType() {
+    public Class<Accessor> getTargetType() {
         return Accessor.class;
     }
 

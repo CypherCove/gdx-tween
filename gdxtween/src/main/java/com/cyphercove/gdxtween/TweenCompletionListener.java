@@ -15,8 +15,6 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween;
 
-import org.jetbrains.annotations.NotNull;
-
 /**
  *
  * @param <T> Tween type. To specify a listener that can be shared by different types of Tweens, use {@code <Tween<?, ?>>}.
@@ -25,5 +23,5 @@ public interface TweenCompletionListener<T> {
     /** Called when the associated tween completes. If a Tween repeats, this is only called when repeating is finished.
      * @param completedTween The completed tween.
      */
-    void onTweenComplete (@NotNull T completedTween);
+    void onTweenComplete (T completedTween);
 }

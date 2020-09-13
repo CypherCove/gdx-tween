@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween.targettweens;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
-import org.jetbrains.annotations.NotNull;
 
 public class GridPoint2Tween extends TargetTween<GridPoint2Tween, GridPoint2> {
 
@@ -33,24 +32,24 @@ public class GridPoint2Tween extends TargetTween<GridPoint2Tween, GridPoint2> {
         return POOL.obtain();
     }
 
-    public GridPoint2Tween(){
+    public GridPoint2Tween() {
         super(2);
     }
 
     @Override
-    public @NotNull Class<GridPoint2> getTargetType() {
+    public Class<GridPoint2> getTargetType() {
         return GridPoint2.class;
     }
 
-    protected void begin () {
+    protected void begin() {
         super.begin();
         setStartValue(0, target.x);
         setStartValue(1, target.y);
     }
 
-    protected void apply (int vectorIndex, float value) {
+    protected void apply(int vectorIndex, float value) {
         int rounded = Math.round(value);
-        switch (vectorIndex){
+        switch (vectorIndex) {
             case 0:
                 target.x = rounded;
                 break;
@@ -60,25 +59,23 @@ public class GridPoint2Tween extends TargetTween<GridPoint2Tween, GridPoint2> {
         }
     }
 
-    @NotNull
-    public GridPoint2Tween end (int endX, int endY){
+    public GridPoint2Tween end(int endX, int endY) {
         setEndValue(0, endX);
         setEndValue(1, endY);
         return this;
     }
 
-    @NotNull
-    public GridPoint2Tween end (@NotNull GridPoint2 end){
+    public GridPoint2Tween end(GridPoint2 end) {
         setEndValue(0, end.x);
         setEndValue(1, end.y);
         return this;
     }
 
-    public float getEndX (){
+    public float getEndX() {
         return getEndValue(0);
     }
 
-    public float getEndY (){
+    public float getEndY() {
         return getEndValue(1);
     }
 

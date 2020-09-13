@@ -19,12 +19,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.math.Scalar;
-import org.jetbrains.annotations.NotNull;
 
-/** A tween for changing the alpha component of a {@linkplain Color}. It does not modify the
+/**
+ * A tween for changing the alpha component of a {@linkplain Color}. It does not modify the
  * RGB components. Since there cannot be multiple Tweens targeting the same object, it will interrupt other types of
  * Color tweens. To treat RGB and Alpha independently, a second {@link com.cyphercove.gdxtween.TweenRunner TweenRunner}
- * dedicated to AlphaTweens may be used.*/
+ * dedicated to AlphaTweens may be used.
+ */
 public class AlphaTween extends TargetTween<AlphaTween, Color> {
 
     private static final Pool<AlphaTween> POOL = new Pool<AlphaTween>() {
@@ -40,39 +41,37 @@ public class AlphaTween extends TargetTween<AlphaTween, Color> {
 
     private float endA;
 
-    public AlphaTween(){
+    public AlphaTween() {
         super(1);
     }
 
     @Override
-    public @NotNull Class<Color> getTargetType() {
+    public Class<Color> getTargetType() {
         return Color.class;
     }
 
     @Override
-    protected void begin () {
+    protected void begin() {
         super.begin();
         setStartValue(0, target.a);
     }
 
     @Override
-    protected void apply (int vectorIndex, float value) {
+    protected void apply(int vectorIndex, float value) {
         target.a = value;
     }
 
-    @NotNull
-    public AlphaTween end (float end){
+    public AlphaTween end(float end) {
         setEndValue(0, end);
         return this;
     }
 
-    @NotNull
-    public AlphaTween end (Scalar end){
+    public AlphaTween end(Scalar end) {
         setEndValue(0, end.x);
         return this;
     }
 
-    public float getEnd (){
+    public float getEnd() {
         return getEndValue(0);
     }
 

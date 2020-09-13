@@ -18,7 +18,6 @@ package com.cyphercove.gdxtween.targettweens;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.math.ScalarInt;
-import org.jetbrains.annotations.NotNull;
 
 public class ScalarIntTween extends TargetTween<ScalarIntTween, ScalarInt> {
 
@@ -33,39 +32,37 @@ public class ScalarIntTween extends TargetTween<ScalarIntTween, ScalarInt> {
         return POOL.obtain();
     }
 
-    public ScalarIntTween(){
+    public ScalarIntTween() {
         super(1);
     }
 
     @Override
-    public @NotNull Class<ScalarInt> getTargetType() {
+    public Class<ScalarInt> getTargetType() {
         return ScalarInt.class;
     }
 
     @Override
-    protected void begin () {
+    protected void begin() {
         super.begin();
         setStartValue(0, target.x);
     }
 
     @Override
-    protected void apply (int vectorIndex, float value) {
+    protected void apply(int vectorIndex, float value) {
         target.x = Math.round(value);
     }
 
-    @NotNull
-    public ScalarIntTween end (float end){
+    public ScalarIntTween end(float end) {
         setEndValue(0, end);
         return this;
     }
 
-    @NotNull
-    public ScalarIntTween end (ScalarInt end){
+    public ScalarIntTween end(ScalarInt end) {
         setEndValue(0, end.x);
         return this;
     }
 
-    public float getEnd (){
+    public float getEnd() {
         return getEndValue(0);
     }
 
