@@ -56,7 +56,7 @@ public class ColorInterpolationComparison extends ExampleScreen {
 		});
 
 		Table innerTable = new Table(sharedAssets.getSkin());
-		String[] types = { "Rgb", "LinearRgb", "Hsv", "Lab", "Lch" };
+		String[] types = { "Rgb", "LinearRgb", "Xyz", "Hsv", "Lab", "Lch" };
 		for (int i = 0; i < types.length; i++) {
 			innerTable.add(types[i]).center();
 			innerTable.add(new ColorTransition(i)).growX().height(50).space(10);
@@ -97,12 +97,15 @@ public class ColorInterpolationComparison extends ExampleScreen {
 						GtColor.lerpLinearRgb(tmpColor, secondColor, progress);
 						break;
 					case 2:
-						GtColor.lerpHsv(tmpColor, secondColor, progress);
+						GtColor.lerpXyz(tmpColor, secondColor, progress);
 						break;
 					case 3:
-						GtColor.lerpLab(tmpColor, secondColor, progress);
+						GtColor.lerpHsv(tmpColor, secondColor, progress);
 						break;
 					case 4:
+						GtColor.lerpLab(tmpColor, secondColor, progress);
+						break;
+					case 5:
 						GtColor.lerpLch(tmpColor, secondColor, progress);
 						break;
 				}

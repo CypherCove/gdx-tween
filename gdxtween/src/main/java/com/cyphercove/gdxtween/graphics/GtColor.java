@@ -69,12 +69,12 @@ public final class GtColor {
      * @param t              The interpolation coefficient. Must be in the range 0..1.
      */
     public static void lerpLinearRgb(Color startAndResult, Color end, float t) {
-        float red = invertGammaCorrection(startAndResult.r);
-        float green = invertGammaCorrection(startAndResult.g);
-        float blue = invertGammaCorrection(startAndResult.b);
-        startAndResult.r = applyGammaCorrection(red + t * (invertGammaCorrection(end.r) - red));
-        startAndResult.g = applyGammaCorrection(green + t * (invertGammaCorrection(end.g) - green));
-        startAndResult.b = applyGammaCorrection(blue + t * (invertGammaCorrection(end.b) - blue));
+        float red = degamma(startAndResult.r);
+        float green = degamma(startAndResult.g);
+        float blue = degamma(startAndResult.b);
+        startAndResult.r = gamma(red + t * (degamma(end.r) - red));
+        startAndResult.g = gamma(green + t * (degamma(end.g) - green));
+        startAndResult.b = gamma(blue + t * (degamma(end.b) - blue));
     }
 
     /**
@@ -102,17 +102,25 @@ public final class GtColor {
         end.toHsv(FLOAT3_B);
         float startHue = FLOAT3_A[0];
         float endHue = FLOAT3_B[0];
+        float startSaturation = FLOAT3_A[1];
+        float endSaturation = FLOAT3_B[1];
+        float startValue = FLOAT3_A[2];
+        float endValue = FLOAT3_B[2];
         if (FLOAT3_A[1] < SATURATION_THRESHOLD)
-            startHue = endHue;
+            FLOAT3_A[0] = endHue;
         else if (FLOAT3_B[1] < SATURATION_THRESHOLD)
             endHue = startHue;
         else if (startHue - endHue > 180f)
             endHue += 360f;
         else if (endHue - startHue > 180f)
             startHue += 360f;
+        if (startValue == 0f)
+            startSaturation = endSaturation;
+        else if (endValue == 0f)
+            endSaturation = startSaturation;
         FLOAT3_A[0] = (startHue + t * (endHue - startHue)) % 360f;
-        FLOAT3_A[1] = FLOAT3_A[1] + t * (FLOAT3_B[1] - FLOAT3_A[1]);
-        FLOAT3_A[2] = FLOAT3_A[2] + t * (FLOAT3_B[2] - FLOAT3_A[2]);
+        FLOAT3_A[1] = startSaturation + t * (endSaturation - startSaturation);
+        FLOAT3_A[2] = startValue + t * (endValue - startValue);
         startAndResult.fromHsv(FLOAT3_A);
     }
 
@@ -125,6 +133,63 @@ public final class GtColor {
      */
     public static void lerpHsvA(Color startAndResult, Color end, float t) {
         lerpHsv(startAndResult, end, t);
+        startAndResult.a = startAndResult.a + t * (end.a - startAndResult.a);
+    }
+
+    /**
+     * Linearly interpolates RGB between the two colors using CIEXYZ color space. Alpha is not modified.
+     *
+     * @param startAndResult The starting color. The result is placed in this color object.
+     * @param end            The target color.
+     * @param t              The interpolation coefficient. Must be in the range 0..1.
+     */
+    public static void lerpXyz(Color startAndResult, Color end, float t) {
+        toXyz(startAndResult, FLOAT3_A);
+        toXyz(end, FLOAT3_B);
+        for (int i = 0; i < 3; i++) {
+            FLOAT3_A[i] = FLOAT3_A[i] + t * (FLOAT3_B[i] - FLOAT3_A[i]);
+        }
+        fromXyz(startAndResult, FLOAT3_A);
+    }
+
+    /**
+     * Linearly interpolates RGB between the two colors using CIEXYZ color space.  Alpha is also linearly interpolated.
+     *
+     * @param startAndResult The starting color. The result is placed in this color object.
+     * @param end            The target color.
+     * @param t              The interpolation coefficient. Must be in the range 0..1.
+     */
+    public static void lerpXyzA(Color startAndResult, Color end, float t) {
+        lerpLab(startAndResult, end, t);
+        startAndResult.a = startAndResult.a + t * (end.a - startAndResult.a);
+    }
+
+    /**
+     * Linearly interpolates RGB between the two colors using CIELAB (aka Lab) color space. Alpha is not modified.
+     *
+     * @param startAndResult The starting color. The result is placed in this color object.
+     * @param end            The target color.
+     * @param t              The interpolation coefficient. Must be in the range 0..1.
+     */
+    public static void lerpLab(Color startAndResult, Color end, float t) {
+        toLab(startAndResult, FLOAT3_A);
+        toLab(end, FLOAT3_B);
+        for (int i = 0; i < 3; i++) {
+            FLOAT3_A[i] = FLOAT3_A[i] + t * (FLOAT3_B[i] - FLOAT3_A[i]);
+        }
+        fromLab(startAndResult, FLOAT3_A);
+    }
+
+    /**
+     * Linearly interpolates RGB between the two colors using CIELAB (aka Lab) color space.  Alpha is also linearly
+     * interpolated.
+     *
+     * @param startAndResult The starting color. The result is placed in this color object.
+     * @param end            The target color.
+     * @param t              The interpolation coefficient. Must be in the range 0..1.
+     */
+    public static void lerpLabA(Color startAndResult, Color end, float t) {
+        lerpLab(startAndResult, end, t);
         startAndResult.a = startAndResult.a + t * (end.a - startAndResult.a);
     }
 
@@ -167,33 +232,74 @@ public final class GtColor {
         startAndResult.a = startAndResult.a + t * (end.a - startAndResult.a);
     }
 
-    /**
-     * Linearly interpolates RGB between the two colors using CIELAB (aka Lab) color space. Alpha is not modified.
-     *
-     * @param startAndResult The starting color. The result is placed in this color object.
-     * @param end            The target color.
-     * @param t              The interpolation coefficient. Must be in the range 0..1.
-     */
-    public static void lerpLab(Color startAndResult, Color end, float t) {
-        toLab(startAndResult, FLOAT3_A);
-        toLab(end, FLOAT3_B);
-        FLOAT3_A[0] = FLOAT3_A[0] + t * (FLOAT3_B[0] - FLOAT3_A[0]);
-        FLOAT3_A[1] = FLOAT3_A[1] + t * (FLOAT3_B[1] - FLOAT3_A[1]);
-        FLOAT3_A[2] = FLOAT3_A[2] + t * (FLOAT3_B[2] - FLOAT3_A[2]);
-        fromLab(startAndResult, FLOAT3_A);
+    public static void fromXyz(Color color, float x, float y, float z) {
+        color.r = gamma(3.2406254773200533f * x - 1.5372079722103187f * y - 0.4986285986982479f * z);
+        color.g = gamma(-0.9689307147293197f * x + 1.8757560608852415f * y + 0.041517523842953964f * z);
+        color.b = gamma(0.055710120445510616f * x + -0.2040210505984867f * y + 1.0569959422543882f * z);
+        if (color.r < 0) color.r = 0;
+        else if (color.r > 1) color.r = 1;
+        if (color.g < 0) color.g = 0;
+        else if (color.g > 1) color.g = 1;
+        if (color.b < 0) color.b = 0;
+        else if (color.b > 1) color.b = 1;
     }
 
-    /**
-     * Linearly interpolates RGB between the two colors using CIELAB (aka Lab) color space.  Alpha is also linearly
-     * interpolated.
-     *
-     * @param startAndResult The starting color. The result is placed in this color object.
-     * @param end            The target color.
-     * @param t              The interpolation coefficient. Must be in the range 0..1.
-     */
-    public static void lerpLabA(Color startAndResult, Color end, float t) {
-        lerpLab(startAndResult, end, t);
-        startAndResult.a = startAndResult.a + t * (end.a - startAndResult.a);
+    public static void fromXyz(Color color, float[] xyzIn) {
+        fromXyz(color, xyzIn[0], xyzIn[1], xyzIn[2]);
+    }
+
+    public static void toXyz(Color color, float[] xyzOut) {
+        toXyz(color.r, color.g, color.b, xyzOut);
+    }
+
+    public static void toXyz(float r, float g, float b, float[] xyzOut) {
+        float red = degamma(r);
+        float green = degamma(g);
+        float blue = degamma(b);
+        xyzOut[0] = 0.4124f * red + 0.3576f * green + 0.1805f * blue;
+        xyzOut[1] = 0.2126f * red + 0.7152f * green + 0.0722f * blue;
+        xyzOut[2] = 0.0193f * red + 0.1192f * green + 0.9505f * blue;
+    }
+
+    public static void fromLab(Color color, float l, float a, float b) {
+        float yF = (l + 16f) / 116f;
+        float zF = yF - b / 200f;
+        float xF = yF + a / 500f;
+        float x = X_D65 * (xF > SIGMA_LAB ? xF * xF * xF : (116f * xF - 16f) / KAP_LAB);
+        float y = l > KAP_LAB * SIGMA_LAB3 ? yF * yF * yF : l / KAP_LAB;
+        float z = Z_D65 * (zF > SIGMA_LAB ? zF * zF * zF : (116f * zF - 16f) / KAP_LAB);
+        color.r = gamma(3.2406254773200533f * x - 1.5372079722103187f * y - 0.4986285986982479f * z);
+        color.g = gamma(-0.9689307147293197f * x + 1.8757560608852415f * y + 0.041517523842953964f * z);
+        color.b = gamma(0.055710120445510616f * x + -0.2040210505984867f * y + 1.0569959422543882f * z);
+        if (color.r < 0) color.r = 0;
+        else if (color.r > 1) color.r = 1;
+        if (color.g < 0) color.g = 0;
+        else if (color.g > 1) color.g = 1;
+        if (color.b < 0) color.b = 0;
+        else if (color.b > 1) color.b = 1;
+    }
+
+    public static void fromLab(Color color, float[] labIn) {
+        fromLab(color, labIn[0], labIn[1], labIn[2]);
+    }
+
+    public static void toLab(Color color, float[] labOut) {
+        toLab(color.r, color.g, color.b, labOut);
+    }
+
+    public static void toLab(float r, float g, float b, float[] labOut) {
+        float red = degamma(r);
+        float green = degamma(g);
+        float blue = degamma(b);
+        float x = 0.4124f * red + 0.3576f * green + 0.1805f * blue;
+        float y = 0.2126f * red + 0.7152f * green + 0.0722f * blue;
+        float z = 0.0193f * red + 0.1192f * green + 0.9505f * blue;
+        float xF = forwardTransformXyz(x / X_D65);
+        float yF = forwardTransformXyz(y);
+        float zF = forwardTransformXyz(z / Z_D65);
+        labOut[0] = 116f * yF - 16f;
+        labOut[1] = 500f * (xF - yF);
+        labOut[2] = 200f * (yF - zF);
     }
 
     /**
@@ -227,55 +333,14 @@ public final class GtColor {
         lchOut[2] = GtMathUtils.atan2(b, a);
     }
 
-    public static void fromLab(Color color, float l, float a, float b) {
-        float yF = (l + 16f) / 116f;
-        float zF = yF - b / 200f;
-        float xF = yF + a / 500f;
-        float x = X_D65 * (xF > SIGMA_LAB ? xF * xF * xF : (116f * xF - 16f) / KAP_LAB);
-        float y = l > KAP_LAB * SIGMA_LAB3 ? yF * yF * yF : l / KAP_LAB;
-        float z = Z_D65 * (zF > SIGMA_LAB ? zF * zF * zF : (116f * zF - 16f) / KAP_LAB);
-        color.r = applyGammaCorrection(3.2406254773200533f * x - 1.5372079722103187f * y - 0.4986285986982479f * z);
-        color.g = applyGammaCorrection(-0.9689307147293197f * x + 1.8757560608852415f * y + 0.041517523842953964f * z);
-        color.b = applyGammaCorrection(0.055710120445510616f * x + -0.2040210505984867f * y + 1.0569959422543882f * z);
-        if (color.r < 0) color.r = 0;
-        else if (color.r > 1) color.r = 1;
-        if (color.g < 0) color.g = 0;
-        else if (color.g > 1) color.g = 1;
-        if (color.b < 0) color.b = 0;
-        else if (color.b > 1) color.b = 1;
-    }
-
-    public static void fromLab(Color color, float[] labIn) {
-        fromLab(color, labIn[0], labIn[1], labIn[2]);
-    }
-
-    public static void toLab(Color color, float[] labOut) {
-        toLab(color.r, color.g, color.b, labOut);
-    }
-
-    public static void toLab(float r, float g, float b, float[] labOut) {
-        float red = invertGammaCorrection(r);
-        float green = invertGammaCorrection(g);
-        float blue = invertGammaCorrection(b);
-        float x = 0.4124f * red + 0.3576f * green + 0.1805f * blue;
-        float y = 0.2126f * red + 0.7152f * green + 0.0722f * blue;
-        float z = 0.0193f * red + 0.1192f * green + 0.9505f * blue;
-        float xF = forwardTransformXyz(x / X_D65);
-        float yF = forwardTransformXyz(y);
-        float zF = forwardTransformXyz(z / Z_D65);
-        labOut[0] = 116f * yF - 16f;
-        labOut[1] = 500f * (xF - yF);
-        labOut[2] = 200f * (yF - zF);
-    }
-
     /**
      * Converts a color channel from gamma-corrected to linear scale.
      *
      * @param component The color channel to make linear.
      * @return The color value in linear scale.
      */
-    public static float invertGammaCorrection(float component) {
-        return (component <= 0.04045f) ? component / 12.92f : (float) Math.pow((component + 0.055f) / 1.055f, 2.4);
+    public static float degamma(float component) {
+        return (float) Math.pow(component, 2.2);//component <= 0.04045f ? component / 12.92f : (float) Math.pow((component + 0.055f) / 1.055f, 2.4);
     }
 
     /**
@@ -284,8 +349,8 @@ public final class GtColor {
      * @param component The color channel to gamma-correct.
      * @return The color value with gamma correction.
      */
-    public static float applyGammaCorrection(float component) {
-        return component <= 0.0031308f ? 12.92f * component : 1.055f * (float) Math.pow(component, 1.0 / 2.4) - 0.055f;
+    public static float gamma(float component) {
+        return (float) Math.pow(component, 1.0 / 2.2);//component <= 0.0031308f ? 12.92f * component : 1.055f * (float) Math.pow(component, 1.0 / 2.4) - 0.055f;
     }
 
     private static float forwardTransformXyz(float component) {

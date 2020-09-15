@@ -70,12 +70,12 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
                 setEndValue(2, endB);
                 break;
             case LinearRgb:
-                setStartValue(0, GtColor.invertGammaCorrection(target.r));
-                setStartValue(1, GtColor.invertGammaCorrection(target.g));
-                setStartValue(2, GtColor.invertGammaCorrection(target.b));
-                setEndValue(0, GtColor.invertGammaCorrection(endR));
-                setEndValue(1, GtColor.invertGammaCorrection(endG));
-                setEndValue(2, GtColor.invertGammaCorrection(endB));
+                setStartValue(0, GtColor.degamma(target.r));
+                setStartValue(1, GtColor.degamma(target.g));
+                setStartValue(2, GtColor.degamma(target.b));
+                setEndValue(0, GtColor.degamma(endR));
+                setEndValue(1, GtColor.degamma(endG));
+                setEndValue(2, GtColor.degamma(endB));
                 break;
             case Hsv:
                 target.toHsv(TMP_SHARED_1);
@@ -115,7 +115,7 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
     protected void apply(int vectorIndex, float value) {
         switch (colorSpace) {
             case LinearRgb:
-                value = GtColor.applyGammaCorrection(value);
+                value = GtColor.gamma(value);
                 // fall through
             case Rgb:
                 value = MathUtils.clamp(value, 0f, 1f);
