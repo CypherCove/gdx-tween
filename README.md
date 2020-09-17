@@ -234,8 +234,8 @@ inSequence {
 
 ## License
 
-gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). Substantial portions of the GtColor class were 
-ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by the 
+gdx-tween is covered by the [Apache 2.0 license](LICENSE.md). The GtColor class contains an optimization in the  
+`fromLab()` method ported from [ac-colors](https://github.com/vinaypillai/ac-colors), which is covered by the 
 [MIT license](LICENSE-AC-COLORS.md).
 
 The example uses [VisUI](https://github.com/kotcrab/vis-ui) and the default VisUI skin.

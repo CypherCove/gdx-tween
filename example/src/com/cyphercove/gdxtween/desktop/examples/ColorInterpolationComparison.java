@@ -2,13 +2,16 @@ package com.cyphercove.gdxtween.desktop.examples;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.Widget;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.OrderedMap;
 import com.cyphercove.covetools.utils.Disposal;
 import com.cyphercove.gdxtween.desktop.ExampleScreen;
 import com.cyphercove.gdxtween.desktop.ExamplesParent;
 import com.cyphercove.gdxtween.desktop.SharedAssets;
+import com.cyphercove.gdxtween.graphics.ColorSpace;
 import com.cyphercove.gdxtween.graphics.GtColor;
 import com.kotcrab.vis.ui.widget.color.BasicColorPicker;
 import com.kotcrab.vis.ui.widget.color.ColorPickerAdapter;
@@ -27,6 +30,23 @@ public class ColorInterpolationComparison extends ExampleScreen {
 	Color tmpColor = new Color(Color.WHITE);
 	Stage stage;
 
+	private static final ObjectMap<String, ColorSpace> choices = new OrderedMap<>();
+	static {
+		choices.put("RGB", ColorSpace.Rgb);
+		choices.put("Linear RGB", ColorSpace.DegammaRgb);
+		choices.put("Euclidean HCL", ColorSpace.EuclideanHcl);
+//		choices.put("Linear Euclidean HCL", ColorSpace.DegammaEuclideanHcl);
+		choices.put("Lab", ColorSpace.DegammaLab);
+		choices.put("IPT", ColorSpace.DegammaIpt);
+		choices.put("Lch", ColorSpace.DegammaLch);
+		choices.put("HSL", ColorSpace.Hsl);
+//		choices.put("Linear HSL", ColorSpace.DegammaHsl);
+		choices.put("HCL", ColorSpace.Hcl);
+//		choices.put("Linear HCL", ColorSpace.DegammaHcl);
+		choices.put("HSV", ColorSpace.Hsv);
+//		choices.put("Linear HSV", ColorSpace.DegammaHsv);
+	}
+
 	@Override
 	protected String getName() {
 		return "Color interpolation comparison";
@@ -34,6 +54,8 @@ public class ColorInterpolationComparison extends ExampleScreen {
 
 	@Override
 	public void show () {
+		GtColor.lerp(new Color(Color.BLACK), Color.RED, 0f, ColorSpace.DegammaHcl, false);
+
 		color.a = 1f;
 		if (stage == null) {
 			stage = sharedAssets.generateStage();
@@ -56,10 +78,9 @@ public class ColorInterpolationComparison extends ExampleScreen {
 		});
 
 		Table innerTable = new Table(sharedAssets.getSkin());
-		String[] types = { "Rgb", "LinearRgb", "Xyz", "Hsv", "Lab", "Lch" };
-		for (int i = 0; i < types.length; i++) {
-			innerTable.add(types[i]).center();
-			innerTable.add(new ColorTransition(i)).growX().height(50).space(10);
+		for (ObjectMap.Entry<String, ColorSpace> entry : choices) {
+			innerTable.add(entry.key).center();
+			innerTable.add(new ColorTransition(entry.value)).growX().height(30).space(10);
 			innerTable.row();
 		}
 		table.add(innerTable).grow();
@@ -75,11 +96,11 @@ public class ColorInterpolationComparison extends ExampleScreen {
 		stage.addActor(table);
 	}
 
-	private class ColorTransition extends Actor {
-		int spaceType;
+	private class ColorTransition extends Widget {
+		ColorSpace colorSpace;
 
-		public ColorTransition(int spaceType) {
-			this.spaceType = spaceType;
+		public ColorTransition(ColorSpace colorSpace) {
+			this.colorSpace = colorSpace;
 		}
 
 		@Override
@@ -89,26 +110,7 @@ public class ColorInterpolationComparison extends ExampleScreen {
 			for (int i = 0; i < segments; i++) {
 				float progress = (float)i / (segments - 1);
 				tmpColor.set(firstColor);
-				switch (spaceType) {
-					case 0:
-						GtColor.lerpRgb(tmpColor, secondColor, progress);
-						break;
-					case 1:
-						GtColor.lerpLinearRgb(tmpColor, secondColor, progress);
-						break;
-					case 2:
-						GtColor.lerpXyz(tmpColor, secondColor, progress);
-						break;
-					case 3:
-						GtColor.lerpHsv(tmpColor, secondColor, progress);
-						break;
-					case 4:
-						GtColor.lerpLab(tmpColor, secondColor, progress);
-						break;
-					case 5:
-						GtColor.lerpLch(tmpColor, secondColor, progress);
-						break;
-				}
+				GtColor.lerp(tmpColor, secondColor, progress, colorSpace, false);
 				batch.setColor(tmpColor);
 				batch.draw(sharedAssets.getWhite(), getX() + segmentWidth * i, getY(), segmentWidth, getHeight());
 			}

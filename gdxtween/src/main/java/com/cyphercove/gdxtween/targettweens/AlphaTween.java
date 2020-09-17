@@ -18,6 +18,7 @@ package com.cyphercove.gdxtween.targettweens;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
+import com.cyphercove.gdxtween.graphics.GtColor;
 import com.cyphercove.gdxtween.math.Scalar;
 
 /**
@@ -40,6 +41,7 @@ public class AlphaTween extends TargetTween<AlphaTween, Color> {
     }
 
     private float endA;
+    private boolean isDegamma;
 
     public AlphaTween() {
         super(1);
@@ -53,26 +55,51 @@ public class AlphaTween extends TargetTween<AlphaTween, Color> {
     @Override
     protected void begin() {
         super.begin();
-        setStartValue(0, target.a);
+        if (isDegamma) {
+            setStartValue(0, GtColor.gammaExpand(target.a));
+            setEndValue(0, GtColor.gammaExpand(endA));
+        } else {
+            setStartValue(0, target.a);
+            setEndValue(0, endA);
+        }
     }
 
     @Override
     protected void apply(int vectorIndex, float value) {
-        target.a = value;
+        target.a = isDegamma ? GtColor.gammaCompress(value) : value;
+    }
+
+    public float getEnd() {
+        return endA;
     }
 
     public AlphaTween end(float end) {
-        setEndValue(0, end);
+        endA = end;
         return this;
     }
 
     public AlphaTween end(Scalar end) {
-        setEndValue(0, end.x);
+        endA = end.x;
         return this;
     }
 
-    public float getEnd() {
-        return getEndValue(0);
+    /**
+     * Whether this tween will treat the inputs as gamma-corrected, and perform the interpolation in linear space.
+     * @return The current setting.
+     */
+    public boolean isDegamma() {
+        return isDegamma;
+    }
+
+    /**
+     * Sets whether the alpha channel should be converted to linear color space before interpolating. If so, the
+     * interpolation is performed in linear space and the result is applied back in gamma-corrected space.
+     * @param shouldDegamma true if alpha should be linearized before interpolating.
+     * @return This tween for building.
+     */
+    public AlphaTween degamma(boolean shouldDegamma) {
+        this.isDegamma = shouldDegamma;
+        return this;
     }
 
     @Override
@@ -81,18 +108,4 @@ public class AlphaTween extends TargetTween<AlphaTween, Color> {
         POOL.free(this);
     }
 
-    //
-//    /**
-//     * Adds another AlphaTween to the end of this chain and returns it.
-//     *
-//     * @param endA     Final alpha value.
-//     * @param duration Duration of the tween.
-//     * @param ease     The Ease to use.
-//     * @return An AlphaTween that will automatically be returned to a pool when complete.
-//     */
-//    public AlphaTween thenTo(float endA, float duration, @Nullable Ease ease) {
-//        AlphaTween tween = Tweens.toAlpha(target, endA, duration, ease);
-//        setNext(tween);
-//        return tween;
-//    }
 }

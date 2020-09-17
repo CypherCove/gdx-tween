@@ -39,7 +39,7 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
         return POOL.obtain();
     }
 
-    private ColorSpace colorSpace = ColorSpace.LinearRgb;
+    private ColorSpace colorSpace = ColorSpace.DegammaRgb;
     private float endR, endG, endB;
 
     private final float[] accumulator = new float[3];
@@ -60,62 +60,104 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
     @Override
     protected void begin() {
         super.begin();
+        float startR, startG, startB, endR, endG, endB;
+        if (colorSpace.isDegamma) {
+            startR = GtColor.gammaExpand(target.r);
+            startG = GtColor.gammaExpand(target.g);
+            startB = GtColor.gammaExpand(target.b);
+            endR = GtColor.gammaExpand(this.endR);
+            endG = GtColor.gammaExpand(this.endG);
+            endB = GtColor.gammaExpand(this.endB);
+        } else {
+            startR = target.r;
+            startG = target.g;
+            startB = target.b;
+            endR = this.endR;
+            endG = this.endG;
+            endB = this.endB;
+        }
         switch (colorSpace) {
             case Rgb:
-                setStartValue(0, target.r);
-                setStartValue(1, target.g);
-                setStartValue(2, target.b);
+            case DegammaRgb:
+                setStartValue(0, startR);
+                setStartValue(1, startG);
+                setStartValue(2, startB);
                 setEndValue(0, endR);
                 setEndValue(1, endG);
                 setEndValue(2, endB);
+                return;
+            case Hcl:
+            case DegammaHcl:
+                GtColor.toHcl(startR, startG, startB, TMP_SHARED_1);
+                GtColor.toHcl(endR, endG, endB, TMP_SHARED_2);
+                fixHxxStartEnd();
                 break;
-            case LinearRgb:
-                setStartValue(0, GtColor.degamma(target.r));
-                setStartValue(1, GtColor.degamma(target.g));
-                setStartValue(2, GtColor.degamma(target.b));
-                setEndValue(0, GtColor.degamma(endR));
-                setEndValue(1, GtColor.degamma(endG));
-                setEndValue(2, GtColor.degamma(endB));
+            case Hsl:
+            case DegammaHsl:
+                GtColor.toHsl(startR, startG, startB, TMP_SHARED_1);
+                GtColor.toHsl(endR, endG, endB, TMP_SHARED_2);
+                fixHxxStartEnd();
                 break;
             case Hsv:
+            case DegammaHsv:
                 target.toHsv(TMP_SHARED_1);
-                float startHue = TMP_SHARED_1[0];
-                float startSaturation = TMP_SHARED_1[1];
-                setStartValue(1, startSaturation);
-                setStartValue(2, TMP_SHARED_1[2]);
-
-                TMP_SHARED_3.set(endR, endG, endB, 1f).toHsv(TMP_SHARED_1);
-                float endHue = TMP_SHARED_1[0];
-                setEndValue(1, TMP_SHARED_1[1]);
-                setEndValue(2, TMP_SHARED_1[2]);
-
-                if (startSaturation < GtColor.SATURATION_THRESHOLD)
-                    startHue = endHue;
-                else if (TMP_SHARED_1[1] < GtColor.SATURATION_THRESHOLD)
-                    endHue = startHue;
-                else if (startHue - endHue > 180f)
-                    endHue += 360f;
-                else if (endHue - startHue > 180f)
-                    startHue += 360f;
-                setStartValue(0, startHue);
-                setEndValue(0, endHue);
+                TMP_SHARED_3.set(endR, endG, endB, 1f).toHsv(TMP_SHARED_2);
+                fixHxxStartEnd();
                 break;
             case Lab:
-                GtColor.toLab(target, TMP_SHARED_1);
+            case DegammaLab:
+                GtColor.toLab(startR, startG, startB, TMP_SHARED_1);
                 GtColor.toLab(endR, endG, endB, TMP_SHARED_2);
-                for (int i = 0; i < 3; i++) {
-                    setStartValue(i, TMP_SHARED_1[i]);
-                    setEndValue(i, TMP_SHARED_2[i]);
-                }
+                break;
+            case Lch:
+            case DegammaLch:
+                GtColor.toLch(startR, startG, startB, TMP_SHARED_1);
+                GtColor.toLch(endR, endG, endB, TMP_SHARED_2);
+                float startHue = TMP_SHARED_1[2];
+                float endHue = TMP_SHARED_2[2];
+                if (TMP_SHARED_1[1] < GtColor.CHROMA_THRESHOLD)
+                    TMP_SHARED_1[2] = endHue;
+                else if (TMP_SHARED_2[1] < GtColor.CHROMA_THRESHOLD)
+                    TMP_SHARED_2[2] = startHue;
+                else if (startHue - endHue > MathUtils.PI)
+                    TMP_SHARED_2[2] += MathUtils.PI2;
+                else if (endHue - startHue > MathUtils.PI)
+                    TMP_SHARED_1[2] += MathUtils.PI2;
+                break;
+            case Ipt:
+            case DegammaIpt:
+                GtColor.toIpt(startR, startG, startB, TMP_SHARED_1);
+                GtColor.toIpt(endR, endG, endB, TMP_SHARED_2);
                 break;
         }
+        for (int i = 0; i < 3; i++) {
+            setStartValue(i, TMP_SHARED_1[i]);
+            setEndValue(i, TMP_SHARED_2[i]);
+        }
+    }
+
+    private static void fixHxxStartEnd(){
+        float startHue = TMP_SHARED_1[0];
+        float endHue = TMP_SHARED_2[0];
+        if (TMP_SHARED_1[1] < GtColor.SATURATION_THRESHOLD)
+            TMP_SHARED_1[0] = endHue;
+        else if (TMP_SHARED_2[1] < GtColor.SATURATION_THRESHOLD)
+            TMP_SHARED_2[0] = startHue;
+        else if (startHue - endHue > 180f)
+            TMP_SHARED_2[0] += 360f;
+        else if (endHue - startHue > 180f)
+            TMP_SHARED_1[0] += 360f;
+        if (TMP_SHARED_1[2] == 0f)
+            TMP_SHARED_1[1] = TMP_SHARED_2[1];
+        else if (TMP_SHARED_2[2] == 0f)
+            TMP_SHARED_2[1] = TMP_SHARED_1[1];
     }
 
     @Override
     protected void apply(int vectorIndex, float value) {
         switch (colorSpace) {
-            case LinearRgb:
-                value = GtColor.gamma(value);
+            case DegammaRgb:
+                value = GtColor.gammaCompress(value);
                 // fall through
             case Rgb:
                 value = MathUtils.clamp(value, 0f, 1f);
@@ -131,17 +173,30 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
                         break;
                 }
                 break;
-
+            case Hcl:
+            case DegammaHcl:
+            case Hsl:
+            case DegammaHsl:
             case Hsv:
+            case DegammaHsv:
                 if (vectorIndex == 0)
                     value = GtMathUtils.modulo(value, 360f);
-                else
-                    value = MathUtils.clamp(value, 0f, 1f);
                 accumulator[vectorIndex] = value;
                 break;
             case Lab:
+            case DegammaLab:
                 if (vectorIndex == 0)
                     value = Math.max(0f, value);
+                accumulator[vectorIndex] = value;
+                break;
+            case Lch:
+            case DegammaLch:
+                if (vectorIndex == 2)
+                    value = GtMathUtils.modulo(value, 360f);
+                accumulator[vectorIndex] = value;
+                break;
+            case Ipt:
+            case DegammaIpt:
                 accumulator[vectorIndex] = value;
                 break;
         }
@@ -149,26 +204,47 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
 
     @Override
     protected void applyAfter() {
+        if (colorSpace == ColorSpace.Rgb || colorSpace == ColorSpace.DegammaRgb)
+            return;
         switch (colorSpace) {
+            case Hsl:
+            case DegammaHsl:
+                GtColor.fromHsl(target, accumulator[0], accumulator[1], accumulator[2]);
+                break;
+            case Hcl:
+            case DegammaHcl:
+                GtColor.fromHcl(target, accumulator[0], accumulator[1], accumulator[2]);
+                break;
             case Hsv:
+            case DegammaHsv:
                 target.fromHsv(accumulator[0], accumulator[1], accumulator[2]);
                 break;
             case Lab:
+            case DegammaLab:
                 GtColor.fromLab(target, accumulator[0], accumulator[1], accumulator[2]);
                 break;
+            case Lch:
+            case DegammaLch:
+                GtColor.fromLch(target, accumulator[0], accumulator[1], accumulator[2]);
+                break;
+            case Ipt:
+            case DegammaIpt:
+                GtColor.fromIpt(target, accumulator[0], accumulator[1], accumulator[2]);
+                break;
+        }
+        if (colorSpace.isDegamma) {
+            target.r = GtColor.gammaCompress(target.r);
+            target.g = GtColor.gammaCompress(target.g);
+            target.b = GtColor.gammaCompress(target.b);
         }
     }
 
     @Override
     protected void applyAfterComplete() {
-        switch (colorSpace) {
-            case LinearRgb:
-            case Hsv:
-            case Lab:
-                target.r = endR;
-                target.g = endG;
-                target.b = endB;
-                break;
+        if (colorSpace != ColorSpace.Rgb) {
+            target.r = endR;
+            target.g = endG;
+            target.b = endB;
         }
     }
 
@@ -222,24 +298,8 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
     @Override
     public void free() {
         super.free();
-        colorSpace = ColorSpace.LinearRgb;
+        colorSpace = ColorSpace.DegammaRgb;
         POOL.free(this);
     }
 
-//    /**
-//     * Adds another ColorTween to the end of this chain, set to use the same ColorSpace, and returns it.
-//     * @param endR     Final red value.
-//     * @param endG     Final green value.
-//     * @param endB     Final blue value.
-//     * @param duration Duration of the tween.
-//     * @param ease     The Ease to use.
-//     * @return An RgbColorTween that will automatically be returned to a pool when this chain is complete.
-//     */
-//    @NotNull
-//    public ColorTween thenTo (float endR, float endG, float endB, float duration, @Nullable Ease ease){
-//        ColorTween tween = Tweens.toRgb(target, endR, endG, endB, duration, ease)
-//                .colorSpace(colorSpace);
-//        setNext(tween);
-//        return tween;
-//    }
 }

@@ -20,7 +20,7 @@ plugins {
 
 project.ext {
     libraryGroupId = 'com.cyphercove.gdxtween'
-    libraryVersion = '0.1.1'
+    libraryVersion = '0.1.2'
     librarySubProjects = subprojects.findAll{
         it.name == 'gdxtween' || it.name == 'gdxtween-kt'
     }
