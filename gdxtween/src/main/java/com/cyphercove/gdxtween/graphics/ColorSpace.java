@@ -95,17 +95,18 @@ public enum ColorSpace {
      */
     DegammaLch(true),
     /**
-     * One transformation short of IPT color space
+     * The gamma compressed LMS stage of the IPT color space. This produces a very smooth blend with hue stability, at
+     * less computation cost than IPT.
      * <p>
      * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
      * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
      */
-    PartialIpt(false),
+    LmsCompressed(false),
     /**
-     * PartialIpt with gamma correction removed, assuming the source Color object is stored in sRGB space. If it is
-     * already in linear space, use PartialIpt instead.
+     * LmsCompressed with gamma correction removed, assuming the source Color object is stored in sRGB space. If it is
+     * already in linear space, use LmsCompressed instead.
      */
-    DegammaPartialIpt(true),
+    DegammaLmsCompressed(true),
     /**
      * IPT color space, which represents colors in a way that makes linear changes look visually linear to the human eye,
      * and has better hue stability than CIELAB.  High computational cost.

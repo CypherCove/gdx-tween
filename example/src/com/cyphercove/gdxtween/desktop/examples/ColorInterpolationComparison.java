@@ -38,7 +38,7 @@ public class ColorInterpolationComparison extends ExampleScreen {
 		choices.put("Euclidean HCL", ColorSpace.EuclideanHcl);
 //		choices.put("Linear Euclidean HCL", ColorSpace.DegammaEuclideanHcl);
 		choices.put("Lab", ColorSpace.DegammaLab);
-		choices.put("Partial IPT (L'M'S')", ColorSpace.DegammaPartialIpt);
+		choices.put("Partial IPT (L'M'S')", ColorSpace.DegammaLmsCompressed);
 		choices.put("IPT", ColorSpace.DegammaIpt);
 		choices.put("Lch", ColorSpace.DegammaLch);
 		choices.put("HSL", ColorSpace.Hsl);
@@ -66,15 +66,6 @@ public class ColorInterpolationComparison extends ExampleScreen {
 		setScreenInputProcessors(stage);
 	}
 
-	private void roundTripCheck(Color color) {
-		Color c = new Color(color);
-		float[] ipt = new float[3];
-		GtColor.toIpt(c, ipt);
-		Gdx.app.log("IPT", "" + ipt[0] + ", " + ipt[1] + ", " + ipt[2]);
-		GtColor.fromIpt(c, ipt);
-		Gdx.app.log("round trip", "Start: " + color + ", return: " + c);
-	}
-
 	private void setupUI () {
 		Table table = new Table();
 		table.setFillParent(true);
@@ -85,7 +76,6 @@ public class ColorInterpolationComparison extends ExampleScreen {
 			@Override
 			public void changed(Color newColor) {
 				firstColor.set(newColor);
-				roundTripCheck(firstColor);
 			}
 		});
 

@@ -144,18 +144,30 @@ change at a constant rate. So, other color spaces may be preferred for interpola
 of a ColorTween is not the basic gamma-corrected RGB that is used by `Color.lerp` and scene2D's `ColorAction`, but 
 rather `ColorSpace.LinearRgb`.
 
-ColorSpace can be selected by using `ColorAction.colorSpace()`. The available types:
+ColorSpace can be selected by using `ColorAction.colorSpace()`. For each color space, there is a direct version, and a
+"Degamma" version. Using the Degamma version of a color space means that it assumes that the Color object is being kept 
+in gamma-corrected sRGB space (as is typical in libGDX if using the color with SpriteBatch's default shader), and that
+gamma correction should be removed for the interpolation and then reapplied on the result.
 
- * *Rgb*: Gamma-corrected color space. This provides direct interpolation of RGB values and is the least computationally
- expensive, but may produce very uneven-looking or muddy blends.
- * *LinearRgb*: (The default) Linear color space. This results in significantly smoother transitions at slightly more
- computational cost.
- * *Hsv*: Hue, saturation, and value color space. This can prevent desaturated color from appearing in the middle when 
+The available color spaces:
+
+ * *RGB*: This provides direct interpolation of a Color's RGB values and is the least computationally expensive, but may 
+ produce uneven or muddy blends. If `DegammaRgb` is used on an sRGB Color, the blend will be smooth in terms of light 
+ energy, but it will not appear even to the eye.
+ * *HSV*: Hue, saturation, and value color space. This can prevent desaturated color from appearing in the middle when 
  interpolating between two saturated colors, but has a tendency to introduce intermediate hues which can produce a 
  rainbow effect. Moderate computational cost.
+ * *HSL*: Hue, saturation and lightness color space. This has a similar effect as Hsv, but treats "whiteness" as distinct
+ from saturation, so blends between whitish or dark colors to pure colors may appear more stable. 
  * *Lab*: CIELAB color space. Lab color space was designed specifically to make even changes in the color parameters look
  even to the human eye. It produces extremely smooth-looking blends. However, for certain transitions it may produce
  faint hints of intermediate hues. It has a high computational cost.
+ * *LCH*: This is a cylindrical transformation of Lab color space, so it has an angular hue component analogous to that of
+ HSV. Blends are very smooth, but may contain intermediate hues, producing a rainbow effect.
+ * *IPT*: IPT color space. It produces extremely smooth-looking blends and has better hue stability than Lab.
+ * *LMS Compressed*: This is the gamma compressed LMS color space that is the intermediate step of transforming XYZ color
+ to IPT color space, as defined by IPT's forward transform. It also produces very smooth-looking blends, but omits a
+ matrix multiplication step as compared to IPT.
 
 
 

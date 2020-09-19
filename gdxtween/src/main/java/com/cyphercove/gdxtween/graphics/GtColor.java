@@ -95,9 +95,10 @@ public final class GtColor {
             case DegammaLch:
                 lerpLch(startAndResult, endCorrected, t);
                 break;
-            case PartialIpt:
-            case DegammaPartialIpt:
-                lerpPartialIpt(startAndResult, endCorrected, t);
+            case LmsCompressed:
+            case DegammaLmsCompressed:
+                lerpLmsCompressed(startAndResult, endCorrected, t);
+                break;
             case Ipt:
             case DegammaIpt:
                 lerpIpt(startAndResult, endCorrected, t);
@@ -204,13 +205,13 @@ public final class GtColor {
         fromLch(startAndResult, FLOAT3_A);
     }
 
-    private static void lerpPartialIpt(Color startAndResult, Color end, float t) {
-        toPartialIpt(startAndResult, FLOAT3_A);
-        toPartialIpt(end, FLOAT3_B);
+    private static void lerpLmsCompressed(Color startAndResult, Color end, float t) {
+        toLmsCompressed(startAndResult, FLOAT3_A);
+        toLmsCompressed(end, FLOAT3_B);
         for (int i = 0; i < 3; i++) {
             FLOAT3_A[i] = FLOAT3_A[i] + t * (FLOAT3_B[i] - FLOAT3_A[i]);
         }
-        fromPartialIpt(startAndResult, FLOAT3_A);
+        fromLmsCompressed(startAndResult, FLOAT3_A);
     }
 
     private static void lerpIpt(Color startAndResult, Color end, float t) {
@@ -521,8 +522,8 @@ public final class GtColor {
      * @param lmsPrimeIn Input color array with L', M', and S' channels in the first three indices, respectively. Must
      *              be of length of at least 3.
      */
-    public static void fromPartialIpt(Color color, float[] lmsPrimeIn) {
-        fromPartialIpt(color, lmsPrimeIn[0], lmsPrimeIn[1], lmsPrimeIn[2]);
+    public static void fromLmsCompressed(Color color, float[] lmsPrimeIn) {
+        fromLmsCompressed(color, lmsPrimeIn[0], lmsPrimeIn[1], lmsPrimeIn[2]);
     }
 
     /**
@@ -536,16 +537,16 @@ public final class GtColor {
      * @param mPrime Input M' channel.
      * @param sPrime Input S' channel.
      */
-    public static void fromPartialIpt(Color color, float lPrime, float mPrime, float sPrime) {
-        float l = lPrime;//reverseTransformLmsIpt(lPrime);
-        float m = mPrime;//reverseTransformLmsIpt(mPrime);
-        float s = sPrime;//reverseTransformLmsIpt(sPrime);
+    public static void fromLmsCompressed(Color color, float lPrime, float mPrime, float sPrime) {
+        float l = reverseTransformLmsIpt(lPrime);
+        float m = reverseTransformLmsIpt(mPrime);
+        float s = reverseTransformLmsIpt(sPrime);
         float xD65 = 1.850243f * l - 1.1383f * m + 0.238435f * s;
         float yD65 = 0.366831f * l + 0.643885f * m - 0.01067f * s;
         float zD65 = 1.08885f * s;
-        color.r = 3.2404542f * xD65 - 1.5371385f * yD65 - 0.4985314f * zD65;
-        color.g = -0.9692660f * xD65 + 1.8760108f * yD65 + 0.0415560f * zD65;
-        color.b = 0.0556434f * xD65 + -0.2040259f * yD65 + 1.0572252f * zD65;
+        color.r = 3.24097f * xD65 - 1.53738f * yD65 - 0.49861f * zD65;
+        color.g = -0.96924f * xD65 + 1.875968f * yD65 + 0.041555f * zD65;
+        color.b = 0.05563f * xD65 - 0.20398f * yD65 + 1.056972f * zD65;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -565,8 +566,8 @@ public final class GtColor {
      * @param lmsPrimeOut Array the result will be placed in, with L'M'S' channels in the first three indices
      *               respectively. Length must be at least 3.
      */
-    public static void toPartialIpt(Color color, float[] lmsPrimeOut) {
-        toPartialIpt(color.r, color.g, color.b, lmsPrimeOut);
+    public static void toLmsCompressed(Color color, float[] lmsPrimeOut) {
+        toLmsCompressed(color.r, color.g, color.b, lmsPrimeOut);
     }
 
     /**
@@ -582,16 +583,16 @@ public final class GtColor {
      * @param lmsPrimeOut Array the result will be placed in, with IPT channels in the first three indices
      *               respectively. Length must be at least 3.
      */
-    public static void toPartialIpt(float r, float g, float b, float[] lmsPrimeOut) {
-        float xD65 = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b;
-        float yD65 = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b;
-        float zD65 = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b;
+    public static void toLmsCompressed(float r, float g, float b, float[] lmsPrimeOut) {
+        float xD65 = 0.412391f * r + 0.357584f * g + 0.180481f * b;
+        float yD65 = 0.212639f * r + 0.715169f * g + 0.072192f * b;
+        float zD65 = 0.019331f * r + 0.119195f * g + 0.950532f * b;
         float l = 0.4002f * xD65 + 0.7075f * yD65 - 0.0807f * zD65;
         float m = -0.2280f * xD65 + 1.1500f * yD65 + 0.0612f * zD65;
         float s = 0.9184f * zD65;
-        lmsPrimeOut[0] = l;//forwardTransformLmsIpt(l);
-        lmsPrimeOut[1] = m;//forwardTransformLmsIpt(m);
-        lmsPrimeOut[2] = s;//forwardTransformLmsIpt(s);
+        lmsPrimeOut[0] = forwardTransformLmsIpt(l);
+        lmsPrimeOut[1] = forwardTransformLmsIpt(m);
+        lmsPrimeOut[2] = forwardTransformLmsIpt(s);
     }
 
     /**
@@ -620,18 +621,18 @@ public final class GtColor {
      * @param t Input T channel.
      */
     public static void fromIpt(Color color, float i, float p, float t) {
-        float lPrime = i - 0.097617f * p + 0.205327f * t;
-        float mPrime = i - 0.11393f * p + 0.1331f * t;
-        float sPrime = i + 0.032631f * p - 0.67685f * t;
+        float lPrime = i + 0.097569f * p + 0.205226f * t;
+        float mPrime = i - 0.11388f * p + 0.133217f * t;
+        float sPrime = i + 0.032615f * p - 0.67689f * t;
         float l = reverseTransformLmsIpt(lPrime);
         float m = reverseTransformLmsIpt(mPrime);
         float s = reverseTransformLmsIpt(sPrime);
         float xD65 = 1.850243f * l - 1.1383f * m + 0.238435f * s;
         float yD65 = 0.366831f * l + 0.643885f * m - 0.01067f * s;
         float zD65 = 1.08885f * s;
-        color.r = 3.2404542f * xD65 - 1.5371385f * yD65 - 0.4985314f * zD65;
-        color.g = -0.9692660f * xD65 + 1.8760108f * yD65 + 0.0415560f * zD65;
-        color.b = 0.0556434f * xD65 + -0.2040259f * yD65 + 1.0572252f * zD65;
+        color.r = 3.24097f * xD65 - 1.53738f * yD65 - 0.49861f * zD65;
+        color.g = -0.96924f * xD65 + 1.875968f * yD65 + 0.041555f * zD65;
+        color.b = 0.05563f * xD65 - 0.20398f * yD65 + 1.056972f * zD65;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -669,9 +670,9 @@ public final class GtColor {
      *               respectively. Length must be at least 3.
      */
     public static void toIpt(float r, float g, float b, float[] iptOut) {
-        float xD65 = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b;
-        float yD65 = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b;
-        float zD65 = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b;
+        float xD65 = 0.412391f * r + 0.357584f * g + 0.180481f * b;
+        float yD65 = 0.212639f * r + 0.715169f * g + 0.072192f * b;
+        float zD65 = 0.019331f * r + 0.119195f * g + 0.950532f * b;
         float l = 0.4002f * xD65 + 0.7075f * yD65 - 0.0807f * zD65;
         float m = -0.2280f * xD65 + 1.1500f * yD65 + 0.0612f * zD65;
         float s = 0.9184f * zD65;
