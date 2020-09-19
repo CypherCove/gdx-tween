@@ -16,13 +16,13 @@ The main goals of this library:
 ## Installation
 Currently, the library is not stable. The API is rapidly evolving with breaking changes and no change log. Use at your own risk.
 
-gdx-tween is available on JCenter. For now, you can publish to Maven local and use:
+gdx-tween is available on JCenter:
 
-    implementation "com.cyphercove.gdxtween:gdxtween:0.1.1"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.2"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.1"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.2"
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and libGDX version increases.
 
