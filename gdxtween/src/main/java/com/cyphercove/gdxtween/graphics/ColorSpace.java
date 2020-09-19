@@ -75,7 +75,7 @@ public enum ColorSpace {
     DegammaHsv(true),
     /**
      * CIELAB, which represents colors in a way that makes linear changes look visually linear to the human eye. This
-     * creates an extremely smooth transition but may produce faint intermediate hues. High computational cost. If the
+     * creates an extremely smooth transition but may produce faint intermediate hues. If the
      * source Color object is in sRGB space, use DegammaLab instead, or the changes will not look visually linear.
      */
     Lab(false),
@@ -86,7 +86,7 @@ public enum ColorSpace {
     DegammaLab(true),
     /**
      * CIELAB converted to cylyndrical coordinates, which may be more intuitive to work with. This has a tendency to
-     * produce intermediate hues which may have a rainbow effect. High computational cost.
+     * produce intermediate hues which may have a rainbow effect.
      */
     Lch(false),
     /**
@@ -94,6 +94,18 @@ public enum ColorSpace {
      * linear space, use Lch instead.
      */
     DegammaLch(true),
+    /**
+     * One transformation short of IPT color space
+     * <p>
+     * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
+     * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
+     */
+    PartialIpt(false),
+    /**
+     * PartialIpt with gamma correction removed, assuming the source Color object is stored in sRGB space. If it is
+     * already in linear space, use PartialIpt instead.
+     */
+    DegammaPartialIpt(true),
     /**
      * IPT color space, which represents colors in a way that makes linear changes look visually linear to the human eye,
      * and has better hue stability than CIELAB.  High computational cost.

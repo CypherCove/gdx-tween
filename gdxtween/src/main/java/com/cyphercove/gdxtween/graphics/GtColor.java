@@ -95,6 +95,9 @@ public final class GtColor {
             case DegammaLch:
                 lerpLch(startAndResult, endCorrected, t);
                 break;
+            case PartialIpt:
+            case DegammaPartialIpt:
+                lerpPartialIpt(startAndResult, endCorrected, t);
             case Ipt:
             case DegammaIpt:
                 lerpIpt(startAndResult, endCorrected, t);
@@ -199,6 +202,15 @@ public final class GtColor {
         FLOAT3_A[1] = FLOAT3_A[1] + t * (FLOAT3_B[1] - FLOAT3_A[1]);
         FLOAT3_A[2] = startHue + t * (endHue - startHue);
         fromLch(startAndResult, FLOAT3_A);
+    }
+
+    private static void lerpPartialIpt(Color startAndResult, Color end, float t) {
+        toPartialIpt(startAndResult, FLOAT3_A);
+        toPartialIpt(end, FLOAT3_B);
+        for (int i = 0; i < 3; i++) {
+            FLOAT3_A[i] = FLOAT3_A[i] + t * (FLOAT3_B[i] - FLOAT3_A[i]);
+        }
+        fromPartialIpt(startAndResult, FLOAT3_A);
     }
 
     private static void lerpIpt(Color startAndResult, Color end, float t) {
@@ -389,9 +401,9 @@ public final class GtColor {
         float x = X_D65 * (xF > SIGMA_LAB ? xF * xF * xF : (116f * xF - 16f) / KAP_LAB);
         float y = l > KAP_LAB * SIGMA_LAB3 ? yF * yF * yF : l / KAP_LAB;
         float z = Z_D65 * (zF > SIGMA_LAB ? zF * zF * zF : (116f * zF - 16f) / KAP_LAB);
-        color.r = 3.2406254773200533f * x - 1.5372079722103187f * y - 0.4986285986982479f * z;
-        color.g = -0.9689307147293197f * x + 1.8757560608852415f * y + 0.041517523842953964f * z;
-        color.b = 0.055710120445510616f * x + -0.2040210505984867f * y + 1.0569959422543882f * z;
+        color.r = 3.2404542f * x - 1.5371385f * y - 0.4985314f * z;
+        color.g = -0.9692660f * x + 1.8760108f * y + 0.0415560f * z;
+        color.b = 0.0556434f * x + -0.2040259f * y + 1.0572252f * z;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -430,9 +442,9 @@ public final class GtColor {
      * @param labOut The output Lab color. Must be of length at least 3.
      */
     public static void toLab(float r, float g, float b, float[] labOut) {
-        float xD65 = 0.43394f * r + 0.37620f * g + 0.18984f * b;
-        float yD65 = 0.21267f * r + 0.71515f * g + 0.07218f * b;
-        float zD65 = 0.01776f * r + 0.10947f * g + 0.87277f * b;
+        float xD65 = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b; //TODO use more accurate values from IPT function
+        float yD65 = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b;
+        float zD65 = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b;
         float xF = forwardTransformXyzLab(xD65);
         float yF = forwardTransformXyzLab(yD65);
         float zF = forwardTransformXyzLab(zD65);
@@ -500,12 +512,95 @@ public final class GtColor {
     }
 
     /**
+     * Sets the RGB of the color from the input L'M'S' as defined by the IPT color space. The result will be in linear
+     * RGB color (not gamma compressed sRGB).
+     * <p>
+     * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
+     * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
+     * @param color Output color.
+     * @param lmsPrimeIn Input color array with L', M', and S' channels in the first three indices, respectively. Must
+     *              be of length of at least 3.
+     */
+    public static void fromPartialIpt(Color color, float[] lmsPrimeIn) {
+        fromPartialIpt(color, lmsPrimeIn[0], lmsPrimeIn[1], lmsPrimeIn[2]);
+    }
+
+    /**
+     * Sets the RGB of the color from the input L'M'S' as defined by the IPT color space. The result will be in linear
+     * RGB color (not gamma compressed sRGB).
+     * <p>
+     * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
+     * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
+     * @param color Output color.
+     * @param lPrime Input L' channel.
+     * @param mPrime Input M' channel.
+     * @param sPrime Input S' channel.
+     */
+    public static void fromPartialIpt(Color color, float lPrime, float mPrime, float sPrime) {
+        float l = lPrime;//reverseTransformLmsIpt(lPrime);
+        float m = mPrime;//reverseTransformLmsIpt(mPrime);
+        float s = sPrime;//reverseTransformLmsIpt(sPrime);
+        float xD65 = 1.850243f * l - 1.1383f * m + 0.238435f * s;
+        float yD65 = 0.366831f * l + 0.643885f * m - 0.01067f * s;
+        float zD65 = 1.08885f * s;
+        color.r = 3.2404542f * xD65 - 1.5371385f * yD65 - 0.4985314f * zD65;
+        color.g = -0.9692660f * xD65 + 1.8760108f * yD65 + 0.0415560f * zD65;
+        color.b = 0.0556434f * xD65 + -0.2040259f * yD65 + 1.0572252f * zD65;
+        if (color.r < 0) color.r = 0;
+        else if (color.r > 1) color.r = 1;
+        if (color.g < 0) color.g = 0;
+        else if (color.g > 1) color.g = 1;
+        if (color.b < 0) color.b = 0;
+        else if (color.b > 1) color.b = 1;
+    }
+
+    /**
+     * Outputs the RGB of the color in L'M'S' as defined by the IPT color space. Assumes the input color is already in
+     * linear RGB (not gamma corrected sRGB).
+     * <p>
+     * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
+     * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
+     *
+     * @param color  Input color.
+     * @param lmsPrimeOut Array the result will be placed in, with L'M'S' channels in the first three indices
+     *               respectively. Length must be at least 3.
+     */
+    public static void toPartialIpt(Color color, float[] lmsPrimeOut) {
+        toPartialIpt(color.r, color.g, color.b, lmsPrimeOut);
+    }
+
+    /**
+     * Outputs the RGB of the color in L'M'S' as defined by the IPT color space. Assumes the input color is already in
+     * linear RGB (not gamma corrected sRGB).
+     * <p>
+     * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
+     * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
+     *
+     * @param r Input red channel in linear space.
+     * @param g Input green channel in linear space.
+     * @param b Input blue channel in linear space.
+     * @param lmsPrimeOut Array the result will be placed in, with IPT channels in the first three indices
+     *               respectively. Length must be at least 3.
+     */
+    public static void toPartialIpt(float r, float g, float b, float[] lmsPrimeOut) {
+        float xD65 = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b;
+        float yD65 = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b;
+        float zD65 = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b;
+        float l = 0.4002f * xD65 + 0.7075f * yD65 - 0.0807f * zD65;
+        float m = -0.2280f * xD65 + 1.1500f * yD65 + 0.0612f * zD65;
+        float s = 0.9184f * zD65;
+        lmsPrimeOut[0] = l;//forwardTransformLmsIpt(l);
+        lmsPrimeOut[1] = m;//forwardTransformLmsIpt(m);
+        lmsPrimeOut[2] = s;//forwardTransformLmsIpt(s);
+    }
+
+    /**
      * Sets the RGB of the color from the input IPT color space. The result will be in linear RGB color (not gamma
      * compressed sRGB).
      * <p>
      * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
      * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
-     * @param color
+     * @param color Output color.
      * @param iptIn Input color array with I, P, and T channels in the first three indices, respectively. Must be of
      *              length of at least 3.
      */
@@ -519,24 +614,24 @@ public final class GtColor {
      * <p>
      * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
      * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
-     * @param color Input color.
+     * @param color Output color.
      * @param i Input I channel.
      * @param p Input P channel.
      * @param t Input T channel.
      */
     public static void fromIpt(Color color, float i, float p, float t) {
-        float lPrime = 1.8501f * i - 1.1383f * p + 0.2385f * t;
-        float mPrime = 0.3668f * i + 0.6439f * p - 0.0107f * t;
-        float sPrime = 1.0889f * t;
-        float l = reverseTransformXyzIpt(lPrime);
-        float m = reverseTransformXyzIpt(mPrime);
-        float s = reverseTransformXyzIpt(sPrime);
-        float x = 0.950489f * l + 0.09277f * m + 0.21589f * s;
-        float y = l - 0.1139f * m + 0.1332f * s;
-        float z = 1.08884f * l + 0.03550f * m - 0.73704f * s;
-        color.r = 3.2406254773200533f * x - 1.5372079722103187f * y - 0.4986285986982479f * z;
-        color.g = -0.9689307147293197f * x + 1.8757560608852415f * y + 0.041517523842953964f * z;
-        color.b = 0.055710120445510616f * x + -0.2040210505984867f * y + 1.0569959422543882f * z;
+        float lPrime = i - 0.097617f * p + 0.205327f * t;
+        float mPrime = i - 0.11393f * p + 0.1331f * t;
+        float sPrime = i + 0.032631f * p - 0.67685f * t;
+        float l = reverseTransformLmsIpt(lPrime);
+        float m = reverseTransformLmsIpt(mPrime);
+        float s = reverseTransformLmsIpt(sPrime);
+        float xD65 = 1.850243f * l - 1.1383f * m + 0.238435f * s;
+        float yD65 = 0.366831f * l + 0.643885f * m - 0.01067f * s;
+        float zD65 = 1.08885f * s;
+        color.r = 3.2404542f * xD65 - 1.5371385f * yD65 - 0.4985314f * zD65;
+        color.g = -0.9692660f * xD65 + 1.8760108f * yD65 + 0.0415560f * zD65;
+        color.b = 0.0556434f * xD65 + -0.2040259f * yD65 + 1.0572252f * zD65;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -574,15 +669,15 @@ public final class GtColor {
      *               respectively. Length must be at least 3.
      */
     public static void toIpt(float r, float g, float b, float[] iptOut) {
-        float xD65 = 0.43394f * r + 0.37620f * g + 0.18984f * b;
-        float yD65 = 0.21267f * r + 0.71515f * g + 0.07218f * b;
-        float zD65 = 0.01776f * r + 0.10947f * g + 0.87277f * b;
+        float xD65 = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b;
+        float yD65 = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b;
+        float zD65 = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b;
         float l = 0.4002f * xD65 + 0.7075f * yD65 - 0.0807f * zD65;
         float m = -0.2280f * xD65 + 1.1500f * yD65 + 0.0612f * zD65;
         float s = 0.9184f * zD65;
-        float lPrime = forwardTransformXyzIpt(l);
-        float mPrime = forwardTransformXyzIpt(m);
-        float sPrime = forwardTransformXyzIpt(s);
+        float lPrime = forwardTransformLmsIpt(l);
+        float mPrime = forwardTransformLmsIpt(m);
+        float sPrime = forwardTransformLmsIpt(s);
         iptOut[0] = 0.4000f * lPrime + 0.4000f * mPrime + 0.2000f * sPrime;
         iptOut[1] = 4.4550f * lPrime - 4.8510f * mPrime + 0.3960f * sPrime;
         iptOut[2] = 0.8056f * lPrime + 0.3572f * mPrime - 1.1628f * sPrime;
@@ -640,11 +735,11 @@ public final class GtColor {
         return component > SIGMA_LAB3 ? (float) Math.cbrt(component) : (KAP_LAB * component + 16f) / 116f;
     }
 
-    private static float forwardTransformXyzIpt(float component) {
+    private static float forwardTransformLmsIpt(float component) {
         return component >= 0f ? (float)Math.pow(component, 0.43) : -(float)Math.pow(-component, 0.43);
     }
 
-    private static float reverseTransformXyzIpt(float component) {
+    private static float reverseTransformLmsIpt(float component) {
         return component >= 0f ? (float)Math.pow(component, 2.3256) : -(float)Math.pow(-component, 2.3256);
     }
 
