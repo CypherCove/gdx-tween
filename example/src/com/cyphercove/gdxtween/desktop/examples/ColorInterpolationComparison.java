@@ -35,18 +35,13 @@ public class ColorInterpolationComparison extends ExampleScreen {
 	static {
 		choices.put("RGB", ColorSpace.Rgb);
 		choices.put("Linear RGB", ColorSpace.DegammaRgb);
-		choices.put("Euclidean HCL", ColorSpace.EuclideanHcl);
-//		choices.put("Linear Euclidean HCL", ColorSpace.DegammaEuclideanHcl);
 		choices.put("Lab", ColorSpace.DegammaLab);
-		choices.put("Partial IPT (L'M'S')", ColorSpace.DegammaLmsCompressed);
+		choices.put("LMS Compressed", ColorSpace.DegammaLmsCompressed);
 		choices.put("IPT", ColorSpace.DegammaIpt);
 		choices.put("Lch", ColorSpace.DegammaLch);
 		choices.put("HSL", ColorSpace.Hsl);
-//		choices.put("Linear HSL", ColorSpace.DegammaHsl);
 		choices.put("HCL", ColorSpace.Hcl);
-//		choices.put("Linear HCL", ColorSpace.DegammaHcl);
 		choices.put("HSV", ColorSpace.Hsv);
-//		choices.put("Linear HSV", ColorSpace.DegammaHsv);
 	}
 
 	@Override

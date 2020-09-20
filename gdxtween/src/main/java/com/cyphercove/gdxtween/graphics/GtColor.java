@@ -38,8 +38,6 @@ public final class GtColor {
      */
     public static final float CHROMA_THRESHOLD = 0.9f * 0.34850854f;
 
-    private static final float X_D65 = 0.9505f;
-    private static final float Z_D65 = 1.089f;
     private static final float SIGMA_LAB = 6f / 29F;
     private static final float SIGMA_LAB3 = SIGMA_LAB * SIGMA_LAB * SIGMA_LAB;
     private static final float KAP_LAB = 24389f / 27f;
@@ -48,12 +46,12 @@ public final class GtColor {
     private static final Color tempEnd = new Color(); // Used internally only in lerp()
 
     /**
-     *
-     * @param startAndResult
-     * @param end
-     * @param t
-     * @param colorSpace
-     * @return
+     * Interpolates between the start and end colors, storing the result in the start color object.
+     * @param startAndResult The color to start from and to put the result in.
+     * @param end The color to interpolate toward.
+     * @param t The interpolation coefficient in the range [0,1].
+     * @param colorSpace The color space to perform the interpolation in.
+     * @return The start color object.
      */
     public static Color lerp(Color startAndResult, Color end, float t, ColorSpace colorSpace, boolean includeAlpha) {
         Color endCorrected;
@@ -78,10 +76,6 @@ public final class GtColor {
             case Hcl:
             case DegammaHcl:
                 lerpHcl(startAndResult, endCorrected, t);
-                break;
-            case EuclideanHcl:
-            case DegammaEuclideanHcl:
-                lerpEuclideanHcl(startAndResult, endCorrected, t);
                 break;
             case Hsv:
             case DegammaHsv:
@@ -132,23 +126,6 @@ public final class GtColor {
         toHsl(end, FLOAT3_B);
         lerpHxx(FLOAT3_A, FLOAT3_B, t, true);
         fromHsl(startAndResult, FLOAT3_A);
-    }
-
-    private static void lerpEuclideanHcl(Color startAndResult, Color end, float t) {
-        toHcl(startAndResult, FLOAT3_A);
-        toHcl(end, FLOAT3_B);
-        FLOAT3_A[0] = GtMathUtils.modulo(FLOAT3_A[0], 360f);
-        FLOAT3_B[0] = GtMathUtils.modulo(FLOAT3_B[0], 360f);
-        float xStart = MathUtils.cosDeg(FLOAT3_A[0]) * FLOAT3_A[1];
-        float xEnd = MathUtils.cosDeg(FLOAT3_B[0]) * FLOAT3_B[1];
-        float yStart = MathUtils.sinDeg(FLOAT3_A[0]) * FLOAT3_A[1];
-        float yEnd = MathUtils.sinDeg(FLOAT3_B[0]) * FLOAT3_B[1];
-        float x = MathUtils.lerp(xStart, xEnd, t);
-        float y = MathUtils.lerp(yStart, yEnd, t);
-        FLOAT3_A[0] = GtMathUtils.atan2(y, x) * MathUtils.radDeg;
-        FLOAT3_A[1] = (float) Math.sqrt(x * x + y * y);
-        FLOAT3_A[2] = FLOAT3_A[2] + t * (FLOAT3_B[2] - FLOAT3_A[2]);
-        fromHcl(startAndResult, FLOAT3_A);
     }
 
     private static void lerpHxx(float[] h_cs_lv_A, float[] h_cs_lv_B, float t, boolean saturation){
@@ -399,12 +376,12 @@ public final class GtColor {
         float yF = (l + 16f) / 116f;
         float zF = yF - b / 200f;
         float xF = yF + a / 500f;
-        float x = X_D65 * (xF > SIGMA_LAB ? xF * xF * xF : (116f * xF - 16f) / KAP_LAB);
-        float y = l > KAP_LAB * SIGMA_LAB3 ? yF * yF * yF : l / KAP_LAB;
-        float z = Z_D65 * (zF > SIGMA_LAB ? zF * zF * zF : (116f * zF - 16f) / KAP_LAB);
-        color.r = 3.2404542f * x - 1.5371385f * y - 0.4985314f * z;
-        color.g = -0.9692660f * x + 1.8760108f * y + 0.0415560f * z;
-        color.b = 0.0556434f * x + -0.2040259f * y + 1.0572252f * z;
+        float xD65 = xF > SIGMA_LAB ? xF * xF * xF : (116f * xF - 16f) / KAP_LAB;
+        float yD65 = l > KAP_LAB * SIGMA_LAB3 ? yF * yF * yF : l / KAP_LAB;
+        float zD65 = zF > SIGMA_LAB ? zF * zF * zF : (116f * zF - 16f) / KAP_LAB;
+        color.r = 3.24097f * xD65 - 1.53738f * yD65 - 0.49861f * zD65;
+        color.g = -0.96924f * xD65 + 1.875968f * yD65 + 0.041555f * zD65;
+        color.b = 0.05563f * xD65 - 0.20398f * yD65 + 1.056972f * zD65;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -443,9 +420,9 @@ public final class GtColor {
      * @param labOut The output Lab color. Must be of length at least 3.
      */
     public static void toLab(float r, float g, float b, float[] labOut) {
-        float xD65 = 0.4124564f * r + 0.3575761f * g + 0.1804375f * b; //TODO use more accurate values from IPT function
-        float yD65 = 0.2126729f * r + 0.7151522f * g + 0.0721750f * b;
-        float zD65 = 0.0193339f * r + 0.1191920f * g + 0.9503041f * b;
+        float xD65 = 0.412391f * r + 0.357584f * g + 0.180481f * b;
+        float yD65 = 0.212639f * r + 0.715169f * g + 0.072192f * b;
+        float zD65 = 0.019331f * r + 0.119195f * g + 0.950532f * b;
         float xF = forwardTransformXyzLab(xD65);
         float yF = forwardTransformXyzLab(yD65);
         float zF = forwardTransformXyzLab(zD65);
@@ -541,12 +518,9 @@ public final class GtColor {
         float l = reverseTransformLmsIpt(lPrime);
         float m = reverseTransformLmsIpt(mPrime);
         float s = reverseTransformLmsIpt(sPrime);
-        float xD65 = 1.850243f * l - 1.1383f * m + 0.238435f * s;
-        float yD65 = 0.366831f * l + 0.643885f * m - 0.01067f * s;
-        float zD65 = 1.08885f * s;
-        color.r = 3.24097f * xD65 - 1.53738f * yD65 - 0.49861f * zD65;
-        color.g = -0.96924f * xD65 + 1.875968f * yD65 + 0.041555f * zD65;
-        color.b = 0.05563f * xD65 - 0.20398f * yD65 + 1.056972f * zD65;
+        color.r = 5.432622f * l - 4.6791f * m + 0.246257f * s;
+        color.g = -1.10517f * l + 2.311198f * m - 0.20588f * s;
+        color.b = 0.028104f * l - 0.19466f * m + 1.166325f * s;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -584,12 +558,9 @@ public final class GtColor {
      *               respectively. Length must be at least 3.
      */
     public static void toLmsCompressed(float r, float g, float b, float[] lmsPrimeOut) {
-        float xD65 = 0.412391f * r + 0.357584f * g + 0.180481f * b;
-        float yD65 = 0.212639f * r + 0.715169f * g + 0.072192f * b;
-        float zD65 = 0.019331f * r + 0.119195f * g + 0.950532f * b;
-        float l = 0.4002f * xD65 + 0.7075f * yD65 - 0.0807f * zD65;
-        float m = -0.2280f * xD65 + 1.1500f * yD65 + 0.0612f * zD65;
-        float s = 0.9184f * zD65;
+        float l = 0.313921f * r + 0.639468f * g + 0.046597f * b;
+        float m = 0.151693f * r + 0.748209f * g + 0.1000044f * b;
+        float s = 0.017753f * r + 0.109468f * g + 0.872969f * b;
         lmsPrimeOut[0] = forwardTransformLmsIpt(l);
         lmsPrimeOut[1] = forwardTransformLmsIpt(m);
         lmsPrimeOut[2] = forwardTransformLmsIpt(s);
@@ -627,12 +598,9 @@ public final class GtColor {
         float l = reverseTransformLmsIpt(lPrime);
         float m = reverseTransformLmsIpt(mPrime);
         float s = reverseTransformLmsIpt(sPrime);
-        float xD65 = 1.850243f * l - 1.1383f * m + 0.238435f * s;
-        float yD65 = 0.366831f * l + 0.643885f * m - 0.01067f * s;
-        float zD65 = 1.08885f * s;
-        color.r = 3.24097f * xD65 - 1.53738f * yD65 - 0.49861f * zD65;
-        color.g = -0.96924f * xD65 + 1.875968f * yD65 + 0.041555f * zD65;
-        color.b = 0.05563f * xD65 - 0.20398f * yD65 + 1.056972f * zD65;
+        color.r = 5.432622f * l - 4.6791f * m + 0.246257f * s;
+        color.g = -1.10517f * l + 2.311198f * m - 0.20588f * s;
+        color.b = 0.028104f * l - 0.19466f * m + 1.166325f * s;
         if (color.r < 0) color.r = 0;
         else if (color.r > 1) color.r = 1;
         if (color.g < 0) color.g = 0;
@@ -670,15 +638,9 @@ public final class GtColor {
      *               respectively. Length must be at least 3.
      */
     public static void toIpt(float r, float g, float b, float[] iptOut) {
-        float xD65 = 0.412391f * r + 0.357584f * g + 0.180481f * b;
-        float yD65 = 0.212639f * r + 0.715169f * g + 0.072192f * b;
-        float zD65 = 0.019331f * r + 0.119195f * g + 0.950532f * b;
-        float l = 0.4002f * xD65 + 0.7075f * yD65 - 0.0807f * zD65;
-        float m = -0.2280f * xD65 + 1.1500f * yD65 + 0.0612f * zD65;
-        float s = 0.9184f * zD65;
-        float lPrime = forwardTransformLmsIpt(l);
-        float mPrime = forwardTransformLmsIpt(m);
-        float sPrime = forwardTransformLmsIpt(s);
+        float lPrime = forwardTransformLmsIpt(0.313921f * r + 0.639468f * g + 0.046597f * b);
+        float mPrime = forwardTransformLmsIpt(0.151693f * r + 0.748209f * g + 0.1000044f * b);
+        float sPrime = forwardTransformLmsIpt(0.017753f * r + 0.109468f * g + 0.872969f * b);
         iptOut[0] = 0.4000f * lPrime + 0.4000f * mPrime + 0.2000f * sPrime;
         iptOut[1] = 4.4550f * lPrime - 4.8510f * mPrime + 0.3960f * sPrime;
         iptOut[2] = 0.8056f * lPrime + 0.3572f * mPrime - 1.1628f * sPrime;

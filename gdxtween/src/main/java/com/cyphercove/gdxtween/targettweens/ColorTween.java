@@ -124,6 +124,11 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
                 else if (endHue - startHue > MathUtils.PI)
                     TMP_SHARED_1[2] += MathUtils.PI2;
                 break;
+            case LmsCompressed:
+            case DegammaLmsCompressed:
+                GtColor.toLmsCompressed(startR, startG, startB, TMP_SHARED_1);
+                GtColor.toLmsCompressed(endR, endG, endB, TMP_SHARED_2);
+                break;
             case Ipt:
             case DegammaIpt:
                 GtColor.toIpt(startR, startG, startB, TMP_SHARED_1);
@@ -195,6 +200,8 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
                     value = GtMathUtils.modulo(value, 360f);
                 accumulator[vectorIndex] = value;
                 break;
+            case LmsCompressed:
+            case DegammaLmsCompressed:
             case Ipt:
             case DegammaIpt:
                 accumulator[vectorIndex] = value;
@@ -227,6 +234,9 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
             case DegammaLch:
                 GtColor.fromLch(target, accumulator[0], accumulator[1], accumulator[2]);
                 break;
+            case LmsCompressed:
+            case DegammaLmsCompressed:
+                GtColor.fromLmsCompressed(target, accumulator[0], accumulator[1], accumulator[2]);
             case Ipt:
             case DegammaIpt:
                 GtColor.fromIpt(target, accumulator[0], accumulator[1], accumulator[2]);

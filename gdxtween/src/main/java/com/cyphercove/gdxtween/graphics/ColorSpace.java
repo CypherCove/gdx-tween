@@ -33,35 +33,25 @@ public enum ColorSpace {
     /**
      * Color represented by hue, saturation, and lightness. This can prevent desaturated color from appearing in the middle
      * when interpolating between two saturated colors, but has a tendency to introduce intermediate hues which can
-     * produce a rainbow effect. The shortest path around the hue circle is taken. Moderate computational cost.
+     * produce a rainbow effect. The shortest path around the hue circle is taken.
      */
     Hsl(false),
     /**
      * Hsl with gamma correction removed, assuming the source Color object is stored in sRGB space. If it is already in
-     * linear space, use Hsv instead.
+     * linear space, use Hsl instead.
      */
     DegammaHsl(true),
     /**
-     * Color represented by hue, chroma, and lightness. This can prevent desaturated color from appearing in the middle
-     * when interpolating between two saturated colors, but has a tendency to introduce intermediate hues which can
-     * produce a rainbow effect. The shortest path around the hue circle is taken. Moderate computational cost.
+     * Color represented by hue, chroma, and lightness. Chroma has more intuitive behavior than saturation, as there is
+     * less opportunity to cross over significantly visually-different colors when interpolating. The shortest path
+     * around the hue circle is taken.
      */
     Hcl(false),
     /**
      * Hcl with gamma correction removed, assuming the source Color object is stored in sRGB space. If it is already in
-     * linear space, use Hsv instead.
+     * linear space, use Hcl instead.
      */
     DegammaHcl(true),
-    /**
-     * Color represented by hue, chroma, and lightness, but interpolated by shortest path in the 3D bicone. Moderate
-     * computational cost.
-     */
-    EuclideanHcl(false),
-    /**
-     * EuclideanHcl with gamma correction removed, assuming the source Color object is stored in sRGB space. If it is
-     * already in linear space, use Hsv instead.
-     */
-    DegammaEuclideanHcl(true),
     /**
      * Color represented by hue, saturation, and value. This can prevent desaturated color from appearing in the middle
      * when interpolating between two saturated colors, but has a tendency to introduce intermediate hues which can
@@ -85,7 +75,7 @@ public enum ColorSpace {
      */
     DegammaLab(true),
     /**
-     * CIELAB converted to cylyndrical coordinates, which may be more intuitive to work with. This has a tendency to
+     * CIELAB converted to cylindrical coordinates, which may be more intuitive to work with. This has a tendency to
      * produce intermediate hues which may have a rainbow effect.
      */
     Lch(false),
@@ -95,8 +85,8 @@ public enum ColorSpace {
      */
     DegammaLch(true),
     /**
-     * The gamma compressed LMS stage of the IPT color space. This produces a very smooth blend with hue stability, at
-     * less computation cost than IPT.
+     * The gamma compressed LMS stage of the IPT color space transformation. This produces a very smooth blend with hue
+     * stability, at less computation cost than IPT.
      * <p>
      * IPT color space is described in "Derivation and modelling hue uniformity and development of the IPT color space"
      * (1998) by Fritz Ebner. Accessed from RIT Scholar Works.
