@@ -66,6 +66,7 @@ public abstract class GroupTween<T> extends Tween<T> {
      */
     @SuppressWarnings("unchecked")
     public T run (Tween<?> childTween) {
+        childTween = childTween.getTopLevelParent();
         if (childTween.isAttached()) {
             throw new IllegalArgumentException("Cannot add child tween " + childTween.getName() + " to "
                     + getName() + " because it has already been started.");
