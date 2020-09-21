@@ -76,7 +76,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
             throw new IllegalStateException("Tween was started without setting a target: " + this);
         duration = getDuration(); // Ensure duration is set (Default 0).
         for (int i = 0; i < vectorSize; i++) {
-            startSpeeds[i] = startWorldSpeeds[i] / duration;
+            startSpeeds[i] = startWorldSpeeds[i] * duration;
         }
     }
 
@@ -350,7 +350,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
             if (isBlended) {
                 ((Ease.BlendInEase) localEase).startSpeed(startSpeeds[i]);
             }
-            output[i] = localEase.speed(progress, startValues[i], endValues[i]) * getDuration();
+            output[i] = localEase.speed(progress, startValues[i], endValues[i]) / getDuration();
         }
     }
 

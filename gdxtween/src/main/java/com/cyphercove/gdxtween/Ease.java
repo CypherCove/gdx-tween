@@ -44,7 +44,7 @@ public abstract class Ease {
      * @param start Where the eased value should be when {@code a} is 0
      * @param end   Where the eased value should be when {@code a} is 1
      * @return the speed of the easing at the current amount of progress {@code a} in units of
-     * value change over fraction of total duration. Multiplying this value by the total duration of
+     * value change over fraction of total duration. Dividing this value by the total duration of
      * the ease gives the world speed of the ease.
      */
     public abstract float speed(float a, float start, float end);
