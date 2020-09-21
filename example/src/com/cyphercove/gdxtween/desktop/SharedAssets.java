@@ -31,7 +31,7 @@ public class SharedAssets implements Disposable {
     private static final int W = 800, H = 480;
 
     Pixmap whitePixmap;
-    Texture badLogic, treeTexture, egg, wheel, white;
+    Texture badLogic, treeTexture, egg, wheel, white, sun, sunFace, hills, cloud;
     SpriteBatch spriteBatch;
     Skin skin;
     Viewport viewport = new ExtendViewport(W, H);
@@ -49,6 +49,14 @@ public class SharedAssets implements Disposable {
         egg.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
         wheel = new Texture(Gdx.files.internal("wheel.png"), true);
         wheel.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        sun = new Texture(Gdx.files.internal("sun.png"), true);
+        sun.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        sunFace = new Texture(Gdx.files.internal("sunface.png"), true);
+        sunFace.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        hills = new Texture(Gdx.files.internal("hills.png"), true);
+        hills.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
+        cloud = new Texture(Gdx.files.internal("cloud.png"), true);
+        cloud.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear);
 
         whitePixmap = new Pixmap(16, 16, Pixmap.Format.RGBA8888);
         whitePixmap.setColor(Color.WHITE);
@@ -78,6 +86,22 @@ public class SharedAssets implements Disposable {
 
     public Texture getWhite() {
         return white;
+    }
+
+    public Texture getSun() {
+        return sun;
+    }
+
+    public Texture getSunFace() {
+        return sunFace;
+    }
+
+    public Texture getHills() {
+        return hills;
+    }
+
+    public Texture getCloud() {
+        return cloud;
     }
 
     public SpriteBatch getSpriteBatch() {

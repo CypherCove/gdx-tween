@@ -138,11 +138,12 @@ a Color object and do not interrupt each other. ColorTween modifies only the RGB
 be treated separately from RGB.
 
 The RGB components can be interpolated in various color spaces. This means the start and end values are converted to a 
-different color format before interpolation, and then converted back. The RGB fields of a Color are stored with 
-gamma-corrected values, but this can lead to visually uneven transitions where brightness or hue do not appear to 
-change at a constant rate. So, other color spaces may be preferred for interpolations. In fact, the default ColorSpace
-of a ColorTween is not the basic gamma-corrected RGB that is used by `Color.lerp` and scene2D's `ColorAction`, but 
-rather `ColorSpace.LinearRgb`.
+different color format before interpolation, and then converted back. The RGB fields of a Color are typically stored with 
+gamma-corrected values (aka sRGB), but some color spaces only produce even blends when they are applied to linear RGB. 
+Many color math equations expect linear RGB. 
+
+gdx-tween's color interpolations allow you to choose to keep your Color objects in sRGB or linear space and select
+interpolations that either expand gamma correction to linear space to perform the math, or leave it alone. 
 
 ColorSpace can be selected by using `ColorAction.colorSpace()`. For each color space, there is a direct version, and a
 "Degamma" version. Using the Degamma version of a color space means that it assumes that the Color object is being kept 
@@ -151,23 +152,28 @@ gamma correction should be removed for the interpolation and then reapplied on t
 
 The available color spaces:
 
- * *RGB*: This provides direct interpolation of a Color's RGB values and is the least computationally expensive, but may 
- produce uneven or muddy blends. If `DegammaRgb` is used on an sRGB Color, the blend will be smooth in terms of light 
+ * **RGB**: This provides direct interpolation of a Color's RGB values and is the least computationally expensive, but may 
+ produce muddy blends. If `DegammaRgb` is used on an sRGB Color, the blend will be smooth in terms of light 
  energy, but it will not appear even to the eye.
- * *HSV*: Hue, saturation, and value color space. This can prevent desaturated color from appearing in the middle when 
+ * **HSV**: Hue, saturation, and value color space. This can prevent desaturated color from appearing in the middle when 
  interpolating between two saturated colors, but has a tendency to introduce intermediate hues which can produce a 
  rainbow effect. Moderate computational cost.
- * *HSL*: Hue, saturation and lightness color space. This has a similar effect as Hsv, but treats "whiteness" as distinct
- from saturation, so blends between whitish or dark colors to pure colors may appear more stable. 
- * *Lab*: CIELAB color space. Lab color space was designed specifically to make even changes in the color parameters look
+ * **HCL**: Hue, chroma and lightness color space, as defined by HSL. This has a similar effect as HSV, but treats 
+ "whiteness" as distinct from saturation, so blends between whitish or dark colors to pure colors may appear more stable. 
+ * **HSL**: Hue, saturation and lightness. This is similar to HCL and is provided for completeness, but it can have
+ surprising intermediate bright colors when blending between colors that are very close to black and white but aren't
+ very saturated.
+ * **Lab**: CIELAB color space. Lab color space was designed specifically to make even changes in the color parameters look
  even to the human eye. It produces extremely smooth-looking blends. However, for certain transitions it may produce
- faint hints of intermediate hues. It has a high computational cost.
- * *LCH*: This is a cylindrical transformation of Lab color space, so it has an angular hue component analogous to that of
+ faint hints of intermediate hues. Lab should always be performed on linear RGB, so if using sRGB Color, use `DegammaLab`.
+ * **LCH**: This is a cylindrical transformation of Lab color space, so it has an angular hue component analogous to that of
  HSV. Blends are very smooth, but may contain intermediate hues, producing a rainbow effect.
- * *IPT*: IPT color space. It produces extremely smooth-looking blends and has better hue stability than Lab.
- * *LMS Compressed*: This is the gamma compressed LMS color space that is the intermediate step of transforming XYZ color
+ * **IPT**: IPT color space. It produces extremely smooth-looking blends and has better hue stability than Lab. IPT 
+ should always be performed on linear RGB, so if using sRGB Color, use `DegammaLch`.
+ * **LMS Compressed**: This is the gamma compressed LMS color space that is the intermediate step of transforming XYZ color
  to IPT color space, as defined by IPT's forward transform. It also produces very smooth-looking blends, but omits a
- matrix multiplication step as compared to IPT.
+ matrix multiplication step as compared to IPT, so it is less expensive. LMS Compressed should always be performed on 
+ linear RGB, so if using sRGB Color, use `DegammaLmsCompressed`.
 
 
 
@@ -217,7 +223,7 @@ class MyScreen: Screen, TweenManager by DelegateTweenManager() {
 
 ### Building GroupTweens
 
-Top level functions `inSequence` and `inBuilder` allow creation of complex tweens using lambda functions, which is more
+Top level functions `inSequence` and `inParallel` allow creation of complex tweens using lambda functions, which is more
 concise and allows the IDE to indent nested tweens for you. Extension functions for creating and adding all the library 
 TargetTweens are also provided for GroupTween, meaning they can be added without wrapping them in `run()`, and 
 ParallelTweens don't need to be followed by a call to `.then()`. (Note `run()` is still required if using the target 

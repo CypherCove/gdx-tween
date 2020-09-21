@@ -17,6 +17,7 @@ package com.cyphercove.gdxtween.desktop;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -30,6 +31,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.cyphercove.covetools.utils.Disposal;
 import com.cyphercove.gdxtween.desktop.examples.ColorInterpolationComparison;
+import com.cyphercove.gdxtween.desktop.examples.SequenceScene;
 import com.cyphercove.gdxtween.desktop.examples.VectorInterruption;
 import com.kotcrab.vis.ui.VisUI;
 
@@ -44,10 +46,12 @@ public class ExampleRunner extends Game implements ExamplesParent {
 
 	@Override
 	public void create() {
+		ShaderProgram.pedantic = false;
 		VisUI.load();
 		screens.addAll(
 				new ColorInterpolationComparison(assets, this),
-				new VectorInterruption(assets, this)
+				new VectorInterruption(assets, this),
+				new SequenceScene(assets, this)
 		);
 		assets.create();
 		setupUI();
