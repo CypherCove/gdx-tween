@@ -15,68 +15,29 @@
  ******************************************************************************/
 package com.cyphercove.gdxtween.math;
 
-import static com.badlogic.gdx.math.MathUtils.*;
-
 /**
  * Math helper functions.
  */
-public final class GtMathUtils {
-    private GtMathUtils () {
-    }
-
-    private static final int ATAN2_SIZE = 10318;
-    // ATAN2_SIZE was optimized for for LCH color interpolation accuracy. ColorConversion is off by as much as 1/255
-    // for any of the three color channels. This is the minimum look-up table size to avoid increasing this maximum
-    // error in LCH ColorConversion.
-    private static final float[] ATAN2 = new float[ATAN2_SIZE + 1];
-    static {
-        for (int i = 0; i <= ATAN2_SIZE; i++) {
-            ATAN2[i] = (float) Math.atan2((double) i / ATAN2_SIZE, 1.0);
-        }
+public final class GtMath {
+    private GtMath() {
     }
 
     /**
-     * Fast atan2, based on a look-up-table. More accurate than MathUtils.atan2. Average error 0.0004 radians
-     * (0.022 degrees), largest error of 0.00010 radians (0.056 degrees).
+     * Fast approximate atan2. Significantly more accurate than {@link com.badlogic.gdx.math.MathUtils#atan2(float, float)}..
      * <p>
-     * Thanks to Icecore on JavaGaming.org for the algorithm, and to mooman219 on JavaGaming.org for benchmarking it.
-     * These accuracy values are the same as mooman219's despite the much smaller look-up table.
+     * Credit to user imuli on dsprelated.com for the algorithm.
      * @param y arctan numerator
      * @param x arctan denominator
      * @return A fast approximate atan2 angle in radians.
      */
-    static public float atan2 (float y, float x) {
-        if (y < 0) {
-            if (x < 0) {
-                if (y < x) {
-                    return -PI / 2 - ATAN2[(int) (x / y * ATAN2_SIZE)];
-                } else {
-                    return -PI + ATAN2[(int) (y / x * ATAN2_SIZE)];
-                }
-            } else {
-                y = -y;
-                if (y > x) {
-                    return -PI / 2 + ATAN2[(int) (x / y * ATAN2_SIZE)];
-                } else {
-                    return -ATAN2[(int) (y / x * ATAN2_SIZE)];
-                }
-            }
-        } else {
-            if (x < 0) {
-                x = -x;
-                if (y > x) {
-                    return PI / 2 + ATAN2[(int) (x / y * ATAN2_SIZE)];
-                } else {
-                    return PI - ATAN2[(int) (y / x * ATAN2_SIZE)];
-                }
-            } else {
-                if (y > x) {
-                    return PI / 2 - ATAN2[(int) (x / y * ATAN2_SIZE)];
-                } else {
-                    return ATAN2[(int) (y / x * ATAN2_SIZE)];
-                }
-            }
-        }
+    public static float atan2(float y, float x){
+        float ay = Math.abs(y), ax = Math.abs(x);
+        boolean invert = ay > ax;
+        float z = invert ? ax/ay : ay/ax;
+        z = ((((0.141499f * z) - 0.343315f) * z - 0.016224f) * z + 1.003839f) * z - 0.000158f;
+        if(invert) z = 1.5707963267948966f - z;
+        if(x < 0) z = 3.141592653589793f - z;
+        return Math.copySign(z, y);
     }
 
     /**

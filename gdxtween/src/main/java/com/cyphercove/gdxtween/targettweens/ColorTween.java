@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Pool;
 import com.cyphercove.gdxtween.TargetTween;
 import com.cyphercove.gdxtween.graphics.ColorSpace;
 import com.cyphercove.gdxtween.graphics.GtColor;
-import com.cyphercove.gdxtween.math.GtMathUtils;
+import com.cyphercove.gdxtween.math.GtMath;
 
 /**
  * A tween for interpolating the components of a {@linkplain Color}.
@@ -185,7 +185,7 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
             case Hsv:
             case DegammaHsv:
                 if (vectorIndex == 0)
-                    value = GtMathUtils.modulo(value, 360f);
+                    value = GtMath.modulo(value, 360f);
                 accumulator[vectorIndex] = value;
                 break;
             case Lab:
@@ -197,7 +197,7 @@ public class ColorTween extends TargetTween<ColorTween, Color> {
             case Lch:
             case DegammaLch:
                 if (vectorIndex == 2)
-                    value = GtMathUtils.modulo(value, 360f);
+                    value = GtMath.modulo(value, 360f);
                 accumulator[vectorIndex] = value;
                 break;
             case LmsCompressed:

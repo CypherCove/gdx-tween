@@ -108,7 +108,7 @@ public class SequenceScene extends ExampleScreen {
                     .run(Tweens.toRgb(skyBottomColor, 58f/255f, 162f/255f, 242f/255f))
                 .then()
                 .inParallel()
-                    .run(Tweens.to(sunPosition, 320f, -sharedAssets.getSun().getHeight()).using(7f, Ease.linear).name("sun position down " + runNumber).interruptionListener(logNameOnInterrupt))
+                    .run(Tweens.to(sunPosition, 320f, -sharedAssets.getSun().getHeight()).duration(7f).name("sun position down " + runNumber).interruptionListener(logNameOnInterrupt))
                     .run(Tweens.inSequence()
                             .delay(1f)
                             .run(Tweens.toRgb(sunColor, 1f, 103/255f, 16f/255f).duration(3f))

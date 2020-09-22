@@ -49,7 +49,7 @@ public final class DelayTween extends Tween<DelayTween> {
     }
 
     /**
-     * Set the length of this delay, not accounting for repeats.
+     * Set the length of this delay.
      * @param duration The DelayTween's length.
      * @return This tween for building.
      */

@@ -162,7 +162,7 @@ inline fun GroupTween<*>.toRgb(target: Color, end: Color): ColorTween =
         Tweens.toRgb(target, end).also { run(it) }
 
 /**
- * Creates a [AlphaTween] and adds it to this [GroupTween].
+ * Creates an [AlphaTween] and adds it to this [GroupTween].
  * @see Tweens.toAlpha
  */
 inline fun GroupTween<*>.toAlpha(target: Color, endA: Float): AlphaTween =

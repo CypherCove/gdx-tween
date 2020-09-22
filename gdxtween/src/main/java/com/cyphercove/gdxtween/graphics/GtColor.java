@@ -17,7 +17,7 @@ package com.cyphercove.gdxtween.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.MathUtils;
-import com.cyphercove.gdxtween.math.GtMathUtils;
+import com.cyphercove.gdxtween.math.GtMath;
 
 /**
  * Utilities for modifying {@linkplain Color Colors} in color spaces other than RGB and HSV.
@@ -51,6 +51,7 @@ public final class GtColor {
      * @param end The color to interpolate toward.
      * @param t The interpolation coefficient in the range [0,1].
      * @param colorSpace The color space to perform the interpolation in.
+     * @param includeAlpha Whether the alpha channel should also be interpolated.
      * @return The start color object.
      */
     public static Color lerp(Color startAndResult, Color end, float t, ColorSpace colorSpace, boolean includeAlpha) {
@@ -486,7 +487,7 @@ public final class GtColor {
         float aStar = lchOut[1];
         float bStar = lchOut[2];
         lchOut[1] = (float) Math.sqrt(aStar * aStar + bStar * bStar);
-        lchOut[2] = GtMathUtils.atan2(bStar, aStar) * MathUtils.radDeg;
+        lchOut[2] = GtMath.atan2(bStar, aStar) * MathUtils.radDeg;
     }
 
     /**

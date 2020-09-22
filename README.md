@@ -175,8 +175,6 @@ The available color spaces:
  matrix multiplication step as compared to IPT, so it is less expensive. LMS Compressed should always be performed on 
  linear RGB, so if using sRGB Color, use `DegammaLmsCompressed`.
 
-
-
 ### Callbacks
 
 TweenCompletionListener can be added to any tween using `.completionListener()`. It fires when a tween reaches its end.

@@ -167,7 +167,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     }
 
     /**
-     * Set the length of this tween, not accounting for repeats.
+     * Set the length of this tween.
      *
      * @param duration The tween's length.
      * @return This tween for building.
@@ -195,8 +195,7 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
     /**
      * Sets the ease function to use for the transition. If the Ease is {@linkplain Ease.BlendInEase blendable}, and
      * this tween interrupts an ongoing tween, then the tween will begin at the speed of the tween it is interrupting,
-     * ignoring any start speed that is set on the ease. If the tween repeats, the original start speed of the ease will
-     * be used when it repeats.
+     * ignoring any start speed that is set on the ease.
      * <p>
      * If the Ease is mutable, it should not be shared with other tweens. Its start speed will be modified if it this
      * tween interrupts another.

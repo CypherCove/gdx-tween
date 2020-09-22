@@ -147,9 +147,9 @@ public abstract class Tween<U> {
     }
 
     /**
-     * The set length of this tween. This does not include repeats.
+     * The set length of this tween.
      *
-     * @return This tween's length without accounting for any repeats.
+     * @return This tween's length.
      */
     public abstract float getDuration();
 
