@@ -18,11 +18,11 @@ Currently, the library is not stable. The API is rapidly evolving with breaking 
 
 gdx-tween is available on JCenter:
 
-    implementation "com.cyphercove.gdxtween:gdxtween:0.1.2"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.3"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.2"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.3"
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and libGDX version increases.
 
