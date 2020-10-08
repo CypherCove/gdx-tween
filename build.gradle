@@ -29,7 +29,7 @@ subprojects {
     apply plugin: "java"
 
     group = 'com.cyphercove.gdxtween'
-    version = '0.1.4'
+    version = '0.1.5'
 
     ext {
         gdxVersion = '1.9.11'
