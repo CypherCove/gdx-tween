@@ -18,7 +18,6 @@ plugins {
     id "com.jfrog.bintray" version "1.8.5"
 }
 
-
 project.ext {
     librarySubProjects = subprojects.findAll{
         it.name == 'gdxtween' || it.name == 'gdxtween-kt'
@@ -98,10 +97,9 @@ configure(project.librarySubProjects) {
     bintray {
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
-        publications = [projectId]
         pkg {
             repo = 'maven'
-            name = projectId
+            name = uploadArtifact
             userOrg = 'cyphercove'
             version {
                 name = version
@@ -110,6 +108,7 @@ configure(project.librarySubProjects) {
             licenses = ['Apache-2.0']
             vcsUrl = 'https://github.com/cyphercove/gdx-tween/'
         }
+        publications = [uploadArtifact]
     }
 
     javadoc {
