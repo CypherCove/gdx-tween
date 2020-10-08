@@ -23,6 +23,10 @@ gdx-tween is available on JCenter:
 If using Kotlin, use gdx-tween-kt instead:
 
     implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.3"
+    
+To use with GWT, add this to the `.gwt.xml` file:
+
+    <inherits name="com.cyphercove.gdxtween" />
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and libGDX version increases.
 
@@ -146,11 +150,12 @@ gdx-tween's color interpolations allow you to choose to keep your Color objects 
 interpolations that either expand gamma correction to linear space to perform the math, or leave it alone. 
 
 ColorSpace can be selected by using `ColorAction.colorSpace()`. For each color space, there is a direct version, and a
-"Degamma" version. Using the Degamma version of a color space means that it assumes that the Color object is being kept 
+"Degamma" version. Using the Degamma version of a color space means that it assumes that the Color object is 
 in gamma-corrected sRGB space (as is typical in libGDX if using the color with SpriteBatch's default shader), and that
 gamma correction should be removed for the interpolation and then reapplied on the result.
 
-The available color spaces:
+The following are the available color spaces. They can be compared in real time using 
+[this web app](https://cyphercove.github.io/ColorInterpolationComparison/).
 
  * **RGB**: This provides direct interpolation of a Color's RGB values and is the least computationally expensive, but may 
  produce muddy blends. If `DegammaRgb` is used on an sRGB Color, the blend will be smooth in terms of light 

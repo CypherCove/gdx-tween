@@ -24,4 +24,3 @@ operator fun AccessorTween.get(vectorIndex: Int): Float = getEndValue(vectorInde
 operator fun AccessorTween.set(vectorIndex: Int, endValue: Float) {
     setEndValue(vectorIndex, endValue)
 }
-

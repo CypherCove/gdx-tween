@@ -18,9 +18,8 @@ plugins {
     id "com.jfrog.bintray" version "1.8.5"
 }
 
+
 project.ext {
-    libraryGroupId = 'com.cyphercove.gdxtween'
-    libraryVersion = '0.1.4'
     librarySubProjects = subprojects.findAll{
         it.name == 'gdxtween' || it.name == 'gdxtween-kt'
     }
@@ -29,6 +28,9 @@ project.ext {
 subprojects {
     apply plugin: "idea"
     apply plugin: "java"
+
+    group = 'com.cyphercove.gdxtween'
+    version = '0.1.4'
 
     ext {
         gdxVersion = '1.9.11'
@@ -63,9 +65,9 @@ configure(project.librarySubProjects) {
     publishing {
         publications {
             "$projectId"(MavenPublication) {
-                groupId = project.libraryGroupId
+                groupId = project.group
                 artifactId = projectId
-                version = project.libraryVersion
+                version = project.version
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
@@ -96,13 +98,13 @@ configure(project.librarySubProjects) {
     bintray {
         user = System.getenv('BINTRAY_USER')
         key = System.getenv('BINTRAY_KEY')
-        publications = ["$projectId"]
+        publications = [projectId]
         pkg {
             repo = 'maven'
             name = projectId
             userOrg = 'cyphercove'
             version {
-                name = project.libraryVersion
+                name = version
                 released  = new Date()
             }
             licenses = ['Apache-2.0']
