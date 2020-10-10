@@ -25,7 +25,7 @@ interface TweenManager {
     /**
      * Starts the tween using the [tweenRunner].
      */
-    fun TargetTween<*, *>.start() = start(tweenRunner)
+    fun Tween<*>.start() = start(tweenRunner)
 
     /**
      * Must be called for every frame of animation to advance all of the tweens.
