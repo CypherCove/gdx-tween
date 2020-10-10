@@ -135,12 +135,8 @@ public class SequenceScene extends ExampleScreen {
         runNumber++;
     }
 
-    private TweenInterruptionListener<Vector2Tween> logNameOnInterrupt = new TweenInterruptionListener<Vector2Tween>() {
-        @Override
-        public void onTweenInterrupted(Vector2Tween interruptedTween, Vector2Tween interruptionSource) {
-            Gdx.app.log("Interrupted", interruptedTween.getName());
-        }
-    };
+    private final TweenInterruptionListener<Vector2Tween> logNameOnInterrupt =
+            interruptedTween -> Gdx.app.log("Interrupted", interruptedTween.getName());
 
     @Override
     public void resize(int width, int height) {

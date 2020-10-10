@@ -67,7 +67,7 @@ public final class DelayTween extends Tween<DelayTween> {
     }
 
     @Override
-    protected boolean checkInterruption(TargetTween<?, ?> sourceTween,  float[] requestedWorldSpeeds) {
+    protected boolean checkInterruption(Class<? extends TargetTween<?, ?>> tweenType, Object target,  float[] requestedWorldSpeeds) {
         return false;
     }
 

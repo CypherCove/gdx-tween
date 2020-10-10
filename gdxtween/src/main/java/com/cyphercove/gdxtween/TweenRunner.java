@@ -60,7 +60,12 @@ public class TweenRunner {
             for (int i = 0; i < snapshotTweensCount; i++) {
                 Tween<?> t = snapshotTweens[i];
                 if (!t.isComplete() && !t.isCanceled()) {
-                    t.checkInterruption(interruptingTween, startWorldSpeeds);
+                    //noinspection unchecked
+                    t.checkInterruption(
+                            (Class<? extends TargetTween<?, ?>>) interruptingTween.getClass(),
+                            interruptingTween.target,
+                            startWorldSpeeds
+                    );
                 }
             }
         }
@@ -81,6 +86,26 @@ public class TweenRunner {
             tween.cancel();
         }
         return true;
+    }
+
+    /**
+     * Cancels TargetTweens of the given type for the given target. If interrupted tweens are members of a GroupTween,
+     * the GroupTween's {@link GroupTween#getChildInterruptionBehavior()} is respected.
+     * @param tweenType Type of TargetTween to interrupt.
+     * @param target Target object of TargetTweens to interrupt.
+     * @return True if any tweens were interrupted.
+     */
+    public boolean interruptTweens(Class<? extends TargetTween<?, ?>> tweenType, Object target) {
+        boolean interruption = false;
+        Tween<?>[] snapshotTweens = tweens.begin();
+        for (int i = 0, n = tweens.size; i < n; i++) {
+            Tween<?> t = snapshotTweens[i];
+            if (!t.isComplete() && !t.isCanceled()) {
+                interruption |= t.checkInterruption(tweenType, target, null);
+            }
+        }
+        tweens.end();
+        return interruption;
     }
 
     /**

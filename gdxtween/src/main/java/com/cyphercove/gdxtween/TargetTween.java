@@ -378,20 +378,20 @@ public abstract class TargetTween<T, TG> extends Tween<T> {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected boolean checkInterruption(TargetTween<?, ?> sourceTween, float[] requestedWorldSpeeds) {
+    protected boolean checkInterruption(Class<? extends TargetTween<?, ?>> tweenType, Object target, float[] requestedWorldSpeeds) {
         if (isComplete()) {
             throw new IllegalStateException("Interruption checked on a complete tween: " + this); // TODO remove check
         }
         if (isCanceled()) {
             return false;
         }
-        if (sourceTween.getClass() == getClass() && sourceTween.getTarget() == getTarget()) {
+        if (tweenType == getClass() && target == getTarget()) {
             cancel();
             if (requestedWorldSpeeds != null && isStarted()) {
                 getWorldSpeeds(requestedWorldSpeeds);
             }
             if (interruptionListener != null) {
-                interruptionListener.onTweenInterrupted((T) this, (T) sourceTween);
+                interruptionListener.onTweenInterrupted((T) this);
             }
             return true;
         }

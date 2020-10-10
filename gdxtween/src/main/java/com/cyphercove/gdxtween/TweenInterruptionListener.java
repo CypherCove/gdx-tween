@@ -26,5 +26,5 @@ public interface TweenInterruptionListener<T> {
      * @param interruptedTween The tween that was interrupted.
      * @param interruptionSource The tween that interrupted the other tween.
      */
-    void onTweenInterrupted (T interruptedTween, T interruptionSource);
+    void onTweenInterrupted (T interruptedTween);
 }

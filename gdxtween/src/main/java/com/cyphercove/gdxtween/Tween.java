@@ -215,21 +215,25 @@ public abstract class Tween<U> {
 
     /**
      * Add all interruption-eligible TargetTweens to the collection, including self if it is one.
+     *
      * @param collection The collection to add the TargetTween(s) to.
      */
     protected abstract void collectInterrupters(Array<? super TargetTween<?, ?>> collection);
 
     /**
-     * Called when starting a {@link TargetTween} to check whether this tween should be interrupted. It should call
-     * {@link #cancel()} and return true if it is interrupted.
+     * Called to find and cancel TargetTweens of a certain type and target object. If the source of cancellation is a
+     * {@link TargetTween} that is able to use the start speeds of the interrupted tween, then world speeds should also
+     * be filled into the provided array. If this tween is a match for cancellation, {@link #cancel()} should be called
+     * and true returned.
      *
-     * @param sourceTween    The tween that that is being started.
+     * @param tweenType            The type of TargetTween that that should be interrupted
+     * @param target               The target object that if matched should result in this tween being cancelled.
      * @param requestedWorldSpeeds If not null and the source target is currently being manipulated by this tween and is being
      *                             interpolated by a TargetingTween of the same type, then the current speed should be filled
      *                             into the array. Otherwise, the array should not be modified.
      * @return True if this tween was interrupted.
      */
-    protected abstract boolean checkInterruption(TargetTween<?, ?> sourceTween, float[] requestedWorldSpeeds);
+    protected abstract boolean checkInterruption(Class<? extends TargetTween<?, ?>> tweenType, Object target, float[] requestedWorldSpeeds);
 
     /**
      * Returns this Tween to its pool when it is no longer used to avoid releasing it to the garbage collector. This is
@@ -250,7 +254,7 @@ public abstract class Tween<U> {
         parent = null;
     }
 
-    protected void logMutationAfterAttachment() {
+    protected final void logMutationAfterAttachment() {
         Gdx.app.error("gdx-tween", "Warning: Tweens must not be modified after attachment to a GroupTween" +
                 "or the TweenRunner, and this call will be ignored. Tween: " + getName());
     }
@@ -258,12 +262,13 @@ public abstract class Tween<U> {
     /**
      * Returns a SequenceTween that contains this tween at the end. If this tween is already a child of a SequenceTween,
      * then that parent is returned. Otherwise, a new SequenceTween is obtained and this tween is added to it.
+     *
      * @return A SequenceTween containing this tween at the end.
      */
-    public SequenceTween then(){
+    public SequenceTween then() {
         Tween<?> parent = getParent();
         if (parent instanceof SequenceTween)
-            return (SequenceTween)parent;
+            return (SequenceTween) parent;
         return Tweens.inSequence().run(this);
     }
 
