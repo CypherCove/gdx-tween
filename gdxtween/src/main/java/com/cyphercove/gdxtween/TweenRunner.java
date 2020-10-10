@@ -58,7 +58,10 @@ public class TweenRunner {
         for (TargetTween<?, ?> interruptingTween: interrupterTweens) {
             float[] startWorldSpeeds = interruptingTween.prepareToInterrupt();
             for (int i = 0; i < snapshotTweensCount; i++) {
-                snapshotTweens[i].checkInterruption(interruptingTween, startWorldSpeeds);
+                Tween<?> t = snapshotTweens[i];
+                if (!t.isComplete() && !t.isCanceled()) {
+                    t.checkInterruption(interruptingTween, startWorldSpeeds);
+                }
             }
         }
         tweens.end();
