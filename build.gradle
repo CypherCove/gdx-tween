@@ -28,12 +28,8 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "java"
 
-    group = 'com.cyphercove.gdxtween'
-    version = '0.1.5'
-
-    ext {
-        gdxVersion = '1.9.11'
-    }
+    group = libraryGroup
+    version = libraryVersion
 
     repositories {
         mavenLocal()
@@ -64,9 +60,9 @@ configure(project.librarySubProjects) {
     publishing {
         publications {
             "$projectId"(MavenPublication) {
-                groupId = project.group
+                groupId = libraryGroup
                 artifactId = projectId
-                version = project.version
+                version = libraryVersion
                 from components.java
                 artifact sourcesJar
                 artifact javadocJar
@@ -102,7 +98,7 @@ configure(project.librarySubProjects) {
             name = uploadArtifact
             userOrg = 'cyphercove'
             version {
-                name = version
+                name = libraryVersion
                 released  = new Date()
             }
             licenses = ['Apache-2.0']
