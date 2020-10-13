@@ -93,9 +93,10 @@ public class TweenRunner {
      * the GroupTween's {@link GroupTween#getChildInterruptionBehavior()} is respected.
      * @param tweenType Type of TargetTween to interrupt.
      * @param target Target object of TargetTweens to interrupt.
+     * @param <T> The type of the target object.
      * @return True if any tweens were interrupted.
      */
-    public boolean interruptTweens(Class<? extends TargetTween<?, ?>> tweenType, Object target) {
+    public <T> boolean interruptTweens(Class<? extends TargetTween<?, T>> tweenType, T target) {
         boolean interruption = false;
         Tween<?>[] snapshotTweens = tweens.begin();
         for (int i = 0, n = tweens.size; i < n; i++) {

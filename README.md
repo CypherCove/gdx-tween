@@ -26,7 +26,9 @@ If using Kotlin, use gdx-tween-kt instead:
     
 To use with GWT, add this to the `.gwt.xml` file:
 
-    <inherits name="com.cyphercove.gdxtween"+/>
+    <inherits name="com.cyphercove.gdxtween"/>
+    
+[![LibGDX](https://img.shields.io/badge/libgdx-1.9.11-red.svg)](http://www.libgdx.com/)
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and libGDX version increases.
 

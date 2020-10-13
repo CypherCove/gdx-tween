@@ -24,7 +24,6 @@ public interface TweenInterruptionListener<T> {
     /** Called when the associated tween is interrupted by a tween with the same target, or one of its children was
      * interrupted. The associated tween will not be completed.
      * @param interruptedTween The tween that was interrupted.
-     * @param interruptionSource The tween that interrupted the other tween.
      */
     void onTweenInterrupted (T interruptedTween);
 }
