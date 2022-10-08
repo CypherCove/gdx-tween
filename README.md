@@ -14,21 +14,21 @@ The main goals of this library:
  * Usable in Scene2D so the second order interrupting behavior can be used in Actions.
 
 ## Installation
-Currently, the library is not stable. The API is rapidly evolving with breaking changes and no change log. Use at your own risk.
+The library is not yetstable. The API is rapidly evolving with breaking changes. The GtColor class is stable.
 
-gdx-tween is available on JCenter:
+gdx-tween is available via [JitPack](https://jitpack.io/#CypherCove/gdxtween):
 
-    implementation "com.cyphercove.gdxtween:gdxtween:0.1.4"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.5"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.4"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.5"
     
 To use with GWT, add this to the `.gwt.xml` file:
 
     <inherits name="com.cyphercove.gdxtween"/>
     
-[![LibGDX](https://img.shields.io/badge/libgdx-1.9.11-red.svg)](http://www.libgdx.com/)
+[![LibGDX](https://img.shields.io/badge/libgdx-1.11.0-red.svg)](http://www.libgdx.com/)
 
 See [CHANGES.md](CHANGES.md) for the change log, which lists breaking changes and libGDX version increases.
 

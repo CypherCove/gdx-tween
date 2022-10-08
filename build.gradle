@@ -1,21 +1,7 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        jcenter()
-    }
-    dependencies {
-
-    }
-}
-
 plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
-    id "com.jfrog.bintray" version "1.8.5"
 }
 
 project.ext {
@@ -34,7 +20,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        jcenter()
+        maven { url = "https://jitpack.io" }
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
     }
@@ -88,23 +74,6 @@ configure(project.librarySubProjects) {
                 }
             }
         }
-    }
-
-    bintray {
-        user = System.getenv('BINTRAY_USER')
-        key = System.getenv('BINTRAY_KEY')
-        pkg {
-            repo = 'maven'
-            name = uploadArtifact
-            userOrg = 'cyphercove'
-            version {
-                name = libraryVersion
-                released  = new Date()
-            }
-            licenses = ['Apache-2.0']
-            vcsUrl = 'https://github.com/cyphercove/gdx-tween/'
-        }
-        publications = [uploadArtifact]
     }
 
     javadoc {
