@@ -16,16 +16,16 @@ The main goals of this library:
 ## Installation
 The library is not yet stable. The API is rapidly evolving with breaking changes. The GtColor class is stable.
 
-[![JitPack](https://jitpack.io/v/CypherCove/gdx-tween.svg)](https://jitpack.io/#cyphercove/gdx-tween)
-[![libGDX](https://img.shields.io/badge/libgdx-1.11.0-red.svg)](http://www.libgdx.com/)
+![Maven Central](https://img.shields.io/maven-central/v/com.cyphercove.gdxtween/gdxtween?color=6d7ac5)
+![libGDX](https://img.shields.io/badge/libgdx-1.12.0-e74a45?link=http%3A%2F%2Fwww.libgdx.com%2F)
 
-gdx-tween is available via [JitPack](https://jitpack.io/#CypherCove/gdx-tween):
+gdx-tween is available via Maven Central:
 
-    implementation "com.github.cyphercove.gdx-tween:gdxtween:0.1.5"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.6"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.github.cyphercove.gdx-tween:gdxtween-kt:0.1.5"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.6"
     
 To use with GWT, add this to the `.gwt.xml` file:
 
