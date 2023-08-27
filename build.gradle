@@ -31,6 +31,19 @@ subprojects {
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = System.getenv("SONATYPE_USERNAME")
+                password = System.getenv("SONATYPE_PASSWORD")
+            }
+        }
+    }
+}
+
 configure(project.librarySubProjects) {
     apply plugin: "java-library"
 
@@ -79,17 +92,6 @@ configure(project.librarySubProjects) {
                         developerConnection = 'scm:git:git@cyphercove/gdx-tween.git'
                         url = 'https://github.com/cyphercove/gdx-tween/'
                     }
-                }
-            }
-        }
-
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                credentials {
-                    username = System.getenv("SONATYPE_USERNAME")
-                    password = System.getenv("SONATYPE_PASSWORD")
                 }
             }
         }

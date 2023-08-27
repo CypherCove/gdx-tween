@@ -1,11 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.8.20'
-    id 'java-library'
 }
 
 compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_1_8
     }
 }
 

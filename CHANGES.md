@@ -1,3 +1,6 @@
+# 0.1.7
+* Attempt to fix -kt compatibility with Java compile version.
+
 # 0.1.6
 * Update -kt version's Kotlin version to 1.8.20
 * Update libGDX version to 1.12.0

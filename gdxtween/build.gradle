@@ -1,9 +1,5 @@
-
-
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
-
-//[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.12'
