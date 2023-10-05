@@ -1,5 +1,5 @@
 # gdx-tween
-gdx-tween is a library for [libGDX](https://github.com/libgdx/libgdx) used for inbetweening (or tweening) values, 
+gdx-tween is a library for [libGDX](https://github.com/libgdx/libgdx) used for in-betweening (or tweening) values, 
 interpolating them over time.
 
 # Introduction
@@ -16,16 +16,18 @@ The main goals of this library:
 ## Installation
 The library is not yet stable. The API is rapidly evolving with breaking changes. The GtColor class is stable.
 
-![Maven Central](https://img.shields.io/maven-central/v/com.cyphercove.gdxtween/gdxtween?color=6d7ac5)
-![libGDX](https://img.shields.io/badge/libgdx-1.12.0-e74a45?link=http%3A%2F%2Fwww.libgdx.com%2F)
+<a href="https://central.sonatype.com/artifact/com.cyphercove.gdxtween/gdxtween" alt="Maven Central">
+    <img src="https://img.shields.io/maven-central/v/com.cyphercove.gdxtween/gdxtween?color=6d7ac5" /></a>
+<a href="https://www.libgdx.com" alt="libGDX">
+    <img src="https://img.shields.io/badge/libgdx-1.12.0-e74a45" /></a>
 
 gdx-tween is available via Maven Central:
 
-    implementation "com.cyphercove.gdxtween:gdxtween:0.1.6"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.7"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.6"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.7"
     
 To use with GWT, add this to the `.gwt.xml` file:
 
