@@ -47,14 +47,9 @@ publishing {
 configure(project.librarySubProjects) {
     apply plugin: "java-library"
 
-    task sourcesJar(type: Jar) {
-        from sourceSets.main.allSource
-        archiveClassifier = 'sources'
-    }
-
-    task javadocJar(type: Jar) {
-        from javadoc
-        archiveClassifier = 'javadoc'
+    java {
+        withJavadocJar()
+        withSourcesJar()
     }
 
     publishing {
@@ -64,8 +59,6 @@ configure(project.librarySubProjects) {
                 artifactId = projectId
                 version = libraryVersion
                 from components.java
-                artifact sourcesJar
-                artifact javadocJar
                 pom {
                     name = projectId
                     description = projectDescription

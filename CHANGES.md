@@ -1,3 +1,7 @@
+# 0.1.8
+* Java compile version for Kotlin module fixed so it uses Java 1.8.
+* Update -kt version's Kotlin version to 1.9.10
+
 # 0.1.7
 * Attempt to fix -kt compatibility with Java compile version.
 

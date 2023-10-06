@@ -23,11 +23,11 @@ The library is not yet stable. The API is rapidly evolving with breaking changes
 
 gdx-tween is available via Maven Central:
 
-    implementation "com.cyphercove.gdxtween:gdxtween:0.1.7"
+    implementation "com.cyphercove.gdxtween:gdxtween:0.1.8"
     
 If using Kotlin, use gdx-tween-kt instead:
 
-    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.7"
+    implementation "com.cyphercove.gdxtween:gdxtween-kt:0.1.8"
     
 To use with GWT, add this to the `.gwt.xml` file:
 
